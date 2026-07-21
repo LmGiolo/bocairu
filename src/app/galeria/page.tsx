@@ -22,7 +22,14 @@ export default async function Galeria() {
       ) : (
         <ul>
           {obras.map((obra) => (
-            <li key={obra.id}>
+            <li key={obra.id} style={{ marginBottom: 24 }}>
+              {obra.imagem_web && (
+                <img
+                  src={obra.imagem_web}
+                  alt={obra.titulo}
+                  style={{ width: 300, height: 'auto', display: 'block' }}
+                />
+              )}
               <strong>{obra.titulo}</strong> — {obra.ano}
               <br />
               {obra.descricao}
