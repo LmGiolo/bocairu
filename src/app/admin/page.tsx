@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import UploadTeste from '@/components/admin/UploadTeste'
+import FormularioObra from '@/components/admin/FormularioObra'
 
 export default async function Admin() {
   const supabase = await createClient()
@@ -30,8 +30,7 @@ export default async function Admin() {
     <main style={{ padding: 40, fontFamily: 'sans-serif' }}>
       <h1>Painel da Artista</h1>
       <p>Você está logada como admin. 🎉</p>
-      <p>Aqui vamos colocar o cadastro de obras.</p>
-      <UploadTeste />
+      <FormularioObra />
     </main>
   )
 }
