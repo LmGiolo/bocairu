@@ -93,7 +93,7 @@ uma galeria física"*. Catálogo curado, não vasto. Cada obra tratada como peç
 
 ## 3. Especificação das telas
 
-### Página da Obra (prioridade atual)
+### Página da Obra (construída — ver §7)
 
 - **Split-screen:** imagem dominante à esquerda, informação à direita.
   A obra **nunca** some abaixo da dobra.
@@ -105,7 +105,7 @@ uma galeria física"*. Catálogo curado, não vasto. Cada obra tratada como peç
 - Obras relacionadas da mesma série, 3–4 cards, no rodapé.
 - **Sem parcelamento agressivo.**
 
-### Galeria
+### Galeria (construída — ver §7; filtros de fato implementados estão em §8, divergem do que está logo abaixo)
 
 - Cabeçalho de contexto: título da série ativa ou "Todas as obras" + contagem.
 - Barra de filtros horizontal: série, técnica, disponibilidade, orientação,
@@ -116,7 +116,7 @@ uma galeria física"*. Catálogo curado, não vasto. Cada obra tratada como peç
   Hover revela zoom sutil, **sem "adicionar ao carrinho" precipitado**.
 - Carregamento incremental com skeleton, sem paginação numerada.
 
-### Home
+### Home (prioridade atual)
 
 - Hero editorial: uma obra em tela cheia + nome da artista + frase de
   posicionamento. **Sem carrossel de banners** — uma única imagem forte.
