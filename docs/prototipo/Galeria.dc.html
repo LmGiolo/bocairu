@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="./image-slot.js"></script>
+  <style>
+    body { margin: 0; background: #F5F1EA; }
+    ::selection { background: #A9814A; color: #F5F1EA; }
+    a { color: #7A2E32; }
+    a:hover { color: #5C1F24; }
+    input:focus { outline: none; }
+    @keyframes dropIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</helmet>
+
+<div style="font-family: 'Work Sans', sans-serif; color: #1B1814; background: #F5F1EA;" data-screen-label="Galeria">
+
+  <!-- ============ HEADER ============ -->
+  <header style="position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(245,241,234,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #DCD4C4;">
+    <a href="Home.dc.html" style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; letter-spacing: 0.04em; color: #1B1814; text-decoration: none;">BOCAIRÚ</a>
+    <div style="display: flex; align-items: center; gap: 40px;">
+    <nav aria-label="Navegação principal" style="display: flex; gap: 40px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">
+      <a href="Home.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Home</a>
+      <a href="#" style="color: #7A2E32; text-decoration: none; border-bottom: 1px solid #7A2E32; padding-bottom: 4px;">Galeria</a>
+      <a href="Colecoes.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Coleções</a>
+      <a href="A Artista.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">A Artista</a>
+      <a href="Encomendas e Consultoria.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Encomendas</a>
+    </nav>
+    <a href="{{ accountHref }}" aria-label="Minha conta" title="Minha conta" style="color: #1B1814; opacity: 0.85; transition: opacity 250ms ease; display: flex; align-items: center;" style-hover="opacity:1;">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5"></path></svg>
+    </a>
+  </div>
+  </header>
+
+  <!-- ============ PAGE HEADER ============ -->
+  <section style="max-width: 1440px; margin: 0 auto; padding: 88px 96px 48px;">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 18px;">{{ overlineLabel }}</div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap;">
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 54px; margin: 0; max-width: 640px;">{{ pageTitle }}</h1>
+      <p style="font-size: 15px; color: #6B6459; max-width: 360px; margin: 0;">Fotografia fine art e edições limitadas, impressas sob encomenda em papel algodão, fotografia fine art ou metacrílico.</p>
+    </div>
+  </section>
+
+  <!-- ============ FILTER BAR ============ -->
+  <section style="position: sticky; top: 65px; z-index: 40; background: #F5F1EA; border-bottom: 1px solid #DCD4C4;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: 0 96px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 0; gap: 24px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <button onClick="{{ clearAllFilters }}" style="display: flex; align-items: center; gap: 7px; background: transparent; color: {{ limparColor }}; border: 1px solid {{ limparBorder }}; border-radius: 999px; padding: 9px 18px; font-size: 13px; cursor: {{ limparCursor }}; transition: color 220ms ease, border-color 220ms ease;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="{{ limparColor }}" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            Limpar filtros
+          </button>
+
+          <div style="position: relative;">
+            <button onClick="{{ toggleColecaoMenu }}" style="background: {{ serieBg }}; color: {{ serieColor }}; border: 1px solid {{ serieBorder }}; border-radius: 999px; padding: 9px 18px; font-size: 13px; cursor: pointer; transition: border-color 220ms ease, background 220ms ease;">{{ serieButtonLabel }}</button>
+            <sc-if value="{{ colecaoMenuOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position: absolute; top: calc(100% + 8px); left: 0; background: #fff; border: 1px solid #DCD4C4; box-shadow: 0 16px 40px rgba(27,24,20,0.1); border-radius: 4px; padding: 8px; z-index: 60; min-width: 210px; animation: dropIn 180ms cubic-bezier(0.16,1,0.3,1) both;">
+                <sc-for list="{{ colecaoOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onSelect }}" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 13.5px; border-radius: 3px; cursor: pointer; color: {{ opt.color }}; transition: background 150ms ease;" style-hover="background:#F5F1EA;">
+                    <span style="width: 16px; height: 16px; flex-shrink: 0; border-radius: 4px; border: 1px solid {{ opt.checkBorder }}; background: {{ opt.checkBg }}; display: flex; align-items: center; justify-content: center;">
+                      <sc-if value="{{ opt.checked }}" hint-placeholder-val="{{ false }}">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5F1EA" stroke-width="3"><path d="M5 13l4 4L19 7"></path></svg>
+                      </sc-if>
+                    </span>
+                    {{ opt.label }}
+                  </div>
+                </sc-for>
+                <sc-if value="{{ colecaoHasSelection }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ clearColecao }}" style="padding: 10px 14px; font-size: 12px; color: #9C9280; cursor: pointer; border-top: 1px solid #EDE7D9; margin-top: 4px;" style-hover="color:#1B1814;">Limpar coleção</div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="position: relative;">
+            <button onClick="{{ toggleTamanhoMenu }}" style="background: {{ tamanhoBg }}; color: {{ tamanhoColor }}; border: 1px solid {{ tamanhoBorder }}; border-radius: 999px; padding: 9px 18px; font-size: 13px; cursor: pointer; transition: border-color 220ms ease, background 220ms ease;">{{ tamanhoButtonLabel }}</button>
+            <sc-if value="{{ tamanhoMenuOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position: absolute; top: calc(100% + 8px); left: 0; background: #fff; border: 1px solid #DCD4C4; box-shadow: 0 16px 40px rgba(27,24,20,0.1); border-radius: 4px; padding: 8px; z-index: 60; min-width: 190px; animation: dropIn 180ms cubic-bezier(0.16,1,0.3,1) both;">
+                <sc-for list="{{ tamanhoOptions }}" as="opt" hint-placeholder-count="3">
+                  <div onClick="{{ opt.onSelect }}" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 13.5px; border-radius: 3px; cursor: pointer; color: {{ opt.color }}; transition: background 150ms ease;" style-hover="background:#F5F1EA;">
+                    <span style="width: 16px; height: 16px; flex-shrink: 0; border-radius: 4px; border: 1px solid {{ opt.checkBorder }}; background: {{ opt.checkBg }}; display: flex; align-items: center; justify-content: center;">
+                      <sc-if value="{{ opt.checked }}" hint-placeholder-val="{{ false }}">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5F1EA" stroke-width="3"><path d="M5 13l4 4L19 7"></path></svg>
+                      </sc-if>
+                    </span>
+                    {{ opt.label }}
+                  </div>
+                </sc-for>
+                <sc-if value="{{ tamanhoHasSelection }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ clearTamanho }}" style="padding: 10px 14px; font-size: 12px; color: #9C9280; cursor: pointer; border-top: 1px solid #EDE7D9; margin-top: 4px;" style-hover="color:#1B1814;">Limpar tamanho</div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="position: relative;">
+            <button onClick="{{ toggleOrientacaoMenu }}" style="background: {{ orientBg }}; color: {{ orientColor }}; border: 1px solid {{ orientBorder }}; border-radius: 999px; padding: 9px 18px; font-size: 13px; cursor: pointer; transition: border-color 220ms ease, background 220ms ease;">{{ orientButtonLabel }}</button>
+            <sc-if value="{{ orientMenuOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position: absolute; top: calc(100% + 8px); left: 0; background: #fff; border: 1px solid #DCD4C4; box-shadow: 0 16px 40px rgba(27,24,20,0.1); border-radius: 4px; padding: 8px; z-index: 60; min-width: 190px; animation: dropIn 180ms cubic-bezier(0.16,1,0.3,1) both;">
+                <sc-for list="{{ orientOptions }}" as="opt" hint-placeholder-count="3">
+                  <div onClick="{{ opt.onSelect }}" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 13.5px; border-radius: 3px; cursor: pointer; color: {{ opt.color }}; transition: background 150ms ease;" style-hover="background:#F5F1EA;">
+                    <span style="width: 16px; height: 16px; flex-shrink: 0; border-radius: 4px; border: 1px solid {{ opt.checkBorder }}; background: {{ opt.checkBg }}; display: flex; align-items: center; justify-content: center;">
+                      <sc-if value="{{ opt.checked }}" hint-placeholder-val="{{ false }}">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5F1EA" stroke-width="3"><path d="M5 13l4 4L19 7"></path></svg>
+                      </sc-if>
+                    </span>
+                    {{ opt.label }}
+                  </div>
+                </sc-for>
+                <sc-if value="{{ orientHasSelection }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ clearOrient }}" style="padding: 10px 14px; font-size: 12px; color: #9C9280; cursor: pointer; border-top: 1px solid #EDE7D9; margin-top: 4px;" style-hover="color:#1B1814;">Limpar orientação</div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="position: relative;">
+            <button onClick="{{ togglePrecoMenu }}" style="background: {{ precoBg }}; color: {{ precoColor }}; border: 1px solid {{ precoBorder }}; border-radius: 999px; padding: 9px 18px; font-size: 13px; cursor: pointer; transition: border-color 220ms ease, background 220ms ease;">{{ precoButtonLabel }}</button>
+            <sc-if value="{{ precoMenuOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position: absolute; top: calc(100% + 8px); left: 0; background: #fff; border: 1px solid #DCD4C4; box-shadow: 0 16px 40px rgba(27,24,20,0.1); border-radius: 4px; padding: 18px; z-index: 60; min-width: 260px; animation: dropIn 180ms cubic-bezier(0.16,1,0.3,1) both;">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #6B6459; margin-bottom: 12px;"><span>R$ {{ precoMinLabel }}</span><span>R$ {{ precoMaxLabel }}</span></div>
+                <input type="range" min="0" max="8000" step="200" value="{{ precoMax }}" onChange="{{ onPrecoChange }}" style="width: 100%; accent-color: #1B1814;" />
+                <div style="font-size: 11px; color: #9C9280; margin-top: 10px;">Mostrando obras até R$ {{ precoMaxLabel }}</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <div style="position: relative;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9C9280" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+            <input type="text" value="{{ searchQuery }}" onChange="{{ onSearchChange }}" placeholder="Buscar por título…" style="width: 200px; box-sizing: border-box; border: 1px solid #DCD4C4; border-radius: 999px; background: #fff; padding: 9px 16px 9px 34px; font-family: 'Work Sans', sans-serif; font-size: 13px; transition: width 250ms ease, border-color 250ms ease;" style-focus="width:240px;border-color:#1B1814;" />
+          </div>
+          <div style="font-size: 13px; color: #6B6459; white-space: nowrap;">Ordenar por: <span style="color: #1B1814; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;">Mais recentes</span></div>
+        </div>
+      </div>
+
+      <sc-if value="{{ hasAnyFilter }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 16px; flex-wrap: wrap;">
+          <span style="font-size: 12px; color: #9C9280;">{{ resultsSummary }}</span>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+
+  <!-- ============ GRID ============ -->
+  <section style="max-width: 1440px; margin: 0 auto; padding: 56px 96px 40px;">
+
+    <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 32px;">
+        <sc-for list="{{ visibleCards }}" as="card" hint-placeholder-count="9">
+          <div style="grid-row: {{ card.rowSpan }}; animation: riseIn 500ms cubic-bezier(0.16,1,0.3,1) both;">
+            <a href="Pagina da Obra.dc.html" style="display: block; overflow: hidden; border: 1px solid #DCD4C4; text-decoration: none; opacity: {{ card.imgOpacity }};">
+              <image-slot id="{{ card.imgId }}" shape="rect" placeholder="{{ card.placeholder }}" style="width: 100%; aspect-ratio: {{ card.ratio }}; display: block; transition: transform 650ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.045);"></image-slot>
+            </a>
+            <div style="padding-top: 16px;">
+              <a href="Pagina da Obra.dc.html" style="font-size: 15px; font-weight: 500; color: #1B1814; text-decoration: none;" style-hover="text-decoration:underline;">{{ card.title }}</a><div style="font-size: 12px; color: #6B6459; margin-top: 2px;">{{ card.subtitle }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; justify-content: center; margin-top: 72px;">
+        <button style="background: transparent; color: #1B1814; border: 1px solid #1B1814; padding: 15px 42px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 250ms ease, color 250ms ease, transform 150ms ease;" style-hover="background:#1B1814;color:#F5F1EA;" style-active="transform:scale(0.98);">Carregar mais obras</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasNoResults }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align: center; padding: 100px 24px;">
+        <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 28px; margin-bottom: 16px;">Nenhuma obra encontrada.</div>
+        <p style="font-size: 15px; color: #6B6459; margin: 0 0 28px;">Tente ajustar os filtros selecionados.</p>
+        <button onClick="{{ clearAllFilters }}" style="background: transparent; color: #1B1814; border: 1px solid #1B1814; padding: 13px 28px; font-size: 13px; border-radius: 2px; cursor: pointer;">Limpar filtros</button>
+      </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="background: #1B1814; color: #B8AF9E; padding: 72px 96px 40px; margin-top: 40px;">
+    <div style="max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px; padding-bottom: 40px;">
+      <div>
+        <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; color: #F5F1EA; margin-bottom: 12px;">BOCAIRÚ</div>
+        <p style="font-size: 14px; max-width: 320px; margin: 0;">Fotografia fine art e obras exclusivas, produzidas em processos de padrão museológico.</p>
+      </div>
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B6459; margin-bottom: 16px;">Navegação</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+          <a href="Home.dc.html" style="color: #B8AF9E; text-decoration: none;">Home</a>
+          <a href="Colecoes.dc.html" style="color: #B8AF9E; text-decoration: none;">Coleções</a>
+          <a href="A Artista.dc.html" style="color: #B8AF9E; text-decoration: none;">A Artista</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B6459; margin-bottom: 16px;">Contato</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+          <a href="#" style="color: #B8AF9E; text-decoration: none;">contato@bocairu.com</a>
+          <a href="#" style="color: #B8AF9E; text-decoration: none;">@bocairu</a>
+          <a href="Encomendas e Consultoria.dc.html" style="color: #B8AF9E; text-decoration: none;">Encomendas &amp; Consultoria</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width: 1440px; margin: 0 auto; border-top: 1px solid rgba(245,241,234,0.12); padding-top: 24px; font-size: 12px; color: #6B6459;">© 2026 Bocairú. Todos os direitos reservados.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  static SERIE_LABELS = {
+    retratos: 'Retratos',
+    'paisagens-urbanas': 'Paisagens Urbanas',
+    'preto-e-branco': 'Preto & Branco',
+    natureza: 'Natureza'
+  };
+
+  static TAMANHO_LABELS = { '30x40': '30 × 40 cm', '50x70': '50 × 70 cm', '70x100': '70 × 100 cm' };
+  static ORIENT_LABELS = { vertical: 'Vertical', horizontal: 'Horizontal', quadrada: 'Quadrada' };
+
+  static CARDS = [
+    { id: 'g-1', title: 'Retrato ao Meio-dia', subtitle: 'Papel algodão · 2025', serie: 'retratos', orientacao: 'vertical', tamanhos: ['30x40', '50x70'], preco: 2400, ratio: '3/4', rowSpan: 'span 2', placeholder: 'Obra — retrato' },
+    { id: 'g-2', title: 'Jardim Interno', subtitle: 'Papel algodão · 2025', serie: 'natureza', orientacao: 'quadrada', tamanhos: ['50x70', '70x100'], preco: 5200, ratio: '1/1', rowSpan: 'span 1', placeholder: 'Obra — quadrada' },
+    { id: 'g-3', title: 'Chão de Sal', subtitle: 'Metacrílico · 2024', serie: 'paisagens-urbanas', orientacao: 'vertical', tamanhos: ['30x40', '50x70', '70x100'], preco: 5600, ratio: '3/4', rowSpan: 'span 2', placeholder: 'Obra — retrato' },
+    { id: 'g-4', title: 'Silêncio Azul', subtitle: 'Fotografia fine art', serie: 'preto-e-branco', orientacao: 'horizontal', tamanhos: ['50x70'], preco: 3600, ratio: '4/3', rowSpan: 'span 1', placeholder: 'Obra — paisagem' },
+    { id: 'g-5', title: 'Entre Redes', subtitle: 'Papel algodão · 2023', serie: 'retratos', orientacao: 'quadrada', tamanhos: ['30x40', '50x70'], preco: 2800, ratio: '1/1', rowSpan: 'span 1', placeholder: 'Obra — quadrada' },
+    { id: 'g-6', title: 'Maré Baixa', subtitle: 'Fotografia fine art · 2025', serie: 'paisagens-urbanas', orientacao: 'horizontal', tamanhos: ['50x70', '70x100'], preco: 4400, ratio: '4/3', rowSpan: 'span 1', placeholder: 'Obra — paisagem' },
+    { id: 'g-7', title: 'Véspera', subtitle: 'Papel algodão · 2024', serie: 'retratos', orientacao: 'vertical', tamanhos: ['50x70', '70x100'], preco: 6800, ratio: '3/4', rowSpan: 'span 2', placeholder: 'Obra — retrato' },
+    { id: 'g-8', title: 'Sombra Longa', subtitle: 'Papel algodão · 2024', serie: 'preto-e-branco', orientacao: 'quadrada', tamanhos: ['30x40'], preco: 1900, ratio: '1/1', rowSpan: 'span 1', placeholder: 'Obra — quadrada' },
+    { id: 'g-9', title: 'Terreiro', subtitle: 'Fotografia fine art · 2022', serie: 'natureza', orientacao: 'horizontal', tamanhos: ['30x40', '50x70'], preco: 3200, ratio: '4/3', rowSpan: 'span 1', placeholder: 'Obra — paisagem' }
+  ];
+
+  state = {
+    serie: (() => { const v = new URLSearchParams(window.location.search).get('serie'); return v ? [v] : []; })(),
+    tamanho: [],
+    orientacao: [],
+    precoMax: 8000,
+    search: '',
+    openMenu: null,
+    isLoggedIn: false
+  };
+
+  componentDidMount() {
+    this.setState({ isLoggedIn: window.localStorage.getItem('bocairu_auth') === '1' });
+  }
+
+  toggleMenu(name) {
+    this.setState((s) => ({ openMenu: s.openMenu === name ? null : name }));
+  }
+
+  toggleValue(key, value) {
+    this.setState((s) => {
+      const arr = s[key];
+      const next = arr.includes(value) ? arr.filter((v) => v !== value) : arr.concat(value);
+      return { [key]: next };
+    });
+  }
+
+  buildMultiMenu(labelsMap, selectedArr, key) {
+    return Object.keys(labelsMap).map((k) => {
+      const checked = selectedArr.includes(k);
+      return {
+        label: labelsMap[k],
+        checked,
+        color: checked ? '#1B1814' : '#3A342C',
+        checkBg: checked ? '#1B1814' : 'transparent',
+        checkBorder: checked ? '#1B1814' : '#DCD4C4',
+        onSelect: () => this.toggleValue(key, k)
+      };
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const labels = Component.SERIE_LABELS;
+
+    const cards = Component.CARDS.map((c) => {
+      let visible = true;
+      if (s.serie.length && !s.serie.includes(c.serie)) visible = false;
+      if (s.tamanho.length && !c.tamanhos.some((t) => s.tamanho.includes(t))) visible = false;
+      if (s.orientacao.length && !s.orientacao.includes(c.orientacao)) visible = false;
+      if (c.preco > s.precoMax) visible = false;
+      if (s.search && !c.title.toLowerCase().includes(s.search.toLowerCase())) visible = false;
+
+      return {
+        ...c,
+        imgId: c.id,
+        imgOpacity: 1,
+        visible
+      };
+    });
+
+    const visibleCards = cards.filter((c) => c.visible);
+    const hasSingleSerie = s.serie.length === 1;
+    const hasAnyFilter = !!(s.serie.length || s.tamanho.length || s.orientacao.length || s.search || s.precoMax < 8000);
+
+    const labelFor = (arr, map, singular) => {
+      if (arr.length === 0) return singular + ' ▾';
+      if (arr.length === 1) return map[arr[0]];
+      return singular + ' · ' + arr.length;
+    };
+
+    return {
+      accountHref: s.isLoggedIn ? 'Minha Conta.dc.html' : 'Autenticacao.dc.html?redirect=account',
+      visibleCards,
+      hasResults: visibleCards.length > 0,
+      hasNoResults: visibleCards.length === 0,
+      hasAnyFilter,
+      resultsSummary: visibleCards.length + ' obra' + (visibleCards.length === 1 ? '' : 's') + ' encontrada' + (visibleCards.length === 1 ? '' : 's'),
+
+      overlineLabel: hasSingleSerie ? (visibleCards.length + ' obra' + (visibleCards.length === 1 ? '' : 's') + ' nesta coleção') : '42 obras',
+      pageTitle: hasSingleSerie ? labels[s.serie[0]] + '.' : 'Galeria completa.',
+
+      clearAllFilters: () => {
+        this.setState({ serie: [], tamanho: [], orientacao: [], precoMax: 8000, search: '', openMenu: null });
+        const url = new URL(window.location.href);
+        url.searchParams.delete('serie');
+        window.history.replaceState({}, '', url);
+      },
+
+      limparColor: hasAnyFilter ? '#1B1814' : '#B8AF9E',
+      limparBorder: hasAnyFilter ? '#1B1814' : '#DCD4C4',
+      limparCursor: hasAnyFilter ? 'pointer' : 'default',
+
+      toggleColecaoMenu: () => this.toggleMenu('colecao'),
+      colecaoMenuOpen: s.openMenu === 'colecao',
+      colecaoOptions: this.buildMultiMenu(labels, s.serie, 'serie'),
+      colecaoHasSelection: s.serie.length > 0,
+      clearColecao: () => this.setState({ serie: [] }),
+      serieButtonLabel: labelFor(s.serie, labels, 'Coleção'),
+      serieBg: s.serie.length ? '#1B1814' : 'transparent',
+      serieColor: s.serie.length ? '#F5F1EA' : '#1B1814',
+      serieBorder: s.serie.length ? '#1B1814' : '#DCD4C4',
+
+      toggleTamanhoMenu: () => this.toggleMenu('tamanho'),
+      tamanhoMenuOpen: s.openMenu === 'tamanho',
+      tamanhoOptions: this.buildMultiMenu(Component.TAMANHO_LABELS, s.tamanho, 'tamanho'),
+      tamanhoHasSelection: s.tamanho.length > 0,
+      clearTamanho: () => this.setState({ tamanho: [] }),
+      tamanhoButtonLabel: labelFor(s.tamanho, Component.TAMANHO_LABELS, 'Tamanho'),
+      tamanhoBg: s.tamanho.length ? '#1B1814' : 'transparent',
+      tamanhoColor: s.tamanho.length ? '#F5F1EA' : '#1B1814',
+      tamanhoBorder: s.tamanho.length ? '#1B1814' : '#DCD4C4',
+
+      toggleOrientacaoMenu: () => this.toggleMenu('orient'),
+      orientMenuOpen: s.openMenu === 'orient',
+      orientOptions: this.buildMultiMenu(Component.ORIENT_LABELS, s.orientacao, 'orientacao'),
+      orientHasSelection: s.orientacao.length > 0,
+      clearOrient: () => this.setState({ orientacao: [] }),
+      orientButtonLabel: labelFor(s.orientacao, Component.ORIENT_LABELS, 'Orientação'),
+      orientBg: s.orientacao.length ? '#1B1814' : 'transparent',
+      orientColor: s.orientacao.length ? '#F5F1EA' : '#1B1814',
+      orientBorder: s.orientacao.length ? '#1B1814' : '#DCD4C4',
+
+      togglePrecoMenu: () => this.toggleMenu('preco'),
+      precoMenuOpen: s.openMenu === 'preco',
+      precoButtonLabel: s.precoMax < 8000 ? ('Até R$ ' + s.precoMax.toLocaleString('pt-BR')) : 'Faixa de preço ▾',
+      precoBg: s.precoMax < 8000 ? '#1B1814' : 'transparent',
+      precoColor: s.precoMax < 8000 ? '#F5F1EA' : '#1B1814',
+      precoBorder: s.precoMax < 8000 ? '#1B1814' : '#DCD4C4',
+      precoMax: s.precoMax,
+      precoMinLabel: '0',
+      precoMaxLabel: s.precoMax.toLocaleString('pt-BR'),
+      onPrecoChange: (e) => this.setState({ precoMax: parseInt(e.target.value, 10) }),
+
+      searchQuery: s.search,
+      onSearchChange: (e) => this.setState({ search: e.target.value })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F5F1EA; }
+    ::selection { background: #A9814A; color: #F5F1EA; }
+  </style>
+  <script src="./image-slot.js"></script>
+</helmet>
+
+<div style="font-family: 'Work Sans', sans-serif; color: #1B1814; background: #F5F1EA; display: flex; min-height: 100vh;">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside style="width: 240px; flex: 0 0 240px; background: #1B1814; color: #B8AF9E; padding: 28px 20px; display: flex; flex-direction: column; gap: 40px; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; box-sizing: border-box;">
+    <a href="Home.dc.html" style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; color: #F5F1EA; padding: 0 8px; text-decoration: none; display: block;">BOCAIRÚ <span style="font-family:'Work Sans',sans-serif; font-style: normal; font-size: 11px; color: #6B6459; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-top: 4px;">Painel administrativo</span></a>
+    <nav aria-label="Navegação do painel" style="display: flex; flex-direction: column; gap: 4px; font-size: 14px;">
+      <a href="javascript:void(0)" onClick="{{ goDashboard }}" style="display:flex; align-items:center; gap:12px; color: {{ navColor.dashboard }}; background: {{ navBg.dashboard }}; text-decoration: none; padding: 11px 12px; border-radius: 4px; transition: background 200ms ease, color 200ms ease; cursor: pointer;" style-hover="background:rgba(245,241,234,0.06);color:#F5F1EA;">▤ Dashboard</a>
+      <a href="javascript:void(0)" onClick="{{ goObras }}" style="display:flex; align-items:center; gap:12px; color: {{ navColor.obras }}; background: {{ navBg.obras }}; text-decoration: none; padding: 11px 12px; border-radius: 4px; transition: background 200ms ease, color 200ms ease; cursor: pointer;" style-hover="background:rgba(245,241,234,0.06);color:#F5F1EA;">▦ Obras</a>
+      <a href="javascript:void(0)" onClick="{{ goPedidos }}" style="display:flex; align-items:center; gap:12px; color: {{ navColor.pedidos }}; background: {{ navBg.pedidos }}; text-decoration: none; padding: 11px 12px; border-radius: 4px; transition: background 200ms ease, color 200ms ease; cursor: pointer;" style-hover="background:rgba(245,241,234,0.06);color:#F5F1EA;">◱ Pedidos</a>
+      <a href="javascript:void(0)" onClick="{{ goClientes }}" style="display:flex; align-items:center; gap:12px; color: {{ navColor.clientes }}; background: {{ navBg.clientes }}; text-decoration: none; padding: 11px 12px; border-radius: 4px; transition: background 200ms ease, color 200ms ease; cursor: pointer;" style-hover="background:rgba(245,241,234,0.06);color:#F5F1EA;">◍ Clientes</a>
+      <a href="javascript:void(0)" onClick="{{ goSeries }}" style="display:flex; align-items:center; gap:12px; color: {{ navColor.series }}; background: {{ navBg.series }}; text-decoration: none; padding: 11px 12px; border-radius: 4px; transition: background 200ms ease, color 200ms ease; cursor: pointer;" style-hover="background:rgba(245,241,234,0.06);color:#F5F1EA;">◫ Séries</a>
+      <a href="javascript:void(0)" onClick="{{ goImagens }}" style="display:flex; align-items:center; gap:12px; color: {{ navColor.imagens }}; background: {{ navBg.imagens }}; text-decoration: none; padding: 11px 12px; border-radius: 4px; transition: background 200ms ease, color 200ms ease; cursor: pointer;" style-hover="background:rgba(245,241,234,0.06);color:#F5F1EA;">▣ Imagens do site</a>
+      <a href="javascript:void(0)" onClick="{{ goAnalytics }}" style="display:flex; align-items:center; gap:12px; color: {{ navColor.analytics }}; background: {{ navBg.analytics }}; text-decoration: none; padding: 11px 12px; border-radius: 4px; transition: background 200ms ease, color 200ms ease; cursor: pointer;" style-hover="background:rgba(245,241,234,0.06);color:#F5F1EA;">▲ Analytics</a>
+    </nav>
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; border-top: 1px solid rgba(245,241,234,0.12);">
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: #A9814A; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #1B1814; font-weight: 600;">B</div>
+      <div style="font-size: 13px; color: #F5F1EA;">Bocairú <div style="font-size: 11px; color: #6B6459;">Administradora</div></div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main style="flex: 1; margin-left: 240px; padding: 44px 56px; max-width: 1320px; box-sizing: border-box;">
+   <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 12px;">Visão geral</div>
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; margin: 0;">Dashboard</h1>
+      </div>
+      <button onClick="{{ openNewModal }}" style="background: #1B1814; color: #F5F1EA; border: none; padding: 13px 26px; font-size: 13px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 200ms ease;" style-hover="background:#2C2721;">+ Nova obra</button>
+    </div>
+
+    <!-- KPIs -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px;">
+      <div style="background: #fff; border: 1px solid #DCD4C4; padding: 22px;">
+        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; margin-bottom: 10px;">Obras publicadas</div>
+        <div style="font-family: 'Instrument Serif', serif; font-size: 32px;">42</div>
+        <div style="font-size: 12px; color: #2F5233; margin-top: 6px;">+3 este mês</div>
+      </div>
+      <div style="background: #fff; border: 1px solid #DCD4C4; padding: 22px;">
+        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; margin-bottom: 10px;">Reservas pendentes</div>
+        <div style="font-family: 'Instrument Serif', serif; font-size: 32px;">7</div>
+        <div style="font-size: 12px; color: #A9814A; margin-top: 6px;">2 aguardando resposta</div>
+      </div>
+      <div style="background: #fff; border: 1px solid #DCD4C4; padding: 22px;">
+        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; margin-bottom: 10px;">Valor em carteira</div>
+        <div style="font-family: 'Instrument Serif', serif; font-size: 32px;">R$ 58,4k</div>
+        <div style="font-size: 12px; color: #2F5233; margin-top: 6px;">+12% vs. mês anterior</div>
+      </div>
+      <div style="background: #fff; border: 1px solid #DCD4C4; padding: 22px;">
+        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; margin-bottom: 10px;">Visitas na galeria</div>
+        <div style="font-family: 'Instrument Serif', serif; font-size: 32px;">3.180</div>
+        <div style="font-size: 12px; color: #7A2E32; margin-top: 6px;">−4% vs. mês anterior</div>
+      </div>
+    </div>
+
+    <!-- Chart + Series stock -->
+    <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; margin-bottom: 40px;">
+      <div style="background: #fff; border: 1px solid #DCD4C4; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 500;">Vendas — últimos 12 meses</div>
+          <div style="font-size: 12px; color: #6B6459;">R$ 58.400 acumulado</div>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 10px; height: 160px;">
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:52px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Jul</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:72px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Ago</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:44px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Set</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:96px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Out</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:64px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Nov</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:110px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Dez</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:80px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Jan</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:58px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Fev</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:88px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Mar</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:70px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Abr</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:120px; background:#EDE6D8;"></div><div style="font-size:10px; color:#6B6459;">Mai</div></div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; height:140px; background:#A9814A;"></div><div style="font-size:10px; color:#6B6459;">Jun</div></div>
+        </div>
+      </div>
+      <div style="background: #fff; border: 1px solid #DCD4C4; padding: 28px;">
+        <div style="font-size: 14px; font-weight: 500; margin-bottom: 20px;">Edições limitadas — estoque</div>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;"><span>Jardim Interno</span><span style="color:#6B6459;">3/10 vendidas</span></div>
+            <div style="height: 6px; background: #EDE6D8;"><div style="height: 100%; width: 30%; background: #A9814A;"></div></div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;"><span>Véspera</span><span style="color:#6B6459;">7/10 vendidas</span></div>
+            <div style="height: 6px; background: #EDE6D8;"><div style="height: 100%; width: 70%; background: #A9814A;"></div></div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;"><span>Chão de Sal</span><span style="color:#6B6459;">1/8 vendidas</span></div>
+            <div style="height: 6px; background: #EDE6D8;"><div style="height: 100%; width: 12.5%; background: #A9814A;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent orders table -->
+    <div style="background: #fff; border: 1px solid #DCD4C4;">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 22px 24px; border-bottom: 1px solid #DCD4C4;">
+        <div style="font-size: 14px; font-weight: 500;">Pedidos recentes</div>
+        <a href="#" style="font-size: 13px; text-decoration: underline; text-underline-offset: 3px; color: #1B1814;">Ver todos →</a>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1fr 1fr 1fr; padding: 12px 24px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; border-bottom: 1px solid #DCD4C4;">
+        <div>Obra</div><div>Cliente</div><div>Status</div><div>Data</div><div>Valor</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1fr 1fr 1fr; padding: 16px 24px; font-size: 14px; border-bottom: 1px solid #EDE6D8; align-items: center;">
+        <div>Retrato ao Meio-dia</div><div>Fabiana R.</div>
+        <div><span style="background: #EAF1EA; color: #2F5233; font-size: 11px; padding: 4px 10px; border-radius: 999px;">Em produção</span></div>
+        <div style="color:#6B6459;">02 Jul</div><div>R$ 4.200</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1fr 1fr 1fr; padding: 16px 24px; font-size: 14px; border-bottom: 1px solid #EDE6D8; align-items: center;">
+        <div>Jardim Interno</div><div>Marcelo T.</div>
+        <div><span style="background: #F5EDE2; color: #A9814A; font-size: 11px; padding: 4px 10px; border-radius: 999px;">Nova solicitação</span></div>
+        <div style="color:#6B6459;">30 Jun</div><div>Sob consulta</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1fr 1fr 1fr; padding: 16px 24px; font-size: 14px; border-bottom: 1px solid #EDE6D8; align-items: center;">
+        <div>Chão de Sal</div><div>Renata A.</div>
+        <div><span style="background: #EAF1EA; color: #2F5233; font-size: 11px; padding: 4px 10px; border-radius: 999px;">Enviada</span></div>
+        <div style="color:#6B6459;">24 Jun</div><div>R$ 5.600</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1fr 1fr 1fr; padding: 16px 24px; font-size: 14px; align-items: center;">
+        <div>Véspera</div><div>Diego M.</div>
+        <div><span style="background: #F0EEE9; color: #6B6459; font-size: 11px; padding: 4px 10px; border-radius: 999px;">Entregue</span></div>
+        <div style="color:#6B6459;">15 Jun</div><div>R$ 3.900</div>
+      </div>
+    </div>
+   </sc-if>
+
+   <!-- ============ OBRAS ============ -->
+   <sc-if value="{{ isObras }}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 12px;">Catálogo</div>
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; margin: 0;">Obras</h1>
+      </div>
+      <button onClick="{{ openNewModal }}" style="background: #1B1814; color: #F5F1EA; border: none; padding: 13px 26px; font-size: 13px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 200ms ease;" style-hover="background:#2C2721;">+ Nova obra</button>
+    </div>
+    <div style="display: flex; gap: 10px; margin-bottom: 24px;">
+      <span style="background: #1B1814; color: #F5F1EA; border-radius: 999px; padding: 8px 18px; font-size: 13px;">Todas · Disponíveis</span>
+    </div>
+    <div style="background: #fff; border: 1px solid #DCD4C4;">
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1.3fr 1.6fr 1.1fr 0.7fr; gap: 16px; padding: 12px 24px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; border-bottom: 1px solid #DCD4C4;">
+        <div>Obra</div><div>Série</div><div>Acabamento</div><div>Tamanhos disponíveis</div><div>A partir de</div><div></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1.3fr 1.6fr 1.1fr 0.7fr; gap: 16px; padding: 14px 24px; font-size: 14px; border-bottom: 1px solid #EDE6D8; align-items: center; white-space: nowrap;">
+        <div style="display:flex; align-items:center; gap:12px; white-space: normal;"><div style="width:40px; height:40px; background:#D8CFBC; flex-shrink:0;"></div>Retrato ao Meio-dia</div>
+        <div style="color:#6B6459;">Retratos</div><div style="color:#6B6459;">Papel algodão</div>
+        <div style="color:#6B6459; white-space: normal;">30 × 40 cm, 50 × 70 cm</div>
+        <div>R$ 2.400</div><div><a href="javascript:void(0)" onClick="{{ openEdit1 }}" style="font-size:13px; text-decoration:underline;">Editar</a></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1.3fr 1.6fr 1.1fr 0.7fr; gap: 16px; padding: 14px 24px; font-size: 14px; border-bottom: 1px solid #EDE6D8; align-items: center; white-space: nowrap;">
+        <div style="display:flex; align-items:center; gap:12px; white-space: normal;"><div style="width:40px; height:40px; background:#D8CFBC; flex-shrink:0;"></div>Jardim Interno</div>
+        <div style="color:#6B6459;">Natureza</div><div style="color:#6B6459;">Metacrílico</div>
+        <div style="color:#6B6459; white-space: normal;">50 × 70 cm, 70 × 100 cm</div>
+        <div>R$ 4.200</div><div><a href="javascript:void(0)" onClick="{{ openEdit2 }}" style="font-size:13px; text-decoration:underline;">Editar</a></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1.3fr 1.6fr 1.1fr 0.7fr; gap: 16px; padding: 14px 24px; font-size: 14px; border-bottom: 1px solid #EDE6D8; align-items: center; white-space: nowrap;">
+        <div style="display:flex; align-items:center; gap:12px; white-space: normal;"><div style="width:40px; height:40px; background:#D8CFBC; flex-shrink:0;"></div>Silêncio Azul</div>
+        <div style="color:#6B6459;">Preto &amp; Branco</div><div style="color:#6B6459;">Fotografia fine art</div>
+        <div style="color:#6B6459; white-space: normal;">50 × 70 cm</div>
+        <div>R$ 4.200</div><div><a href="javascript:void(0)" onClick="{{ openEdit3 }}" style="font-size:13px; text-decoration:underline;">Editar</a></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1.3fr 1.6fr 1.1fr 0.7fr; gap: 16px; padding: 14px 24px; font-size: 14px; align-items: center; white-space: nowrap;">
+        <div style="display:flex; align-items:center; gap:12px; white-space: normal;"><div style="width:40px; height:40px; background:#D8CFBC; flex-shrink:0;"></div>Chão de Sal</div>
+        <div style="color:#6B6459;">Paisagens Urbanas</div><div style="color:#6B6459;">Metacrílico</div>
+        <div style="color:#6B6459; white-space: normal;">30 × 40 cm, 50 × 70 cm, 70 × 100 cm</div>
+        <div>R$ 2.400</div><div><a href="javascript:void(0)" onClick="{{ openEdit4 }}" style="font-size:13px; text-decoration:underline;">Editar</a></div>
+      </div>
+    </div>
+   </sc-if>
+
+   <!-- ============ PEDIDOS ============ -->
+   <sc-if value="{{ isPedidos }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-bottom: 32px;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 12px;">Reservas &amp; encomendas</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; margin: 0;">Pedidos</h1>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px;">
+      <div style="background:#fff; border:1px solid #DCD4C4; padding:18px; text-align:center;"><div style="font-size:11px; text-transform:uppercase; color:#6B6459; margin-bottom:8px;">Nova solicitação</div><div style="font-family:'Instrument Serif', serif; font-size:26px; color:#A9814A;">2</div></div>
+      <div style="background:#fff; border:1px solid #DCD4C4; padding:18px; text-align:center;"><div style="font-size:11px; text-transform:uppercase; color:#6B6459; margin-bottom:8px;">Em produção</div><div style="font-family:'Instrument Serif', serif; font-size:26px;">3</div></div>
+      <div style="background:#fff; border:1px solid #DCD4C4; padding:18px; text-align:center;"><div style="font-size:11px; text-transform:uppercase; color:#6B6459; margin-bottom:8px;">Enviada</div><div style="font-family:'Instrument Serif', serif; font-size:26px; color:#2F5233;">1</div></div>
+      <div style="background:#fff; border:1px solid #DCD4C4; padding:18px; text-align:center;"><div style="font-size:11px; text-transform:uppercase; color:#6B6459; margin-bottom:8px;">Entregue</div><div style="font-family:'Instrument Serif', serif; font-size:26px; color:#6B6459;">14</div></div>
+    </div>
+    <div style="background: #fff; border: 1px solid #DCD4C4;">
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1.2fr 1fr 1fr; padding: 12px 24px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; border-bottom: 1px solid #DCD4C4;">
+        <div>Obra</div><div>Cliente</div><div>Status</div><div>Data</div><div>Valor</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1.2fr 1fr 1fr; padding: 16px 24px; font-size: 14px; border-bottom: 1px solid #EDE6D8; align-items: center;">
+        <div>Retrato ao Meio-dia</div><div>Fabiana R.</div>
+        <div><span style="background: #EAF1EA; color: #2F5233; font-size: 11px; padding: 4px 10px; border-radius: 999px;">Em produção</span></div>
+        <div style="color:#6B6459;">02 Jul</div><div>R$ 4.200</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1.2fr 1fr 1fr; padding: 16px 24px; font-size: 14px; border-bottom: 1px solid #EDE6D8; align-items: center;">
+        <div>Jardim Interno</div><div>Marcelo T.</div>
+        <div><span style="background: #F5EDE2; color: #A9814A; font-size: 11px; padding: 4px 10px; border-radius: 999px;">Nova solicitação</span></div>
+        <div style="color:#6B6459;">30 Jun</div><div>Sob consulta</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1.2fr 1fr 1fr; padding: 16px 24px; font-size: 14px; border-bottom: 1px solid #EDE6D8; align-items: center;">
+        <div>Chão de Sal</div><div>Renata A.</div>
+        <div><span style="background: #EAF1EA; color: #2F5233; font-size: 11px; padding: 4px 10px; border-radius: 999px;">Enviada</span></div>
+        <div style="color:#6B6459;">24 Jun</div><div>R$ 5.600</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1.6fr 1.2fr 1fr 1fr; padding: 16px 24px; font-size: 14px; align-items: center;">
+        <div>Véspera</div><div>Diego M.</div>
+        <div><span style="background: #F0EEE9; color: #6B6459; font-size: 11px; padding: 4px 10px; border-radius: 999px;">Entregue</span></div>
+        <div style="color:#6B6459;">15 Jun</div><div>R$ 3.900</div>
+      </div>
+    </div>
+   </sc-if>
+
+   <!-- ============ CLIENTES ============ -->
+   <sc-if value="{{ isClientes }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-bottom: 32px;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 12px;">Colecionadores</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; margin: 0;">Clientes</h1>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+      <div style="background:#fff; border:1px solid #DCD4C4; padding: 24px; display:flex; gap:16px;">
+        <div style="width:48px; height:48px; border-radius:50%; background:#A9814A; display:flex; align-items:center; justify-content:center; font-size:16px; color:#1B1814; font-weight:600; flex-shrink:0;">F</div>
+        <div>
+          <div style="font-size:16px; font-weight:500;">Fabiana R.</div>
+          <div style="font-size:13px; color:#6B6459; margin-bottom:10px;">fabiana@email.com</div>
+          <div style="font-size:13px;">1 obra adquirida · Retrato ao Meio-dia</div>
+          <div style="font-size:12px; color:#6B6459; margin-top:6px;">Nota: prefere impressão em papel algodão.</div>
+        </div>
+      </div>
+      <div style="background:#fff; border:1px solid #DCD4C4; padding: 24px; display:flex; gap:16px;">
+        <div style="width:48px; height:48px; border-radius:50%; background:#A9814A; display:flex; align-items:center; justify-content:center; font-size:16px; color:#1B1814; font-weight:600; flex-shrink:0;">M</div>
+        <div>
+          <div style="font-size:16px; font-weight:500;">Marcelo T.</div>
+          <div style="font-size:13px; color:#6B6459; margin-bottom:10px;">marcelo@email.com</div>
+          <div style="font-size:13px;">2 obras adquiridas · Chão de Sal, Véspera</div>
+          <div style="font-size:12px; color:#6B6459; margin-top:6px;">Nota: interesse em consultoria corporativa.</div>
+        </div>
+      </div>
+      <div style="background:#fff; border:1px solid #DCD4C4; padding: 24px; display:flex; gap:16px;">
+        <div style="width:48px; height:48px; border-radius:50%; background:#A9814A; display:flex; align-items:center; justify-content:center; font-size:16px; color:#1B1814; font-weight:600; flex-shrink:0;">R</div>
+        <div>
+          <div style="font-size:16px; font-weight:500;">Renata A.</div>
+          <div style="font-size:13px; color:#6B6459; margin-bottom:10px;">renata@email.com</div>
+          <div style="font-size:13px;">1 obra adquirida · Chão de Sal</div>
+        </div>
+      </div>
+      <div style="background:#fff; border:1px solid #DCD4C4; padding: 24px; display:flex; gap:16px;">
+        <div style="width:48px; height:48px; border-radius:50%; background:#A9814A; display:flex; align-items:center; justify-content:center; font-size:16px; color:#1B1814; font-weight:600; flex-shrink:0;">D</div>
+        <div>
+          <div style="font-size:16px; font-weight:500;">Diego M.</div>
+          <div style="font-size:13px; color:#6B6459; margin-bottom:10px;">diego@email.com</div>
+          <div style="font-size:13px;">1 obra adquirida · Véspera</div>
+        </div>
+      </div>
+    </div>
+   </sc-if>
+
+   <!-- ============ SÉRIES ============ -->
+   <sc-if value="{{ isSeries }}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 12px;">Coleções</div>
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; margin: 0;">Séries</h1>
+      </div>
+      <button style="background: #1B1814; color: #F5F1EA; border: none; padding: 13px 26px; font-size: 13px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer;">+ Nova série</button>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+      <div style="background:#fff; border:1px solid #DCD4C4;">
+        <div style="height:120px; background:#D8CFBC;"></div>
+        <div style="padding:16px;"><div style="font-size:15px; font-weight:500;">Retratos</div><div style="font-size:12px; color:#6B6459; margin-top:4px;">12 obras</div></div>
+      </div>
+      <div style="background:#fff; border:1px solid #DCD4C4;">
+        <div style="height:120px; background:#D8CFBC;"></div>
+        <div style="padding:16px;"><div style="font-size:15px; font-weight:500;">Paisagens Urbanas</div><div style="font-size:12px; color:#6B6459; margin-top:4px;">9 obras</div></div>
+      </div>
+      <div style="background:#fff; border:1px solid #DCD4C4;">
+        <div style="height:120px; background:#D8CFBC;"></div>
+        <div style="padding:16px;"><div style="font-size:15px; font-weight:500;">Preto &amp; Branco</div><div style="font-size:12px; color:#6B6459; margin-top:4px;">15 obras</div></div>
+      </div>
+      <div style="background:#fff; border:1px solid #DCD4C4;">
+        <div style="height:120px; background:#D8CFBC;"></div>
+        <div style="padding:16px;"><div style="font-size:15px; font-weight:500;">Natureza</div><div style="font-size:12px; color:#6B6459; margin-top:4px;">6 obras</div></div>
+      </div>
+    </div>
+    <p style="font-size: 13px; color: #6B6459; margin-top: 20px;">Arraste os cartões para reordenar — a ordem aqui define a exibição na Home e na Galeria.</p>
+   </sc-if>
+
+   <!-- ============ IMAGENS DO SITE ============ -->
+   <sc-if value="{{ isImagens }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-bottom: 8px;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 12px;">Conteúdo visual</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; margin: 0 0 12px;">Imagens do site</h1>
+      <p style="font-size: 14px; color: #6B6459; max-width: 640px; margin: 0 0 40px;">Clique ou arraste um arquivo em cada quadro para substituir a imagem exibida na página correspondente. As mudanças refletem direto no site.</p>
+    </div>
+
+    <!-- HOME -->
+    <div style="margin-bottom: 48px;">
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #DCD4C4;">
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 22px; margin: 0;">Página Home</h2>
+        <a href="Home.dc.html" style="font-size: 12px; color: #6B6459; text-decoration: underline; text-underline-offset: 3px;">ver página →</a>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <div style="font-size: 13px; font-weight: 500; margin-bottom: 10px;">Foto de destaque</div>
+        <div style="max-width: 320px; aspect-ratio: 16/9; border: 1px solid #DCD4C4;"><image-slot id="hero-photo" shape="rect" placeholder="Foto de destaque — hero" style="width:100%; height:100%; display:block;"></image-slot></div>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px;">
+          <div style="font-size: 13px; font-weight: 500;">Coleções (esteira)</div>
+          <span style="font-size: 12px; color: #6B6459;">Novas coleções aparecem aqui automaticamente — cadastre em <a href="javascript:void(0)" onClick="{{ goSeries }}" style="color:#1B1814;">Séries</a></span>
+        </div>
+        <div style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;">
+          <div style="flex: 0 0 180px;">
+            <div style="aspect-ratio: 3/4; border: 1px solid #DCD4C4;"><image-slot id="series-1" shape="rect" placeholder="Série: Retratos" style="width:100%; height:100%; display:block;"></image-slot></div>
+            <div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Retratos</div>
+          </div>
+          <div style="flex: 0 0 180px;">
+            <div style="aspect-ratio: 3/4; border: 1px solid #DCD4C4;"><image-slot id="series-2" shape="rect" placeholder="Série: Paisagens Urbanas" style="width:100%; height:100%; display:block;"></image-slot></div>
+            <div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Paisagens Urbanas</div>
+          </div>
+          <div style="flex: 0 0 180px;">
+            <div style="aspect-ratio: 3/4; border: 1px solid #DCD4C4;"><image-slot id="series-3" shape="rect" placeholder="Série: Preto & Branco" style="width:100%; height:100%; display:block;"></image-slot></div>
+            <div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Preto &amp; Branco</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <div style="font-size: 13px; font-weight: 500; margin-bottom: 10px;">Obras em destaque</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 640px;">
+          <div><div style="aspect-ratio: 4/5; border: 1px solid #DCD4C4;"><image-slot id="feat-1" shape="rect" placeholder="Obra em destaque 1" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Destaque 1</div></div>
+          <div><div style="aspect-ratio: 4/5; border: 1px solid #DCD4C4;"><image-slot id="feat-2" shape="rect" placeholder="Obra em destaque 2" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Destaque 2</div></div>
+          <div><div style="aspect-ratio: 4/5; border: 1px solid #DCD4C4;"><image-slot id="feat-3" shape="rect" placeholder="Obra em destaque 3" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Destaque 3</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 13px; font-weight: 500; margin-bottom: 10px;">Bastidor &amp; artista</div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 460px;">
+          <div><div style="aspect-ratio: 4/5; border: 1px solid #DCD4C4;"><image-slot id="processo-hero" shape="rect" placeholder="Bastidor: artista em campo" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Bastidor: artista em campo</div></div>
+          <div><div style="aspect-ratio: 4/5; border: 1px solid #DCD4C4;"><image-slot id="artist-portrait" shape="rect" placeholder="Retrato da fotógrafa" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Retrato da fotógrafa</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A ARTISTA -->
+    <div style="margin-bottom: 48px;">
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #DCD4C4;">
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 22px; margin: 0;">Página A Artista</h2>
+        <a href="A Artista.dc.html" style="font-size: 12px; color: #6B6459; text-decoration: underline; text-underline-offset: 3px;">ver página →</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 460px; margin-bottom: 24px;">
+        <div><div style="aspect-ratio: 4/5; border: 1px solid #DCD4C4;"><image-slot id="artista-hero" shape="rect" placeholder="Retrato da fotógrafa, em corpo inteiro" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Retrato da fotógrafa, em corpo inteiro</div></div>
+        <div><div style="aspect-ratio: 4/5; border: 1px solid #DCD4C4;"><image-slot id="processo-1" shape="rect" placeholder="Bastidor: artista em campo" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Bastidor: artista em campo</div></div>
+      </div>
+      <div>
+        <div style="font-size: 13px; font-weight: 500; margin-bottom: 10px;">Ateliê</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 640px;">
+          <div><div style="aspect-ratio: 3/4; border: 1px solid #DCD4C4;"><image-slot id="atelie-1" shape="rect" placeholder="Ateliê 1" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Ateliê 1</div></div>
+          <div><div style="aspect-ratio: 3/4; border: 1px solid #DCD4C4;"><image-slot id="atelie-2" shape="rect" placeholder="Ateliê 2" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Ateliê 2</div></div>
+          <div><div style="aspect-ratio: 3/4; border: 1px solid #DCD4C4;"><image-slot id="atelie-3" shape="rect" placeholder="Ateliê 3 — impressão" style="width:100%; height:100%; display:block;"></image-slot></div><div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Ateliê 3 — impressão</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENCOMENDAS -->
+    <div>
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #DCD4C4;">
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 22px; margin: 0;">Página Encomendas e Consultoria</h2>
+        <a href="Encomendas e Consultoria.dc.html" style="font-size: 12px; color: #6B6459; text-decoration: underline; text-underline-offset: 3px;">ver página →</a>
+      </div>
+      <div style="max-width: 320px;">
+        <div style="aspect-ratio: 4/5; border: 1px solid #DCD4C4;"><image-slot id="encomenda-hero" shape="rect" placeholder="Obra instalada em ambiente residencial" style="width:100%; height:100%; display:block;"></image-slot></div>
+        <div style="font-size: 12px; color: #6B6459; margin-top: 6px;">Obra instalada em ambiente residencial</div>
+      </div>
+    </div>
+   </sc-if>
+
+   <!-- ============ ANALYTICS ============ -->
+   <sc-if value="{{ isAnalytics }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-bottom: 32px;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 12px;">Desempenho</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; margin: 0;">Analytics</h1>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px;">
+      <div style="background:#fff; border:1px solid #DCD4C4; padding:22px;"><div style="font-size:12px; text-transform:uppercase; color:#6B6459; margin-bottom:10px;">Taxa de conversão</div><div style="font-family:'Instrument Serif', serif; font-size:32px;">6,4%</div><div style="font-size:12px; color:#2F5233; margin-top:6px;">visualização → consulta</div></div>
+      <div style="background:#fff; border:1px solid #DCD4C4; padding:22px;"><div style="font-size:12px; text-transform:uppercase; color:#6B6459; margin-bottom:10px;">Tempo médio na página</div><div style="font-family:'Instrument Serif', serif; font-size:32px;">2m 40s</div><div style="font-size:12px; color:#6B6459; margin-top:6px;">página da obra</div></div>
+      <div style="background:#fff; border:1px solid #DCD4C4; padding:22px;"><div style="font-size:12px; text-transform:uppercase; color:#6B6459; margin-bottom:10px;">Origem principal</div><div style="font-family:'Instrument Serif', serif; font-size:32px;">Instagram</div><div style="font-size:12px; color:#6B6459; margin-top:6px;">54% do tráfego</div></div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div style="background:#fff; border:1px solid #DCD4C4; padding:28px;">
+        <div style="font-size:14px; font-weight:500; margin-bottom:20px;">Obras mais vistas</div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>Retrato ao Meio-dia</span><span style="color:#6B6459;">1.240</span></div><div style="height:6px; background:#EDE6D8;"><div style="height:100%; width:90%; background:#A9814A;"></div></div></div>
+          <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>Jardim Interno</span><span style="color:#6B6459;">980</span></div><div style="height:6px; background:#EDE6D8;"><div style="height:100%; width:70%; background:#A9814A;"></div></div></div>
+          <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>Véspera</span><span style="color:#6B6459;">640</span></div><div style="height:6px; background:#EDE6D8;"><div style="height:100%; width:46%; background:#A9814A;"></div></div></div>
+        </div>
+      </div>
+      <div style="background:#fff; border:1px solid #DCD4C4; padding:28px;">
+        <div style="font-size:14px; font-weight:500; margin-bottom:20px;">Origem de tráfego</div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>Instagram</span><span style="color:#6B6459;">54%</span></div><div style="height:6px; background:#EDE6D8;"><div style="height:100%; width:54%; background:#1B1814;"></div></div></div>
+          <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>Busca direta</span><span style="color:#6B6459;">28%</span></div><div style="height:6px; background:#EDE6D8;"><div style="height:100%; width:28%; background:#1B1814;"></div></div></div>
+          <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>Indicação</span><span style="color:#6B6459;">18%</span></div><div style="height:6px; background:#EDE6D8;"><div style="height:100%; width:18%; background:#1B1814;"></div></div></div>
+        </div>
+      </div>
+    </div>
+   </sc-if>
+  </main>
+
+  <!-- ============ MODAL: NOVA OBRA ============ -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 200; background: rgba(27,24,20,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 48px 24px; overflow-y: auto;" onClick="{{ overlayClick }}">
+      <div role="dialog" aria-modal="true" aria-label="{{ modalAriaLabel }}" onClick="{{ stopClick }}" style="background: #F5F1EA; width: 100%; max-width: 880px; border: 1px solid #DCD4C4; box-shadow: 0 24px 64px rgba(27,24,20,0.28); border-radius: 2px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 28px 36px; border-bottom: 1px solid #DCD4C4;">
+          <div>
+            <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 8px;">{{ modalOverline }}</div>
+            <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 28px; margin: 0;">{{ modalTitle }}</h2>
+          </div>
+          <button onClick="{{ closeModal }}" aria-label="Fechar" style="background: transparent; border: 1px solid #DCD4C4; color: #1B1814; width: 36px; height: 36px; border-radius: 999px; font-size: 16px; cursor: pointer; transition: border-color 200ms ease;" style-hover="border-color:#1B1814;">×</button>
+        </div>
+
+        <div style="padding: 32px 36px; display: flex; flex-direction: column; gap: 28px;">
+
+          <!-- Imagens -->
+          <div>
+            <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 10px;">Imagens da obra</label>
+            <div style="display: flex; gap: 12px;">
+              <div style="width: 140px; height: 140px; border: 1px solid #1B1814;"><image-slot id="{{ formImgMain }}" shape="rect" placeholder="Imagem principal" style="width:100%; height:100%; display:block;"></image-slot></div>
+              <div style="width: 140px; height: 140px; border: 1px dashed #DCD4C4;"><image-slot id="{{ formImgDetail1 }}" shape="rect" placeholder="Detalhe" style="width:100%; height:100%; display:block;"></image-slot></div>
+              <div style="width: 140px; height: 140px; border: 1px dashed #DCD4C4;"><image-slot id="{{ formImgDetail2 }}" shape="rect" placeholder="Ambientada" style="width:100%; height:100%; display:block;"></image-slot></div>
+            </div>
+          </div>
+
+          <!-- Título / Série / Ano -->
+          <div style="display: grid; grid-template-columns: 1.4fr 1fr 0.7fr; gap: 24px;">
+            <div>
+              <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Título</label>
+              <input type="text" value="{{ formTitulo }}" onChange="{{ onTituloChange }}" placeholder="Ex: Retrato ao Meio-dia" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+            </div>
+            <div>
+              <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Série</label>
+              <select value="{{ formSerie }}" onChange="{{ onSerieChange }}" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;">
+                <option>Retratos</option>
+                <option>Paisagens Urbanas</option>
+                <option>Preto &amp; Branco</option>
+                <option>Natureza</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Ano</label>
+              <input type="text" value="{{ formAno }}" onChange="{{ onAnoChange }}" placeholder="2026" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Acabamento / Dimensões -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
+            <div>
+              <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Acabamento</label>
+              <select value="{{ formAcabamento }}" onChange="{{ onAcabamentoChange }}" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;">
+                <option>Papel Algodão</option>
+                <option>Fotografia Fine Art</option>
+                <option>Metacrílico</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Largura (cm)</label>
+              <input type="text" value="{{ formLargura }}" onChange="{{ onLarguraChange }}" placeholder="60" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+            </div>
+            <div>
+              <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Altura (cm)</label>
+              <input type="text" value="{{ formAltura }}" onChange="{{ onAlturaChange }}" placeholder="80" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Tamanhos disponíveis -->
+          <div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px;">
+              <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459;">Tamanhos disponíveis</label>
+              <span style="font-size: 12px; color: #2F5233;">● Disponível para produção sob encomenda</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <sc-for list="{{ sizeRows }}" as="row" hint-placeholder-count="2">
+                <div style="display: flex; align-items: center; gap: 10px; border: 1px solid #DCD4C4; border-radius: 2px; padding: 10px 14px;">
+                  <input type="text" value="{{ row.largura }}" onChange="{{ row.onLarguraChange }}" placeholder="30" style="width: 56px; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 6px 2px; font-family: 'Work Sans', sans-serif; font-size: 14px; outline: none; text-align: center;" />
+                  <span style="color: #9C9280;">×</span>
+                  <input type="text" value="{{ row.altura }}" onChange="{{ row.onAlturaChange }}" placeholder="40" style="width: 56px; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 6px 2px; font-family: 'Work Sans', sans-serif; font-size: 14px; outline: none; text-align: center;" />
+                  <span style="font-size: 13px; color: #6B6459;">cm</span>
+                  <div style="flex: 1;"></div>
+                  <span style="font-size: 13px; color: #6B6459;">R$</span>
+                  <input type="text" value="{{ row.preco }}" onChange="{{ row.onPrecoChange }}" placeholder="0" style="width: 100px; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 6px 2px; font-family: 'Work Sans', sans-serif; font-size: 14px; outline: none;" />
+                  <button onClick="{{ row.onRemove }}" disabled="{{ row.removeDisabled }}" aria-label="Remover tamanho" style="background: transparent; border: 1px solid #DCD4C4; color: {{ row.removeColor }}; width: 28px; height: 28px; border-radius: 999px; font-size: 14px; cursor: {{ row.removeCursor }}; flex-shrink: 0;">×</button>
+                </div>
+              </sc-for>
+              <button onClick="{{ addSizeRow }}" style="align-self: flex-start; background: transparent; border: 1px dashed #DCD4C4; color: #1B1814; padding: 9px 18px; font-size: 13px; border-radius: 2px; cursor: pointer; margin-top: 4px; transition: border-color 200ms ease;" style-hover="border-color:#1B1814;">+ Adicionar dimensão</button>
+            </div>
+          </div>
+
+          <!-- Narrativa -->
+          <div>
+            <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Narrativa curatorial</label>
+            <textarea value="{{ formNarrativa }}" onChange="{{ onNarrativaChange }}" placeholder="Um parágrafo sobre o contexto e a composição da obra..." style="width: 100%; box-sizing: border-box; border: 1px solid #DCD4C4; background: #fff; padding: 12px; font-family: 'Work Sans', sans-serif; font-size: 15px; min-height: 90px; outline: none; border-radius: 2px;"></textarea>
+          </div>
+
+          <!-- Certificado -->
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;">
+            <input type="checkbox" checked="{{ formCertificado }}" onChange="{{ onCertificadoChange }}" style="width: 16px; height: 16px; accent-color: #1B1814;" />
+            Emitir certificado de autenticidade assinado à mão
+          </label>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 24px 36px; border-top: 1px solid #DCD4C4;">
+          <button onClick="{{ closeModal }}" style="background: transparent; color: #1B1814; border: 1px solid #1B1814; padding: 13px 26px; font-size: 13px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer;">Cancelar</button>
+          <button onClick="{{ closeModal }}" style="background: #1B1814; color: #F5F1EA; border: none; padding: 13px 26px; font-size: 13px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 200ms ease;" style-hover="background:#2C2721;">{{ modalSaveLabel }}</button>
+        </div>
+
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  static WORKS = [
+    { id: 1, titulo: 'Retrato ao Meio-dia', serie: 'Retratos', ano: '2025', acabamento: 'Papel Algodão', narrativa: '', certificado: true, sizes: [{ id: 1, largura: '30', altura: '40', preco: '2.400' }, { id: 2, largura: '50', altura: '70', preco: '4.200' }] },
+    { id: 2, titulo: 'Jardim Interno', serie: 'Natureza', ano: '2025', acabamento: 'Metacrílico', narrativa: '', certificado: true, sizes: [{ id: 1, largura: '50', altura: '70', preco: '4.200' }, { id: 2, largura: '70', altura: '100', preco: '6.800' }] },
+    { id: 3, titulo: 'Silêncio Azul', serie: 'Preto & Branco', ano: '2024', acabamento: 'Fotografia Fine Art', narrativa: '', certificado: true, sizes: [{ id: 1, largura: '50', altura: '70', preco: '4.200' }] },
+    { id: 4, titulo: 'Chão de Sal', serie: 'Paisagens Urbanas', ano: '2024', acabamento: 'Metacrílico', narrativa: '', certificado: true, sizes: [{ id: 1, largura: '30', altura: '40', preco: '2.400' }, { id: 2, largura: '50', altura: '70', preco: '4.200' }, { id: 3, largura: '70', altura: '100', preco: '6.800' }] }
+  ];
+
+  emptyForm() {
+    return { titulo: '', serie: 'Retratos', ano: '', acabamento: 'Papel Algodão', narrativa: '', certificado: true, sizes: [{ id: 1, largura: '30', altura: '40', preco: '' }] };
+  }
+
+  state = {
+    modalOpen: false,
+    editingId: null,
+    form: this.emptyForm(),
+    activeTab: 'dashboard'
+  };
+
+  switchTab(tab) {
+    this.setState({ activeTab: tab });
+    window.scrollTo(0, 0);
+  }
+
+  openNew() {
+    this.setState({ modalOpen: true, editingId: null, form: this.emptyForm() });
+  }
+
+  openEdit(id) {
+    const work = Component.WORKS.find((w) => w.id === id);
+    if (!work) return;
+    const { id: _id, ...form } = work;
+    this.setState({ modalOpen: true, editingId: id, form });
+  }
+
+  setForm(patch) {
+    this.setState((s) => ({ form: Object.assign({}, s.form, patch) }));
+  }
+
+  addSizeRow() {
+    this.setState((s) => {
+      const nextId = s.form.sizes.reduce((m, r) => Math.max(m, r.id), 0) + 1;
+      return { form: Object.assign({}, s.form, { sizes: s.form.sizes.concat({ id: nextId, largura: '', altura: '', preco: '' }) }) };
+    });
+  }
+
+  removeSizeRow(id) {
+    this.setState((s) => {
+      if (s.form.sizes.length <= 1) return null;
+      return { form: Object.assign({}, s.form, { sizes: s.form.sizes.filter((r) => r.id !== id) }) };
+    });
+  }
+
+  setSizeField(id, field, value) {
+    this.setState((s) => ({ form: Object.assign({}, s.form, { sizes: s.form.sizes.map((r) => r.id === id ? Object.assign({}, r, { [field]: value }) : r) }) }));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const f = s.form;
+    const imgStem = s.editingId ? ('work-' + s.editingId) : 'new-artwork';
+    const canRemove = f.sizes.length > 1;
+    const sizeRows = f.sizes.map((row) => ({
+      largura: row.largura,
+      altura: row.altura,
+      preco: row.preco,
+      onLarguraChange: (e) => this.setSizeField(row.id, 'largura', e.target.value),
+      onAlturaChange: (e) => this.setSizeField(row.id, 'altura', e.target.value),
+      onPrecoChange: (e) => this.setSizeField(row.id, 'preco', e.target.value),
+      onRemove: canRemove ? (() => this.removeSizeRow(row.id)) : (() => {}),
+      removeDisabled: !canRemove,
+      removeColor: canRemove ? '#1B1814' : '#DCD4C4',
+      removeCursor: canRemove ? 'pointer' : 'default'
+    }));
+
+    const tabs = ['dashboard', 'obras', 'pedidos', 'clientes', 'series', 'imagens', 'analytics'];
+    const navColor = {}; const navBg = {};
+    tabs.forEach((t) => {
+      const active = s.activeTab === t;
+      navColor[t] = active ? '#F5F1EA' : '#B8AF9E';
+      navBg[t] = active ? 'rgba(245,241,234,0.08)' : 'transparent';
+    });
+
+    return {
+      isDashboard: s.activeTab === 'dashboard',
+      isObras: s.activeTab === 'obras',
+      isPedidos: s.activeTab === 'pedidos',
+      isClientes: s.activeTab === 'clientes',
+      isSeries: s.activeTab === 'series',
+      isImagens: s.activeTab === 'imagens',
+      isAnalytics: s.activeTab === 'analytics',
+      navColor, navBg,
+      goDashboard: () => this.switchTab('dashboard'),
+      goObras: () => this.switchTab('obras'),
+      goPedidos: () => this.switchTab('pedidos'),
+      goClientes: () => this.switchTab('clientes'),
+      goSeries: () => this.switchTab('series'),
+      goImagens: () => this.switchTab('imagens'),
+      goAnalytics: () => this.switchTab('analytics'),
+
+      modalOpen: s.modalOpen,
+      openNewModal: () => this.openNew(),
+      openEdit1: () => this.openEdit(1),
+      openEdit2: () => this.openEdit(2),
+      openEdit3: () => this.openEdit(3),
+      openEdit4: () => this.openEdit(4),
+      closeModal: () => this.setState({ modalOpen: false }),
+      overlayClick: () => this.setState({ modalOpen: false }),
+      stopClick: (e) => e.stopPropagation(),
+
+      modalOverline: s.editingId ? 'Edição de obra' : 'Cadastro de obra',
+      modalTitle: s.editingId ? f.titulo : 'Nova obra',
+      modalAriaLabel: s.editingId ? 'Editar obra' : 'Cadastrar nova obra',
+      modalSaveLabel: s.editingId ? 'Salvar alterações' : 'Salvar obra',
+
+      formImgMain: imgStem + '-main',
+      formImgDetail1: imgStem + '-detail-1',
+      formImgDetail2: imgStem + '-detail-2',
+
+      formTitulo: f.titulo, onTituloChange: (e) => this.setForm({ titulo: e.target.value }),
+      formSerie: f.serie, onSerieChange: (e) => this.setForm({ serie: e.target.value }),
+      formAno: f.ano, onAnoChange: (e) => this.setForm({ ano: e.target.value }),
+      formAcabamento: f.acabamento, onAcabamentoChange: (e) => this.setForm({ acabamento: e.target.value }),
+      formNarrativa: f.narrativa, onNarrativaChange: (e) => this.setForm({ narrativa: e.target.value }),
+      formCertificado: f.certificado, onCertificadoChange: (e) => this.setForm({ certificado: e.target.checked }),
+      sizeRows,
+      addSizeRow: () => this.addSizeRow()
+    };
+  }
+}
+
+</script>
+</body>
+</html>

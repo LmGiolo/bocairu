@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="./image-slot.js"></script>
+  <style>
+    body { margin: 0; background: #F5F1EA; }
+    ::selection { background: #A9814A; color: #F5F1EA; }
+    a { color: #7A2E32; }
+    a:hover { color: #5C1F24; }
+  </style>
+</helmet>
+
+<div style="font-family: 'Work Sans', sans-serif; color: #1B1814; background: #F5F1EA;">
+
+  <!-- ============ HEADER ============ -->
+  <header style="position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(245,241,234,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #DCD4C4;">
+    <a href="Home.dc.html" style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; letter-spacing: 0.04em; color: #1B1814; text-decoration: none;">BOCAIRÚ</a>
+    <div style="display: flex; align-items: center; gap: 40px;">
+    <nav aria-label="Navegação principal" style="display: flex; gap: 40px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">
+      <a href="Home.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Home</a>
+      <a href="Galeria.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Galeria</a>
+      <a href="Colecoes.dc.html" style="color: #7A2E32; text-decoration: none; border-bottom: 1px solid #7A2E32; padding-bottom: 4px;">Coleções</a>
+      <a href="A Artista.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">A Artista</a>
+      <a href="Encomendas e Consultoria.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Encomendas</a>
+    </nav>
+    <a href="{{ accountHref }}" aria-label="Minha conta" title="Minha conta" style="color: #1B1814; opacity: 0.85; transition: opacity 250ms ease; display: flex; align-items: center;" style-hover="opacity:1;">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5"></path></svg>
+    </a>
+  </div>
+  </header>
+
+  <!-- ============ PAGE HEADER ============ -->
+  <section style="max-width: 1440px; margin: 0 auto; padding: 96px 96px 56px;">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">4 coleções</div>
+    <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 54px; margin: 0 0 24px; max-width: 640px;">Um olhar, muitos capítulos.</h1>
+    <p style="font-size: 16px; color: #6B6459; max-width: 560px; margin: 0;">Cada coleção nasce de uma permanência prolongada em um mesmo lugar ou tema. Explore por narrativa, não por categoria.</p>
+  </section>
+
+  <!-- ============ GRID DE COLEÇÕES ============ -->
+  <section style="max-width: 1440px; margin: 0 auto; padding: 32px 96px 160px;">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px;">
+
+      <a href="Galeria.dc.html?serie=retratos" style="text-decoration: none; color: inherit; display: block; transition: transform 400ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:translateY(-4px);">
+        <div style="position: relative; overflow: hidden; border: 1px solid #DCD4C4; box-shadow: 0 0 0 rgba(27,24,20,0); transition: box-shadow 400ms ease;">
+          <image-slot id="col-1" shape="rect" placeholder="Coleção: Retratos" style="width: 100%; aspect-ratio: 4/3; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.6) 100%); pointer-events: none;"></div>
+          <div style="position: absolute; left: 28px; bottom: 24px; right: 28px; color: #F5F1EA;">
+            <div style="font-family: 'Instrument Serif', serif; font-size: 30px; margin-bottom: 6px;">Retratos</div>
+            <div style="font-size: 13px; color: #E9E3D6;">12 obras · Presença sem performance</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="Galeria.dc.html?serie=paisagens-urbanas" style="text-decoration: none; color: inherit; display: block; transition: transform 400ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:translateY(-4px);">
+        <div style="position: relative; overflow: hidden; border: 1px solid #DCD4C4;">
+          <image-slot id="col-2" shape="rect" placeholder="Coleção: Paisagens Urbanas" style="width: 100%; aspect-ratio: 4/3; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.6) 100%); pointer-events: none;"></div>
+          <div style="position: absolute; left: 28px; bottom: 24px; right: 28px; color: #F5F1EA;">
+            <div style="font-family: 'Instrument Serif', serif; font-size: 30px; margin-bottom: 6px;">Paisagens Urbanas</div>
+            <div style="font-size: 13px; color: #E9E3D6;">9 obras · O Brasil visto de perto</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="Galeria.dc.html?serie=preto-e-branco" style="text-decoration: none; color: inherit; display: block; transition: transform 400ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:translateY(-4px);">
+        <div style="position: relative; overflow: hidden; border: 1px solid #DCD4C4;">
+          <image-slot id="col-3" shape="rect" placeholder="Coleção: Preto & Branco" style="width: 100%; aspect-ratio: 4/3; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.6) 100%); pointer-events: none;"></div>
+          <div style="position: absolute; left: 28px; bottom: 24px; right: 28px; color: #F5F1EA;">
+            <div style="font-family: 'Instrument Serif', serif; font-size: 30px; margin-bottom: 6px;">Preto &amp; Branco</div>
+            <div style="font-size: 13px; color: #E9E3D6;">15 obras · A coleção fundadora</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="Galeria.dc.html?serie=natureza" style="text-decoration: none; color: inherit; display: block; transition: transform 400ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:translateY(-4px);">
+        <div style="position: relative; overflow: hidden; border: 1px solid #DCD4C4;">
+          <image-slot id="col-4" shape="rect" placeholder="Coleção: Natureza" style="width: 100%; aspect-ratio: 4/3; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.6) 100%); pointer-events: none;"></div>
+          <div style="position: absolute; left: 28px; bottom: 24px; right: 28px; color: #F5F1EA;">
+            <div style="font-family: 'Instrument Serif', serif; font-size: 30px; margin-bottom: 6px;">Natureza</div>
+            <div style="font-size: 13px; color: #E9E3D6;">6 obras · Silêncio vegetal</div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="background: #1B1814; color: #B8AF9E; padding: 64px 96px 40px;">
+    <div style="max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px; padding-bottom: 40px;">
+      <div>
+        <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; color: #F5F1EA; margin-bottom: 12px;">BOCAIRÚ</div>
+        <p style="font-size: 14px; max-width: 320px; margin: 0;">Fotografia fine art e obras exclusivas, produzidas em processos de padrão museológico.</p>
+      </div>
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B6459; margin-bottom: 16px;">Navegação</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+          <a href="Galeria.dc.html" style="color: #B8AF9E; text-decoration: none;">Galeria</a>
+          <a href="Colecoes.dc.html" style="color: #B8AF9E; text-decoration: none;">Coleções</a>
+          <a href="A Artista.dc.html" style="color: #B8AF9E; text-decoration: none;">A Artista</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B6459; margin-bottom: 16px;">Contato</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+          <a href="Encomendas e Consultoria.dc.html" style="color: #B8AF9E; text-decoration: none;">Encomendas &amp; Consultoria</a>
+          <a href="#" style="color: #B8AF9E; text-decoration: none;">@bocairu</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width: 1440px; margin: 0 auto; border-top: 1px solid rgba(245,241,234,0.12); padding-top: 24px; font-size: 12px; color: #6B6459;">© 2026 Bocairú. Todos os direitos reservados.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { isLoggedIn: false };
+
+  componentDidMount() {
+    this.setState({ isLoggedIn: window.localStorage.getItem('bocairu_auth') === '1' });
+  }
+
+  renderVals() {
+    return {
+      accountHref: this.state.isLoggedIn ? 'Minha Conta.dc.html' : 'Autenticacao.dc.html?redirect=account'
+    };
+  }
+}
+
+</script>
+</body>
+</html>

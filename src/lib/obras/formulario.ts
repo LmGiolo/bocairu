@@ -8,10 +8,24 @@
 export type TamanhoValidado = {
   rotulo: string
   preco_centavos: number
+  disponivel: boolean
+  prazo_dias: string | null
   ordem: number
 }
 
-export type DadosObraValidados = {
+// Campos de texto opcionais da obra. Todos nullable no banco; aqui, ou string
+// com conteúdo, ou null — nunca string vazia (ver validarTextoOpcional).
+export type FichaObra = {
+  serie: string | null
+  historia_titulo: string | null
+  historia: string | null
+  tecnica: string | null
+  material: string | null
+  impressao: string | null
+  papel: string | null
+}
+
+export type DadosObraValidados = FichaObra & {
   titulo: string
   descricao: string | null
   ano: number | null
@@ -27,6 +41,11 @@ const MAX_TAMANHOS = 30
 const MAX_CARACTERES_ROTULO = 60
 const MAX_CARACTERES_TITULO = 200
 const MAX_CARACTERES_DESCRICAO = 5000
+const MAX_CARACTERES_PRAZO = 60
+// Teto genérico dos campos curtos da ficha (série, técnica, material...).
+const MAX_CARACTERES_FICHA = 200
+// Historia é o único texto longo da ficha — cabe um parágrafo de contexto.
+const MAX_CARACTERES_HISTORIA = 5000
 
 // R$ 1.000.000,00 em centavos. Não é regra de negócio, é rede contra
 // dedo escorregado — quem digita 25000000 provavelmente quis 250,00.
@@ -77,6 +96,28 @@ export function precoParaCentavos(entrada: string): number | null {
 }
 
 /**
+ * Lê um campo de texto opcional do FormData: apara os espaços, confere o
+ * tamanho e devolve null quando vazio.
+ *
+ * Campo em branco vira null, não string vazia — no banco "não informado" é
+ * null, e string vazia só criaria um segundo jeito de dizer a mesma coisa.
+ */
+function validarTextoOpcional(
+  formulario: FormData,
+  campo: string,
+  rotulo: string,
+  max: number
+): Resultado<string | null> {
+  const bruto = (formulario.get(campo) as string | null)?.trim() ?? ''
+
+  if (bruto.length > max) {
+    return { ok: false, erro: `${rotulo} passa de ${max} caracteres.` }
+  }
+
+  return { ok: true, valor: bruto || null }
+}
+
+/**
  * Valida a lista de tamanhos que chegou como JSON no FormData.
  *
  * `bruto` é `unknown` porque veio de JSON.parse: até conferir, pode ser
@@ -106,7 +147,7 @@ export function validarTamanhos(bruto: unknown): Resultado<TamanhoValidado[]> {
       return { ok: false, erro: `Tamanho ${posicao} está malformado.` }
     }
 
-    const { rotulo, preco } = item as Record<string, unknown>
+    const { rotulo, preco, disponivel, prazo_dias } = item as Record<string, unknown>
 
     if (typeof rotulo !== 'string' || !rotulo.trim()) {
       return { ok: false, erro: `Tamanho ${posicao}: falta o rótulo.` }
@@ -139,9 +180,29 @@ export function validarTamanhos(bruto: unknown): Resultado<TamanhoValidado[]> {
       return { ok: false, erro: `Tamanho ${posicao}: preço "${preco}" não é um valor válido.` }
     }
 
+    // disponivel vem como boolean do formulário. Qualquer outra coisa é
+    // dado torto: em vez de "chutar" um valor, recusamos. Ausente (undefined)
+    // é o único caso tolerado — cai no default true da coluna.
+    if (disponivel !== undefined && typeof disponivel !== 'boolean') {
+      return { ok: false, erro: `Tamanho ${posicao}: campo "disponível" malformado.` }
+    }
+
+    if (prazo_dias !== undefined && prazo_dias !== null && typeof prazo_dias !== 'string') {
+      return { ok: false, erro: `Tamanho ${posicao}: prazo malformado.` }
+    }
+
+    const prazoLimpo = typeof prazo_dias === 'string' ? prazo_dias.trim() : ''
+
+    if (prazoLimpo.length > MAX_CARACTERES_PRAZO) {
+      return { ok: false, erro: `Tamanho ${posicao}: prazo passa de ${MAX_CARACTERES_PRAZO} caracteres.` }
+    }
+
     tamanhos.push({
       rotulo: rotuloLimpo,
       preco_centavos: centavos,
+      // Ausente = disponível: o default da coluna é true e é o caso comum.
+      disponivel: disponivel ?? true,
+      prazo_dias: prazoLimpo || null,
       // Guarda a ordem em que a artista montou a lista, senão o banco
       // devolve os tamanhos em ordem arbitrária depois.
       ordem: indice,
@@ -162,15 +223,27 @@ export function validarFormularioObra(formulario: FormData): Resultado<DadosObra
     return { ok: false, erro: `Título passa de ${MAX_CARACTERES_TITULO} caracteres.` }
   }
 
-  const descricaoBruta = (formulario.get('descricao') as string | null)?.trim() ?? ''
+  const descricao = validarTextoOpcional(formulario, 'descricao', 'Descrição', MAX_CARACTERES_DESCRICAO)
+  if (!descricao.ok) return descricao
 
-  if (descricaoBruta.length > MAX_CARACTERES_DESCRICAO) {
-    return { ok: false, erro: `Descrição passa de ${MAX_CARACTERES_DESCRICAO} caracteres.` }
+  // Ficha técnica: sete campos de texto, todos opcionais. Historia é o único
+  // longo; o resto compartilha o mesmo teto curto. Na primeira falha, para.
+  const camposFicha = [
+    ['serie', 'Série', MAX_CARACTERES_FICHA],
+    ['historia_titulo', 'Título da história', MAX_CARACTERES_FICHA],
+    ['historia', 'História', MAX_CARACTERES_HISTORIA],
+    ['tecnica', 'Técnica', MAX_CARACTERES_FICHA],
+    ['material', 'Material', MAX_CARACTERES_FICHA],
+    ['impressao', 'Impressão', MAX_CARACTERES_FICHA],
+    ['papel', 'Papel', MAX_CARACTERES_FICHA],
+  ] as const
+
+  const ficha = {} as FichaObra
+  for (const [campo, rotulo, max] of camposFicha) {
+    const resultado = validarTextoOpcional(formulario, campo, rotulo, max)
+    if (!resultado.ok) return resultado
+    ficha[campo] = resultado.valor
   }
-
-  // Campo vazio vira null, não string vazia: no banco "não informado" é
-  // null, e string vazia só criaria um segundo jeito de dizer a mesma coisa.
-  const descricao = descricaoBruta || null
 
   const anoBruto = (formulario.get('ano') as string | null)?.trim() ?? ''
   let ano: number | null = null
@@ -204,5 +277,8 @@ export function validarFormularioObra(formulario: FormData): Resultado<DadosObra
   const tamanhos = validarTamanhos(tamanhosJson)
   if (!tamanhos.ok) return tamanhos
 
-  return { ok: true, valor: { titulo, descricao, ano, tamanhos: tamanhos.valor } }
+  return {
+    ok: true,
+    valor: { titulo, descricao: descricao.valor, ano, ...ficha, tamanhos: tamanhos.valor },
+  }
 }

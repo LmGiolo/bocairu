@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="./image-slot.js"></script>
+  <style>
+    body { margin: 0; background: #F5F1EA; }
+    ::selection { background: #A9814A; color: #F5F1EA; }
+    a { color: #7A2E32; }
+    a:hover { color: #5C1F24; }
+  </style>
+</helmet>
+
+<div style="font-family: 'Work Sans', sans-serif; color: #1B1814; background: #F5F1EA;" data-screen-label="A Artista">
+
+  <!-- ============ HEADER ============ -->
+  <header style="position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(245,241,234,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #DCD4C4;">
+    <a href="Home.dc.html" style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; letter-spacing: 0.04em; color: #1B1814; text-decoration: none;">BOCAIRÚ</a>
+    <div style="display: flex; align-items: center; gap: 40px;">
+    <nav aria-label="Navegação principal" style="display: flex; gap: 40px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">
+      <a href="Home.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Home</a>
+      <a href="Galeria.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Galeria</a>
+      <a href="Colecoes.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Coleções</a>
+      <a href="A Artista.dc.html" style="color: #7A2E32; text-decoration: none; border-bottom: 1px solid #7A2E32; padding-bottom: 4px;">A Artista</a>
+      <a href="Encomendas e Consultoria.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Encomendas</a>
+    </nav>
+    <a href="{{ accountHref }}" aria-label="Minha conta" title="Minha conta" style="color: #1B1814; opacity: 0.85; transition: opacity 250ms ease; display: flex; align-items: center;" style-hover="opacity:1;">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5"></path></svg>
+    </a>
+  </div>
+  </header>
+
+  <!-- ============ ABERTURA EDITORIAL ============ -->
+  <section style="max-width: 1440px; margin: 0 auto; padding: 96px 96px 60px; display: grid; grid-template-columns: 0.9fr 1fr; gap: 24px; align-items: end;">
+    <div style="font-family: 'Instrument Serif', serif; font-size: 200px; line-height: 0.75; color: #DCD4C4; user-select: none;">01</div>
+    <div>
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">A Artista — Perfil</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 64px; line-height: 1.05; margin: 0;">Bocairú observa antes de fotografar.</h1>
+    </div>
+  </section>
+
+  <section style="max-width: 1440px; margin: 0 auto; padding: 0 96px 140px; display: grid; grid-template-columns: 0.85fr 1fr; gap: 88px; align-items: center;">
+    <image-slot id="artista-hero" shape="rect" placeholder="Retrato da fotógrafa, em corpo inteiro" style="width: 100%; aspect-ratio: 4/5; display: block;"></image-slot>
+    <div>
+      <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 26px; color: #1B1814; line-height: 1.5; margin: 0 0 32px;">"Não fotografo o que vejo na primeira vez. Espero até que o lugar pare de posar."</p>
+      <p style="font-size: 16px; line-height: 1.8; color: #3A342C; margin: 0;">Nascida em Goiás, Bocairú constrói há alguns anos uma obra que recusa o espetáculo — composições silenciosas, quase sempre em preto e branco, sobre presença, tempo e permanência.</p>
+    </div>
+  </section>
+
+  <!-- ============ TRAJETÓRIA / HISTÓRIA ============ -->
+  <section style="background: #EDE6D8; padding: 140px 96px;">
+    <div style="max-width: 880px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">Trajetória</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; margin: 0 0 32px;">Vinte e oito anos observando o mundo de perto.</h2>
+      <p style="font-size: 18px; line-height: 1.85; color: #3A342C; margin: 0 0 24px;">Bocairú começou fotografando comunidades do interior de Goiás, onde nasceu. O que era registro documental foi, aos poucos, se tornando linguagem própria: composições que recusam o espetáculo e privilegiam a permanência sobre o instante.</p>
+      <p style="font-size: 18px; line-height: 1.85; color: #3A342C; margin: 0;">Hoje sua obra é colecionada por casas particulares e escritórios em todo o país, sempre produzida em pequenas tiragens e processos de impressão de padrão museológico.</p>
+    </div>
+  </section>
+
+  <!-- ============ LINHA DO TEMPO ============ -->
+  <section style="max-width: 1000px; margin: 0 auto; padding: 140px 96px;">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">Linha do tempo</div>
+    <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 36px; margin: 0 0 64px;">Marcos de uma trajetória.</h2>
+
+    <div style="display: flex; flex-direction: column;">
+      <sc-for list="{{ timeline }}" as="item" hint-placeholder-count="6">
+        <div style="display: grid; grid-template-columns: 100px 1fr; gap: 40px; padding: 28px 0; border-top: 1px solid #DCD4C4;">
+          <div style="font-family: 'Instrument Serif', serif; font-size: 26px; color: #A9814A;">{{ item.year }}</div>
+          <div>
+            <div style="font-size: 16px; font-weight: 500; margin-bottom: 6px;">{{ item.title }}</div>
+            <div style="font-size: 14px; color: #6B6459; line-height: 1.6; max-width: 560px;">{{ item.description }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ PROCESSO CRIATIVO ============ -->
+  <section style="max-width: 1440px; margin: 0 auto; padding: 100px 96px 140px; display: grid; grid-template-columns: 1fr 0.85fr; gap: 88px; align-items: center;">
+    <div>
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">Processo criativo</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 34px; margin: 0 0 28px; max-width: 460px;">Dias de permanência antes de um único clique.</h2>
+      <p style="font-size: 16px; line-height: 1.8; color: #3A342C; margin: 0 0 20px;">Cada série nasce de uma imersão prolongada — às vezes semanas — no lugar retratado. A câmera só aparece quando a presença da artista deixou de alterar a cena.</p>
+      <p style="font-size: 16px; line-height: 1.8; color: #3A342C; margin: 0;">O resultado é uma fotografia sem pose, onde luz e silêncio fazem o trabalho de composição.</p>
+    </div>
+    <image-slot id="processo-1" shape="rect" placeholder="Bastidor: artista em campo" style="width: 100%; aspect-ratio: 4/5; display: block;"></image-slot>
+  </section>
+
+  <!-- ============ ATELIÊ / BASTIDORES ============ -->
+  <section style="background: #EDE6D8; padding: 140px 96px;">
+    <div style="max-width: 1440px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">Bastidores</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 34px; margin: 0 0 56px; max-width: 600px;">Do ateliê à impressão final.</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+        <image-slot id="atelie-1" shape="rect" placeholder="Ateliê 1" style="width: 100%; aspect-ratio: 3/4; display: block; transition: transform 600ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.03);"></image-slot>
+        <image-slot id="atelie-2" shape="rect" placeholder="Ateliê 2" style="width: 100%; aspect-ratio: 3/4; display: block; transition: transform 600ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.03);"></image-slot>
+        <image-slot id="atelie-3" shape="rect" placeholder="Ateliê 3 — impressão" style="width: 100%; aspect-ratio: 3/4; display: block; transition: transform 600ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.03);"></image-slot>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXPOSIÇÕES ============ -->
+  <section style="max-width: 1440px; margin: 0 auto; padding: 140px 96px; display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 88px;">
+    <div>
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">Exposições</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 34px; margin: 0; max-width: 340px;">Individuais e coletivas selecionadas.</h2>
+    </div>
+    <div style="display: flex; flex-direction: column;">
+      <sc-for list="{{ exposicoes }}" as="exp" hint-placeholder-count="5">
+        <div style="display: grid; grid-template-columns: 70px 1.4fr 1fr; gap: 24px; padding: 22px 0; border-top: 1px solid #DCD4C4; align-items: baseline;">
+          <div style="font-size: 14px; color: #A9814A;">{{ exp.year }}</div>
+          <div style="font-size: 15.5px;">{{ exp.title }}</div>
+          <div style="font-size: 13px; color: #6B6459;">{{ exp.venue }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ PUBLICAÇÕES & PRÊMIOS ============ -->
+  <section style="background: #EDE6D8; padding: 140px 96px;">
+    <div style="max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 88px;">
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">Publicações</div>
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 30px; margin: 0 0 36px;">Em revista e livro.</h2>
+        <div style="display: flex; flex-direction: column; gap: 22px;">
+          <sc-for list="{{ publicacoes }}" as="pub" hint-placeholder-count="4">
+            <div style="display: flex; gap: 16px; align-items: baseline; border-top: 1px solid #DCD4C4; padding-top: 22px;">
+              <span style="font-size: 13px; color: #A9814A; flex-shrink: 0;">{{ pub.year }}</span>
+              <div><div style="font-size: 15px;">{{ pub.title }}</div><div style="font-size: 13px; color: #6B6459; margin-top: 2px;">{{ pub.outlet }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">Premiações</div>
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 30px; margin: 0 0 36px;">Reconhecimentos.</h2>
+        <div style="display: flex; flex-direction: column; gap: 22px;">
+          <sc-for list="{{ premios }}" as="premio" hint-placeholder-count="3">
+            <div style="display: flex; gap: 16px; align-items: baseline; border-top: 1px solid #DCD4C4; padding-top: 22px;">
+              <span style="font-size: 13px; color: #A9814A; flex-shrink: 0;">{{ premio.year }}</span>
+              <div><div style="font-size: 15px;">{{ premio.title }}</div><div style="font-size: 13px; color: #6B6459; margin-top: 2px;">{{ premio.org }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FILOSOFIA ============ -->
+  <section style="max-width: 880px; margin: 0 auto; padding: 160px 96px; text-align: center;">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 28px;">Filosofia</div>
+    <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 30px; line-height: 1.5; color: #1B1814; margin: 0;">"Uma fotografia fine art não documenta um lugar — ela devolve ao lugar a atenção que ele merecia e nunca recebeu."</p>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section style="background: #1B1814; padding: 100px 96px; text-align: center;">
+    <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-style: italic; font-size: 32px; color: #F5F1EA; margin: 0 0 32px;">Conheça as obras que nasceram dessa jornada.</h2>
+    <a href="Galeria.dc.html" style="text-decoration: none; background: #F5F1EA; color: #1B1814; padding: 16px 34px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; display: inline-block; transition: background 250ms ease, transform 150ms ease;" style-hover="background:#E9C98A;" style-active="transform:scale(0.98);">Ver a galeria</a>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="background: #1B1814; color: #B8AF9E; padding: 48px 96px;">
+    <div style="max-width: 1440px; margin: 0 auto; border-top: 1px solid rgba(245,241,234,0.12); padding-top: 24px; font-size: 12px; color: #6B6459;">© 2026 Bocairú. Todos os direitos reservados.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { isLoggedIn: false };
+
+  componentDidMount() {
+    this.setState({ isLoggedIn: window.localStorage.getItem('bocairu_auth') === '1' });
+  }
+
+  renderVals() {
+    return {
+      accountHref: this.state.isLoggedIn ? 'Minha Conta.dc.html' : 'Autenticacao.dc.html?redirect=account',
+      timeline: [
+        { year: '2006', title: 'Primeiros registros documentais', description: 'Início da fotografia em comunidades do interior do Rio de Janeiro, ainda em linguagem fotojornalística.' },
+        { year: '2011', title: 'Virada para a fotografia autoral', description: 'Abandono do registro documental puro em favor de composições silenciosas e autorais.' },
+        { year: '2015', title: 'Série "Preto & Branco"', description: 'Primeira série concebida como corpo de trabalho unificado, hoje coleção fundadora do ateliê.' },
+        { year: '2019', title: 'Primeira individual', description: 'Exposição individual em galeria carioca, marco de reconhecimento crítico.' },
+        { year: '2022', title: 'Ateliê próprio de impressão', description: 'Estabelecimento de processo de impressão de padrão museológico em parceria com atelier especializado.' },
+        { year: '2026', title: 'Lançamento do catálogo Bocairú', description: 'Consolidação do acervo em plataforma própria, com certificação e edições limitadas.' }
+      ],
+      exposicoes: [
+        { year: '2024', title: 'Permanências — individual', venue: 'Galeria Traço, Rio de Janeiro' },
+        { year: '2023', title: 'Fotografia Brasileira Contemporânea — coletiva', venue: 'Centro Cultural, São Paulo' },
+        { year: '2021', title: 'Território e Silêncio — individual', venue: 'Espaço Cultural, Niterói' },
+        { year: '2019', title: 'Novos Olhares — coletiva', venue: 'Galeria Vernáculo, Rio de Janeiro' },
+        { year: '2018', title: 'Retratos do Interior — individual', venue: 'Casa das Artes, Petrópolis' }
+      ],
+      publicacoes: [
+        { year: '2025', title: 'Bocairú: presença sem performance', outlet: 'Revista ZUM' },
+        { year: '2023', title: 'Fotografia e permanência no Brasil contemporâneo', outlet: 'Livro coletivo, Editora Cobogó' },
+        { year: '2021', title: 'Perfil da artista', outlet: 'Revista Piauí' },
+        { year: '2020', title: 'Um olhar sobre o interior', outlet: 'Caderno de Cultura, O Globo' }
+      ],
+      premios: [
+        { year: '2024', title: 'Prêmio Marc Ferrez de Fotografia — finalista', org: 'Funarte' },
+        { year: '2022', title: 'Bolsa de Fotografia Contemporânea', org: 'Instituto Moreira Salles' },
+        { year: '2019', title: 'Prêmio Foco Revelação', org: 'FotoRio' }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

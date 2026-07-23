@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ erro: dados.erro }, { status: 400 })
   }
 
-  const { titulo, descricao, ano, tamanhos } = dados.valor
+  const { tamanhos, ...camposObra } = dados.valor
 
   const arquivo = formulario.get('arquivo')
 
@@ -196,9 +196,9 @@ export async function POST(request: NextRequest) {
   const { data: obra, error: erroObra } = await admin
     .from('obras')
     .insert({
-      titulo,
-      descricao,
-      ano,
+      // titulo, descricao, ano e a ficha (serie, historia, tecnica...) já
+      // vêm validados e com as chaves batendo as colunas.
+      ...camposObra,
       // Mantém o comportamento que o UploadTeste já tinha. Se você quiser um
       // fluxo de rascunho → revisão → publicação, este é o lugar de mudar
       // (conferindo antes quais valores a coluna status aceita).

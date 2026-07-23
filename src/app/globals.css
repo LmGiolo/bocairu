@@ -10,6 +10,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-areia: #F5F1EA;
+  --color-tinta: #1B1814;
+  --color-fumaca: #6B6459;
+  --color-pedra: #B8AF9E;
+  --color-ouro: #A9814A;
+  --color-vinho: #7A2E32;
+  --color-vinho-escuro: #5C1F24;
+  --color-linho: #DCD4C4;
+  --color-creme: #EDE6D8;
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
 }
 
 @media (prefers-color-scheme: dark) {

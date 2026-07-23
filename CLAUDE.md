@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Site de galeria de fotografia de uma artista. Next.js 16 (App Router) + Supabase (Postgres, Auth, Storage).
 
+A especificação de design e o estado do projeto estão em docs/handoff.md; consulte antes de construir telas.
+
 ## Comandos
 
 ```bash

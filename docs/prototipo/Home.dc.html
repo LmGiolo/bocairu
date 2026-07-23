@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<template id="__bundler_thumbnail" data-bg-color="#1B1814">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <text x="50" y="58" font-family="Georgia, serif" font-style="italic" font-size="26" fill="#F5F1EA" text-anchor="middle">B</text>
+  </svg>
+</template>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="./image-slot.js"></script>
+  <style>
+    body { margin: 0; background: #F5F1EA; }
+    ::selection { background: #A9814A; color: #F5F1EA; }
+    a { color: #7A2E32; }
+    a:hover { color: #5C1F24; }
+    @keyframes riseIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    ::-webkit-scrollbar { height: 6px; }
+  </style>
+</helmet>
+
+<div style="font-family: 'Work Sans', sans-serif; color: #1B1814; background: #F5F1EA; overflow-x: hidden;" data-screen-label="Home">
+
+  <!-- ============ HEADER ============ -->
+  <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: {{ headerPaddingV }} 48px; transition: padding 320ms ease, background 320ms ease, border-color 320ms ease; background: {{ headerBg }}; border-bottom: 1px solid {{ headerBorder }};">
+    <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 26px; letter-spacing: 0.04em; color: {{ headerText }}; transition: color 320ms ease;">BOCAIRÚ</div>
+    <div style="display: flex; align-items: center; gap: 40px;">
+      <nav aria-label="Navegação principal" style="display: flex; gap: 40px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">
+        <a href="Galeria.dc.html" style="color: {{ headerText }}; text-decoration: none; transition: color 320ms ease; opacity: 0.9;" style-hover="opacity:1;">Galeria</a>
+        <a href="Colecoes.dc.html" style="color: {{ headerText }}; text-decoration: none; transition: color 320ms ease; opacity: 0.9;" style-hover="opacity:1;">Coleções</a>
+        <a href="A Artista.dc.html" style="color: {{ headerText }}; text-decoration: none; transition: color 320ms ease; opacity: 0.9;" style-hover="opacity:1;">A Artista</a>
+        <a href="Encomendas e Consultoria.dc.html" style="color: {{ headerText }}; text-decoration: none; transition: color 320ms ease; opacity: 0.9;" style-hover="opacity:1;">Encomendas</a>
+      </nav>
+      <a href="{{ accountHref }}" aria-label="Minha conta" title="Minha conta" style="color: {{ headerText }}; opacity: 0.9; transition: opacity 320ms ease; display: flex; align-items: center;" style-hover="opacity:1;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5"></path></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ============ 1. HERO ============ -->
+  <section style="position: relative; width: 100%; height: 100vh; min-height: 640px;">
+    <image-slot id="hero-photo" shape="rect" placeholder="Foto de destaque — retrato ou paisagem em preto e branco" style="position: absolute; inset: 0; width: 100%; height: 100%;"></image-slot>
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 40%, rgba(15,13,10,0.75) 100%); pointer-events: none;"></div>
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 0 48px 72px; animation: riseIn 900ms cubic-bezier(0.16,1,0.3,1) both;">
+      <div style="font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #E9C98A; font-weight: 600; margin-bottom: 20px;">Fotografia Fine Art</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-style: italic; font-size: 76px; line-height: 1.05; color: #F5F1EA; margin: 0 0 24px; max-width: 800px;">A luz que permanece depois do instante.</h1>
+      <p style="font-size: 17px; color: #E9E3D6; max-width: 520px; margin: 0 0 40px;">Obras exclusivas e edições limitadas em papel algodão, fotografia fine art e metacrílico, assinadas por Bocairú.</p>
+      <div style="display: flex; gap: 20px;">
+        <a href="Galeria.dc.html" style="text-decoration: none; background: #F5F1EA; color: #1B1814; padding: 15px 30px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; transition: background 250ms ease, transform 150ms ease;" style-hover="background:#E9C98A;" style-active="transform:scale(0.98);">Ver a galeria</a>
+        <a href="A Artista.dc.html" style="text-decoration: none; border: 1px solid rgba(245,241,234,0.6); color: #F5F1EA; padding: 15px 30px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; transition: border-color 250ms ease, transform 150ms ease;" style-hover="border-color:#F5F1EA;" style-active="transform:scale(0.98);">Conhecer a fotógrafa</a>
+      </div>
+    </div>
+    <div style="position: absolute; right: 48px; bottom: 40px; display: flex; align-items: center; gap: 10px; color: #E9E3D6; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;">
+      <div style="width: 1px; height: 32px; background: rgba(245,241,234,0.5);"></div>
+      Role para explorar
+    </div>
+  </section>
+
+  <!-- ============ 2. MANIFESTO ============ -->
+  <section style="max-width: 900px; margin: 0 auto; padding: 200px 96px; text-align: center;">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 32px;">Manifesto</div>
+    <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 34px; line-height: 1.5; color: #1B1814; margin: 0 0 32px;">"Não fotografo o que vejo na primeira vez. Espero até que o lugar pare de posar — e a fotografia aconteça sozinha, sem pressa e sem plateia."</p>
+    <div style="font-size: 14px; color: #6B6459; letter-spacing: 0.04em;">— Bocairú</div>
+  </section>
+
+  <!-- ============ 3. COLEÇÕES ============ -->
+  <section id="colecoes" style="background: #EDE6D8; padding: 140px 0;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: 0 96px; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 56px;">
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">Coleções</div>
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 42px; margin: 0;">Um olhar, muitos capítulos.</h2>
+      </div>
+      <a href="Colecoes.dc.html" style="text-decoration: underline; text-underline-offset: 4px; font-size: 14px; color: #1B1814; white-space: nowrap;">Ver todas as coleções →</a>
+    </div>
+    <div style="display: flex; gap: 28px; justify-content: center; overflow-x: auto; padding: 0 96px 12px; scroll-snap-type: x proximity;">
+      <a href="Galeria.dc.html?serie=retratos" style="flex: 0 0 360px; scroll-snap-align: start; text-decoration: none; color: inherit;">
+        <div style="position: relative; overflow: hidden;">
+          <image-slot id="series-1" shape="rect" placeholder="Série: Retratos" style="width: 100%; aspect-ratio: 3/4; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%); pointer-events: none;"></div>
+          <div style="position: absolute; left: 20px; bottom: 18px; color: #F5F1EA; font-family: 'Instrument Serif', serif; font-size: 22px;">Retratos</div>
+        </div>
+      </a>
+      <a href="Galeria.dc.html?serie=paisagens-urbanas" style="flex: 0 0 360px; scroll-snap-align: start; text-decoration: none; color: inherit;">
+        <div style="position: relative; overflow: hidden;">
+          <image-slot id="series-2" shape="rect" placeholder="Série: Paisagens Urbanas" style="width: 100%; aspect-ratio: 3/4; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%); pointer-events: none;"></div>
+          <div style="position: absolute; left: 20px; bottom: 18px; color: #F5F1EA; font-family: 'Instrument Serif', serif; font-size: 22px;">Paisagens Urbanas</div>
+        </div>
+      </a>
+      <a href="Galeria.dc.html?serie=preto-e-branco" style="flex: 0 0 360px; scroll-snap-align: start; text-decoration: none; color: inherit;">
+        <div style="position: relative; overflow: hidden;">
+          <image-slot id="series-3" shape="rect" placeholder="Série: Preto &amp; Branco" style="width: 100%; aspect-ratio: 3/4; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%); pointer-events: none;"></div>
+          <div style="position: absolute; left: 20px; bottom: 18px; color: #F5F1EA; font-family: 'Instrument Serif', serif; font-size: 22px;">Preto &amp; Branco</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ 4. OBRAS EM DESTAQUE ============ -->
+  <section id="curadoria" style="max-width: 1440px; margin: 0 auto; padding: 160px 96px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 56px;">
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">Curadoria da semana</div>
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 42px; margin: 0;">Três obras em destaque.</h2>
+      </div>
+      <a href="Galeria.dc.html" style="text-decoration: underline; text-underline-offset: 4px; font-size: 14px; color: #1B1814;">Ver toda a galeria →</a>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;">
+      <div>
+        <a href="Pagina da Obra.dc.html" style="text-decoration: none; color: inherit;"><div style="overflow: hidden; border: 1px solid #DCD4C4;">
+          <image-slot id="feat-1" shape="rect" placeholder="Obra em destaque 1" style="width: 100%; aspect-ratio: 4/5; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+        </div></a>
+        <div style="padding-top: 18px; display: flex; justify-content: space-between; align-items: baseline;">
+          <div>
+            <a href="Pagina da Obra.dc.html" style="font-size: 16px; font-weight: 500; color: #1B1814; text-decoration: none;" style-hover="text-decoration:underline;">Retrato ao Meio-dia</a>
+            <div style="font-size: 13px; color: #6B6459; margin-top: 4px;">Fotografia fine art · Papel algodão</div>
+          </div>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #2F5233;">Disponível</span>
+        </div>
+      </div>
+      <div>
+        <a href="Pagina da Obra.dc.html" style="text-decoration: none; color: inherit;"><div style="overflow: hidden; border: 1px solid #DCD4C4;">
+          <image-slot id="feat-2" shape="rect" placeholder="Obra em destaque 2" style="width: 100%; aspect-ratio: 4/5; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+        </div></a>
+        <div style="padding-top: 18px; display: flex; justify-content: space-between; align-items: baseline;">
+          <div>
+            <a href="Pagina da Obra.dc.html" style="font-size: 16px; font-weight: 500; color: #1B1814; text-decoration: none;" style-hover="text-decoration:underline;">Silêncio Azul</a>
+            <div style="font-size: 13px; color: #6B6459; margin-top: 4px;">Fotografia fine art · Metacrílico</div>
+          </div>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #7A2E32;">Vendida</span>
+        </div>
+      </div>
+      <div>
+        <a href="Pagina da Obra.dc.html" style="text-decoration: none; color: inherit;"><div style="overflow: hidden; border: 1px solid #DCD4C4;">
+          <image-slot id="feat-3" shape="rect" placeholder="Obra em destaque 3" style="width: 100%; aspect-ratio: 4/5; display: block; transition: transform 700ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.04);"></image-slot>
+        </div></a>
+        <div style="padding-top: 18px; display: flex; justify-content: space-between; align-items: baseline;">
+          <div>
+            <a href="Pagina da Obra.dc.html" style="font-size: 16px; font-weight: 500; color: #1B1814; text-decoration: none;" style-hover="text-decoration:underline;">Jardim Interno</a>
+            <div style="font-size: 13px; color: #6B6459; margin-top: 4px;">Edição limitada · 3/10</div>
+          </div>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #A9814A;">Sob consulta</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. PROCESSO ARTÍSTICO ============ -->
+  <section style="background: #1B1814; padding: 160px 96px; color: #F5F1EA;">
+    <div style="max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 1fr 0.85fr; gap: 88px; align-items: center;">
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #E9C98A; font-weight: 600; margin-bottom: 20px;">Processo artístico</div>
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 38px; margin: 0 0 28px; max-width: 480px;">Dias de permanência antes de um único clique.</h2>
+        <p style="font-size: 16px; line-height: 1.8; color: #D8D0C0; margin: 0 0 36px; max-width: 480px;">Cada série nasce de uma imersão prolongada — às vezes semanas — no lugar retratado. A câmera só aparece quando a presença da artista deixou de alterar a cena.</p>
+        <a href="A Artista.dc.html" style="text-decoration: underline; text-underline-offset: 4px; font-size: 15px; color: #F5F1EA;">Conhecer o processo completo →</a>
+      </div>
+      <image-slot id="processo-hero" shape="rect" placeholder="Bastidor: artista em campo" style="width: 100%; aspect-ratio: 4/5; display: block;"></image-slot>
+    </div>
+  </section>
+
+  <!-- ============ 6. SOBRE A ARTISTA ============ -->
+  <section style="max-width: 1440px; margin: 0 auto; padding: 160px 96px; display: grid; grid-template-columns: 0.85fr 1fr; gap: 88px; align-items: center;">
+    <image-slot id="artist-portrait" shape="rect" placeholder="Retrato da fotógrafa" style="width: 100%; aspect-ratio: 4/5; display: block;"></image-slot>
+    <div>
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">A artista</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 38px; margin: 0 0 28px; max-width: 480px;">Bocairú observa antes de fotografar.</h2>
+      <p style="font-size: 17px; line-height: 1.8; color: #3A342C; max-width: 480px; margin: 0 0 20px;">Cada série nasce de uma permanência prolongada no lugar retratado — o gesto, a luz e o silêncio importam mais que o instante decisivo.</p>
+      <a href="A Artista.dc.html" style="text-decoration: underline; text-underline-offset: 4px; font-size: 15px; color: #1B1814;">Conhecer a história completa →</a>
+    </div>
+  </section>
+
+  <!-- ============ 7. DEPOIMENTOS ============ -->
+  <section style="background: #EDE6D8; padding: 140px 96px;">
+    <div style="max-width: 1440px; margin: 0 auto;">
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 72px;">
+        <div style="width: 40px; height: 1px; background: #A9814A;"></div>
+        <div style="font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B6459;">Certificado de autenticidade assinado à mão em toda edição limitada</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 72px;">
+        <div style="border-left: 2px solid #A9814A; padding-left: 32px;">
+          <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 23px; color: #1B1814; margin: 0 0 20px; line-height: 1.5;">"A obra transformou a sala. Cada visita vira uma conversa sobre a fotografia e sobre o Brasil que ela retrata."</p>
+          <div style="font-size: 13px; color: #6B6459;">— Fabiana R., colecionadora</div>
+        </div>
+        <div style="border-left: 2px solid #A9814A; padding-left: 32px;">
+          <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 23px; color: #1B1814; margin: 0 0 20px; line-height: 1.5;">"Acompanhei todo o processo — simplesmente a artista mais perfeita."</p>
+          <div style="font-size: 13px; color: #6B6459;">— Lucas G., desenvolvedor</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8. CTA FINAL ============ -->
+  <section id="cta-final" style="background: #1B1814; color: #F5F1EA; padding: 120px 96px;">
+    <div style="max-width: 1440px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 48px; flex-wrap: wrap;">
+      <div style="max-width: 460px;">
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-style: italic; font-size: 36px; margin: 0 0 16px;">Uma obra sob medida para o seu espaço.</h2>
+        <p style="font-size: 15px; color: #B8AF9E; margin: 0;">Encomendas exclusivas e consultoria para projetos residenciais e corporativos.</p>
+      </div>
+      <a href="Encomendas e Consultoria.dc.html" style="text-decoration: none; background: #F5F1EA; color: #1B1814; padding: 17px 36px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; display: inline-block; transition: background 250ms ease, transform 150ms ease; white-space: nowrap;" style-hover="background:#E9C98A;" style-active="transform:scale(0.98);">Solicitar encomenda</a>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="background: #1B1814; color: #B8AF9E; padding: 72px 96px 40px; border-top: 1px solid rgba(245,241,234,0.12);">
+    <div style="max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px; padding-bottom: 40px;">
+      <div>
+        <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; color: #F5F1EA; margin-bottom: 12px;">BOCAIRÚ</div>
+        <p style="font-size: 14px; max-width: 320px; margin: 0;">Fotografia fine art e obras exclusivas, produzidas em processos de padrão museológico.</p>
+      </div>
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B6459; margin-bottom: 16px;">Navegação</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+          <a href="Galeria.dc.html" style="color: #B8AF9E; text-decoration: none;">Galeria</a>
+          <a href="Colecoes.dc.html" style="color: #B8AF9E; text-decoration: none;">Coleções</a>
+          <a href="A Artista.dc.html" style="color: #B8AF9E; text-decoration: none;">A Artista</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B6459; margin-bottom: 16px;">Contato</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+          <a href="#" style="color: #B8AF9E; text-decoration: none;">contato@bocairu.com</a>
+          <a href="#" style="color: #B8AF9E; text-decoration: none;">@bocairu</a>
+          <a href="Encomendas e Consultoria.dc.html" style="color: #B8AF9E; text-decoration: none;">Encomendas &amp; Consultoria</a>
+          <a href="Admin.dc.html" style="color: #6B6459; text-decoration: none; font-size: 12px; margin-top: 6px;" style-hover="color:#B8AF9E;">Painel administrativo</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width: 1440px; margin: 0 auto; border-top: 1px solid rgba(245,241,234,0.12); padding-top: 24px; font-size: 12px; color: #6B6459;">© 2026 Bocairú. Todos os direitos reservados.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { scrolled: false, isLoggedIn: false };
+
+  componentDidMount() {
+    this._onScroll = () => {
+      const isScrolled = window.scrollY > 40;
+      if (isScrolled !== this.state.scrolled) this.setState({ scrolled: isScrolled });
+    };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    this.setState({ isLoggedIn: window.localStorage.getItem('bocairu_auth') === '1' });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this._onScroll);
+  }
+
+  renderVals() {
+    const scrolled = this.state.scrolled;
+    return {
+      headerPaddingV: scrolled ? '14px' : '28px',
+      headerBg: scrolled ? 'rgba(245,241,234,0.96)' : 'transparent',
+      headerBorder: scrolled ? '#DCD4C4' : 'transparent',
+      headerText: scrolled ? '#1B1814' : '#F5F1EA',
+      accountHref: this.state.isLoggedIn ? 'Minha Conta.dc.html' : 'Autenticacao.dc.html?redirect=account'
+    };
+  }
+}
+
+</script>
+</body>
+</html>

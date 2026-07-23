@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F5F1EA; }
+    ::selection { background: #A9814A; color: #F5F1EA; }
+    .anchor-link { color: #7A2E32; text-decoration: underline; text-underline-offset: 3px; }
+    .anchor-link:hover { color: #5C1F24; }
+  </style>
+</helmet>
+
+<div style="font-family: 'Work Sans', sans-serif; color: #1B1814; background: #F5F1EA; line-height: 1.6;">
+
+  <!-- ============ TOP NAV ============ -->
+  <div style="position: sticky; top: 0; z-index: 50; background: rgba(245,241,234,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #DCD4C4; display: flex; align-items: center; gap: 24px; padding: 14px 32px; overflow: hidden;">
+    <div style="font-family: 'Instrument Serif', serif; font-size: 20px; letter-spacing: 0.02em; white-space: nowrap; flex: 0 0 auto;">Bocairú <span style="color:#A9814A; font-style: italic;">— Design Doc</span></div>
+    <div style="display: flex; gap: 22px; font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; color: #6B6459; white-space: nowrap; overflow-x: auto; flex: 1 1 auto; scrollbar-width: thin;">
+      <a href="#referencias" style="color: inherit; text-decoration: none;">Referências</a>
+      <a href="#arquitetura" style="color: inherit; text-decoration: none;">Arquitetura</a>
+      <a href="#ux" style="color: inherit; text-decoration: none;">UX</a>
+      <a href="#design-system" style="color: inherit; text-decoration: none;">Design System</a>
+      <a href="#componentes" style="color: inherit; text-decoration: none;">Componentes</a>
+      <a href="#animacoes" style="color: inherit; text-decoration: none;">Animações</a>
+      <a href="#responsivo" style="color: inherit; text-decoration: none;">Responsivo</a>
+      <a href="#acessibilidade" style="color: inherit; text-decoration: none;">A11y</a>
+    </div>
+  </div>
+
+  <!-- ============ COVER ============ -->
+  <section data-screen-label="Capa" style="max-width: 1120px; margin: 0 auto; padding: 120px 48px 96px;">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 24px;">Especificação de Produto — UX / UI / Design System</div>
+    <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 76px; line-height: 1.02; margin: 0 0 28px; max-width: 900px;">Uma galeria digital que se comporta como uma galeria física.</h1>
+    <p style="font-size: 19px; max-width: 660px; color: #3A342C; margin: 0 0 40px;">Documento de design para o site de <strong>Bocairú</strong> — fotografia fine art e obras exclusivas. Este documento define arquitetura, fluxos de UX, sistema de design e especificações de implementação, para ser entregue diretamente a desenvolvimento.</p>
+    <div style="display: flex; gap: 48px; padding-top: 32px; border-top: 1px solid #DCD4C4;">
+      <div><div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459;">Estilo</div><div style="font-size: 16px; margin-top: 4px;">Clássico / Figurativo</div></div>
+      <div><div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459;">Mood</div><div style="font-size: 16px; margin-top: 4px;">Luxuoso &amp; Editorial</div></div>
+      <div><div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459;">Escopo</div><div style="font-size: 16px; margin-top: 4px;">Site + Admin Avançado</div></div>
+      <div><div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459;">Versão</div><div style="font-size: 16px; margin-top: 4px;">1.0 — Jul 2026</div></div>
+    </div>
+  </section>
+
+  <!-- ============ REFERÊNCIAS ============ -->
+  <section id="referencias" data-screen-label="Análise de Referências" style="background: #EDE6D8; padding: 96px 48px;">
+    <div style="max-width: 1120px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">01 — Análise de Referências</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; margin: 0 0 56px; max-width: 700px;">O que aprendemos com o mercado — e o que vamos fazer diferente.</h2>
+
+      <!-- Democrart -->
+      <div style="display: grid; grid-template-columns: 280px 1fr; gap: 48px; padding: 40px 0; border-top: 1px solid #DCD4C4;">
+        <div>
+          <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 28px;">Democrart</div>
+          <div style="font-size: 14px; color: #6B6459; margin-top: 8px;">Marketplace de fine art (Shopify), grande escala, foco em conversão e volume.</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+          <div>
+            <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #2F5233; margin-bottom: 12px;">✓ Faz bem</div>
+            <ul style="margin: 0; padding-left: 18px; font-size: 15px; color: #3A342C;">
+              <li style="margin-bottom: 8px;">Storytelling da obra: descrição crítica + biografia do artista dão peso curatorial ao produto.</li>
+              <li style="margin-bottom: 8px;">Transparência total de material (algodão, papel, metacrilato) com explicação sensorial de cada acabamento.</li>
+              <li style="margin-bottom: 8px;">Prova social concreta (nº de colecionadores, obras entregues) e certificado assinado como diferencial de confiança.</li>
+              <li>Seletor de material/tamanho claro, com preço e parcelamento visíveis antes da rolagem.</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #7A2E32; margin-bottom: 12px;">✗ Faz mal</div>
+            <ul style="margin: 0; padding-left: 18px; font-size: 15px; color: #3A342C;">
+              <li style="margin-bottom: 8px;">Menu com dezenas de categorias cruzadas (formato × inspiração × cor) — sobrecarga cognitiva, sente-se e-commerce genérico, não curadoria.</li>
+              <li style="margin-bottom: 8px;">Página de produto vira um "wall of text" institucional (frete, conservação, trocas, depoimentos) repetido em todo produto — a obra se perde no meio de política de loja.</li>
+              <li style="margin-bottom: 8px;">Densidade visual alta, pouco respiro; sensação de loja, não de galeria.</li>
+              <li>Identidade visual genérica de tema Shopify — nada comunica exclusividade de uma artista específica.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ad Astra -->
+      <div style="display: grid; grid-template-columns: 280px 1fr; gap: 48px; padding: 40px 0; border-top: 1px solid #DCD4C4;">
+        <div>
+          <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 28px;">Ad Astra</div>
+          <div style="font-size: 14px; color: #6B6459; margin-top: 8px;">Arte + décor lifestyle, curadoria por coleções/viagens, catálogo extenso.</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+          <div>
+            <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #2F5233; margin-bottom: 12px;">✓ Faz bem</div>
+            <ul style="margin: 0; padding-left: 18px; font-size: 15px; color: #3A342C;">
+              <li style="margin-bottom: 8px;">Organização por coleção/narrativa (lugares, viagens) em vez de só categoria de produto — cria contexto emocional.</li>
+              <li style="margin-bottom: 8px;">Hierarquia clara entre linha "Classic" (acessível) e "Some of a Kind" (exclusiva/editada) — segmenta colecionador.</li>
+              <li>"Olhada rápida" (quick view) reduz fricção para navegar muitos itens sem sair da grade.</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #7A2E32; margin-bottom: 12px;">✗ Faz mal</div>
+            <ul style="margin: 0; padding-left: 18px; font-size: 15px; color: #3A342C;">
+              <li style="margin-bottom: 8px;">Catálogo gigantesco e raso: dezenas de variações da mesma fotografia competem por atenção, dilui a sensação de "obra única".</li>
+              <li style="margin-bottom: 8px;">Mistura arte com bandejas, espelhos e décor no mesmo nível de navegação — a obra perde status de peça central.</li>
+              <li>Overlay de seletor de país/moeda e cookies compete com a primeira impressão visual do site.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Síntese -->
+      <div style="margin-top: 48px; background: #1B1814; color: #F5F1EA; padding: 40px 48px; border-radius: 2px;">
+        <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #A9814A; margin-bottom: 16px;">Nossa direção</div>
+        <p style="font-size: 17px; margin: 0; max-width: 780px; color: #E9E3D6;">Um catálogo <em>curado, não vasto</em>: poucas obras, cada uma tratada como peça única, com storytelling forte (herdado de Democrart) mas sem ruído institucional na página do produto. Navegação por <em>coleções/séries da artista</em> (herdado de Ad Astra), não por grades cruzadas de categoria. Identidade visual própria — tipografia editorial, paleta terrosa, sem clichês de tema de e-commerce genérico.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ARQUITETURA ============ -->
+  <section id="arquitetura" data-screen-label="Arquitetura do Produto" style="padding: 96px 48px;">
+    <div style="max-width: 1120px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">02 — Arquitetura do Produto</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; margin: 0 0 56px; max-width: 700px;">Sitemap, navegação e jornada.</h2>
+
+      <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Sitemap</div>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 64px;">
+        <div style="border: 1px solid #DCD4C4; padding: 20px; background: #fff;">
+          <div style="font-weight: 600; margin-bottom: 10px;">Home</div>
+          <div style="font-size: 13px; color: #6B6459;">Hero da artista, obra em destaque, séries, sobre, contato rápido</div>
+        </div>
+        <div style="border: 1px solid #DCD4C4; padding: 20px; background: #fff;">
+          <div style="font-weight: 600; margin-bottom: 10px;">Galeria</div>
+          <div style="font-size: 13px; color: #6B6459;">Grade de obras · filtros (série, técnica, disponibilidade, tamanho) · busca</div>
+        </div>
+        <div style="border: 1px solid #DCD4C4; padding: 20px; background: #fff;">
+          <div style="font-weight: 600; margin-bottom: 10px;">Página da Obra</div>
+          <div style="font-size: 13px; color: #6B6459;">Imagem em alta, ficha técnica, edição/disponibilidade, aquisição, obras relacionadas</div>
+        </div>
+        <div style="border: 1px solid #DCD4C4; padding: 20px; background: #fff;">
+          <div style="font-weight: 600; margin-bottom: 10px;">Sobre a Artista</div>
+          <div style="font-size: 13px; color: #6B6459;">Biografia, processo, exposições, imprensa</div>
+        </div>
+        <div style="border: 1px solid #DCD4C4; padding: 20px; background: #fff;">
+          <div style="font-weight: 600; margin-bottom: 10px;">Contato / Encomenda</div>
+          <div style="font-size: 13px; color: #6B6459;">Encomenda sob medida, consultoria corporativa, formulário</div>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 64px; margin-top: -40px;">
+        <div></div>
+        <div style="border: 1px dashed #DCD4C4; padding: 16px; font-size: 13px; color: #6B6459;">└ Página de Série/Coleção</div>
+        <div style="border: 1px dashed #DCD4C4; padding: 16px; font-size: 13px; color: #6B6459;">└ Checkout / Reserva</div>
+        <div></div>
+        <div style="border: 1px solid #7A2E32; padding: 16px; font-size: 13px; color: #7A2E32; grid-column: span 1;">Painel Admin <span style="opacity:0.7;">(auth)</span></div>
+      </div>
+
+      <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Fluxo de navegação principal</div>
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin-bottom: 64px; font-size: 15px;">
+        <div style="border: 1px solid #1B1814; padding: 14px 22px; background: #fff;">Home</div>
+        <div style="padding: 0 12px; color: #A9814A;">→</div>
+        <div style="border: 1px solid #1B1814; padding: 14px 22px; background: #fff;">Galeria (grade + filtros)</div>
+        <div style="padding: 0 12px; color: #A9814A;">→</div>
+        <div style="border: 1px solid #1B1814; padding: 14px 22px; background: #fff;">Página da Obra</div>
+        <div style="padding: 0 12px; color: #A9814A;">→</div>
+        <div style="border: 1px solid #1B1814; padding: 14px 22px; background: #fff;">Reserva / Consulta de compra</div>
+        <div style="padding: 0 12px; color: #A9814A;">→</div>
+        <div style="border: 1px solid #7A2E32; color: #7A2E32; padding: 14px 22px; background: #fff;">Confirmação + WhatsApp/Email</div>
+      </div>
+
+      <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Jornada do usuário (colecionador)</div>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; border-top: 1px solid #DCD4C4; border-bottom: 1px solid #DCD4C4;">
+        <div style="padding: 24px 20px; border-right: 1px solid #DCD4C4;">
+          <div style="font-size: 12px; color: #A9814A; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Descoberta</div>
+          <div style="font-size: 14px;">Chega via Instagram/indicação. Home comunica em 3s quem é a artista e o nível da obra.</div>
+        </div>
+        <div style="padding: 24px 20px; border-right: 1px solid #DCD4C4;">
+          <div style="font-size: 12px; color: #A9814A; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Exploração</div>
+          <div style="font-size: 14px;">Navega a galeria por série; filtra por disponibilidade e tamanho compatível com o ambiente.</div>
+        </div>
+        <div style="padding: 24px 20px; border-right: 1px solid #DCD4C4;">
+          <div style="font-size: 12px; color: #A9814A; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Aprofundamento</div>
+          <div style="font-size: 14px;">Abre a obra: zoom em alta resolução, lê a narrativa, confere edição/exclusividade e ficha técnica.</div>
+        </div>
+        <div style="padding: 24px 20px; border-right: 1px solid #DCD4C4;">
+          <div style="font-size: 12px; color: #A9814A; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Decisão</div>
+          <div style="font-size: 14px;">Solicita reserva ou fala com a artista/estúdio; obras exclusivas usam consulta, não checkout automático.</div>
+        </div>
+        <div style="padding: 24px 20px;">
+          <div style="font-size: 12px; color: #A9814A; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Pós-venda</div>
+          <div style="font-size: 14px;">Recebe certificado de autenticidade, acompanha status de produção/envio.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ UX FLOWS ============ -->
+  <section id="ux" data-screen-label="Fluxos de UX" style="background: #EDE6D8; padding: 96px 48px;">
+    <div style="max-width: 1120px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">03 — UX: Fluxos por Tela</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; margin: 0 0 56px; max-width: 700px;">Como cada tela se comporta.</h2>
+
+      <!-- HOME -->
+      <div data-screen-label="Home" style="margin-bottom: 80px;">
+        <h3 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 30px; margin: 0 0 20px;">Home</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px;">
+          <ol style="margin: 0; padding-left: 20px; font-size: 15px; color: #3A342C;">
+            <li style="margin-bottom: 10px;"><strong>Hero editorial:</strong> uma obra em tela cheia + nome da artista + frase de posicionamento. Sem carrossel de banners — uma única imagem forte.</li>
+            <li style="margin-bottom: 10px;"><strong>Faixa de destaque:</strong> 3 obras selecionadas ("Curadoria da semana") em cards grandes.</li>
+            <li style="margin-bottom: 10px;"><strong>Séries/Coleções:</strong> navegação por narrativa visual (não por categoria de produto).</li>
+            <li style="margin-bottom: 10px;"><strong>Sobre a artista:</strong> bloco curto com retrato + link para biografia completa.</li>
+            <li style="margin-bottom: 10px;"><strong>Prova de confiança:</strong> certificado de autenticidade, processo de produção, 1-2 depoimentos (não um carrossel infinito).</li>
+            <li><strong>CTA final:</strong> convite para encomenda sob medida / newsletter.</li>
+          </ol>
+          <div style="background: #fff; border: 1px solid #DCD4C4; padding: 12px;">
+            <div style="font-size: 11px; color: #6B6459; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Wireframe — Desktop</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="height: 22px; background: #EDE6D8; display:flex; align-items:center; padding: 0 10px; font-size: 10px; color:#6B6459;">nav — logo · séries · sobre · contato</div>
+              <div style="height: 180px; background: #D8CFBC; display:flex; align-items:flex-end; padding: 12px; font-size: 10px; color:#5C4A3A;">hero full-bleed · headline sobre a imagem</div>
+              <div style="display:flex; gap: 6px;">
+                <div style="flex:1; height: 90px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">obra 1</div>
+                <div style="flex:1; height: 90px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">obra 2</div>
+                <div style="flex:1; height: 90px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">obra 3</div>
+              </div>
+              <div style="height: 60px; background: #F5F1EA; border: 1px dashed #DCD4C4; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">séries / coleções (scroll horizontal)</div>
+              <div style="height: 70px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">bloco "sobre a artista"</div>
+              <div style="height: 30px; background: #1B1814; font-size:10px; color:#F5F1EA; display:flex; align-items:center; justify-content:center;">footer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GALERIA -->
+      <div data-screen-label="Galeria" style="margin-bottom: 80px;">
+        <h3 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 30px; margin: 0 0 20px;">Galeria</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px;">
+          <ol style="margin: 0; padding-left: 20px; font-size: 15px; color: #3A342C;">
+            <li style="margin-bottom: 10px;"><strong>Cabeçalho de contexto:</strong> título da série ativa ou "Todas as obras" + contagem de itens.</li>
+            <li style="margin-bottom: 10px;"><strong>Barra de filtros horizontal:</strong> série, acabamento (papel algodão, fotografia fine art, metacrilato), disponibilidade (disponível/vendida/sob consulta), orientação, faixa de tamanho. Em mobile vira drawer.</li>
+            <li style="margin-bottom: 10px;"><strong>Grade assimétrica:</strong> 2-3 colunas no desktop, respeitando proporção real de cada obra (sem forçar crop quadrado) — reforça senso de peça única.</li>
+            <li style="margin-bottom: 10px;"><strong>Card de obra:</strong> imagem, título, técnica/ano, status ("Disponível" / "Vendida" / "Edição 3/10"). Hover revela zoom sutil, sem "adicionar ao carrinho" precipitado.</li>
+            <li><strong>Carregamento incremental:</strong> scroll infinito com skeleton, sem paginação numerada (mantém fluidez de "percorrer uma galeria").</li>
+          </ol>
+          <div style="background: #fff; border: 1px solid #DCD4C4; padding: 12px;">
+            <div style="font-size: 11px; color: #6B6459; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Wireframe — Desktop</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="height: 22px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; padding:0 10px;">nav</div>
+              <div style="height: 34px; background: #F5F1EA; border: 1px dashed #DCD4C4; font-size:10px; color:#6B6459; display:flex; align-items:center; padding:0 10px; gap: 12px;"><span>série ▾</span><span>técnica ▾</span><span>disponibilidade ▾</span><span>tamanho ▾</span></div>
+              <div style="display:grid; grid-template-columns: 1.2fr 1fr 0.9fr; gap: 6px;">
+                <div style="height: 160px; background: #D8CFBC; font-size:10px; color:#5C4A3A; display:flex; align-items:center; justify-content:center;">obra (retrato)</div>
+                <div style="height: 120px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">obra (quadrada)</div>
+                <div style="height: 200px; background: #D8CFBC; font-size:10px; color:#5C4A3A; display:flex; align-items:center; justify-content:center;">obra (retrato)</div>
+              </div>
+              <div style="display:grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 6px;">
+                <div style="height: 120px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">obra</div>
+                <div style="height: 90px; background: #D8CFBC; font-size:10px; color:#5C4A3A; display:flex; align-items:center; justify-content:center;">obra (paisagem)</div>
+                <div style="height: 140px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">obra</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OBRA -->
+      <div data-screen-label="Página da Obra" style="margin-bottom: 80px;">
+        <h3 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 30px; margin: 0 0 20px;">Página da Obra</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px;">
+          <ol style="margin: 0; padding-left: 20px; font-size: 15px; color: #3A342C;">
+            <li style="margin-bottom: 10px;"><strong>Split-screen:</strong> imagem dominante à esquerda (com zoom on-hover/pinch), informação à direita — nunca a obra some abaixo da dobra.</li>
+            <li style="margin-bottom: 10px;"><strong>Ficha técnica objetiva:</strong> título, ano, técnica, dimensões, se é original única ou edição limitada (nº/total).</li>
+            <li style="margin-bottom: 10px;"><strong>Narrativa curta:</strong> 1 parágrafo curatorial (inspirado no ponto forte da Democrart, sem o excesso institucional).</li>
+            <li style="margin-bottom: 10px;"><strong>Ação principal contextual:</strong> "Disponível" → botão de reserva/consulta com preço; "Vendida" → CTA para obras semelhantes; sem parcelamento agressivo — indicação simples de forma de pagamento sob consulta.</li>
+            <li style="margin-bottom: 10px;"><strong>Selo de autenticidade</strong> discreto (não banner promocional).</li>
+            <li><strong>Obras relacionadas</strong> da mesma série, 3-4 cards, no rodapé.</li>
+          </ol>
+          <div style="background: #fff; border: 1px solid #DCD4C4; padding: 12px;">
+            <div style="font-size: 11px; color: #6B6459; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Wireframe — Desktop</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="height: 22px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; padding:0 10px;">nav</div>
+              <div style="display:grid; grid-template-columns: 1.3fr 1fr; gap: 6px;">
+                <div style="height: 320px; background: #D8CFBC; font-size:10px; color:#5C4A3A; display:flex; align-items:center; justify-content:center;">imagem da obra (zoom)</div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <div style="height: 40px; background: #F5F1EA; border:1px dashed #DCD4C4; font-size:10px; color:#6B6459; display:flex; align-items:center; padding:0 8px;">título / artista</div>
+                  <div style="height: 70px; background: #F5F1EA; border:1px dashed #DCD4C4; font-size:10px; color:#6B6459; display:flex; align-items:center; padding:0 8px;">ficha técnica</div>
+                  <div style="height: 70px; background: #F5F1EA; border:1px dashed #DCD4C4; font-size:10px; color:#6B6459; display:flex; align-items:center; padding:0 8px;">narrativa curatorial</div>
+                  <div style="height: 40px; background: #1B1814; font-size:10px; color:#F5F1EA; display:flex; align-items:center; justify-content:center;">CTA reserva/consulta</div>
+                  <div style="height: 30px; background: #F5F1EA; border:1px dashed #DCD4C4; font-size:10px; color:#6B6459; display:flex; align-items:center; padding:0 8px;">selo autenticidade</div>
+                </div>
+              </div>
+              <div style="height: 90px; background: #EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">obras relacionadas (4 cards)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN -->
+      <div data-screen-label="Painel Administrativo">
+        <h3 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 30px; margin: 0 0 20px;">Painel Administrativo</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px;">
+          <ol style="margin: 0; padding-left: 20px; font-size: 15px; color: #3A342C;">
+            <li style="margin-bottom: 10px;"><strong>Dashboard:</strong> KPIs (obras publicadas, reservas pendentes, valor em carteira, visitas na galeria) + gráfico simples de vendas por período.</li>
+            <li style="margin-bottom: 10px;"><strong>Obras (CRUD):</strong> tabela com busca/filtro por status/série; formulário de cadastro com upload múltiplo de imagem, técnica, dimensões, série, tipo (original/edição limitada) e controle de tiragem/estoque.</li>
+            <li style="margin-bottom: 10px;"><strong>Pedidos/Reservas:</strong> lista com status (nova solicitação → em produção → enviada → entregue), detalhe do cliente e histórico.</li>
+            <li style="margin-bottom: 10px;"><strong>Clientes:</strong> ficha de colecionador — obras adquiridas, contato, notas internas.</li>
+            <li style="margin-bottom: 10px;"><strong>Séries/Coleções:</strong> criação e reordenação de coleções que alimentam a Home e a Galeria.</li>
+            <li><strong>Analytics:</strong> obras mais vistas, taxa de conversão visualização→consulta, origem de tráfego.</li>
+          </ol>
+          <div style="background: #fff; border: 1px solid #DCD4C4; padding: 12px;">
+            <div style="font-size: 11px; color: #6B6459; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Wireframe — Desktop</div>
+            <div style="display:grid; grid-template-columns: 130px 1fr; gap: 6px; height: 340px;">
+              <div style="background:#1B1814; color:#F5F1EA; font-size:10px; padding: 10px; display:flex; flex-direction:column; gap:10px;">
+                <div>Dashboard</div><div style="opacity:0.6;">Obras</div><div style="opacity:0.6;">Pedidos</div><div style="opacity:0.6;">Clientes</div><div style="opacity:0.6;">Séries</div><div style="opacity:0.6;">Analytics</div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; gap:6px;">
+                  <div style="flex:1; height:60px; background:#EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">KPI</div>
+                  <div style="flex:1; height:60px; background:#EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">KPI</div>
+                  <div style="flex:1; height:60px; background:#EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">KPI</div>
+                  <div style="flex:1; height:60px; background:#EDE6D8; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">KPI</div>
+                </div>
+                <div style="height:110px; background:#F5F1EA; border:1px dashed #DCD4C4; font-size:10px; color:#6B6459; display:flex; align-items:center; justify-content:center;">gráfico de vendas</div>
+                <div style="flex:1; background:#F5F1EA; border:1px dashed #DCD4C4; font-size:10px; color:#6B6459; display:flex; flex-direction:column; padding: 8px; gap:6px;">
+                  <div>tabela — obras / pedidos recentes</div>
+                  <div style="height:16px; background:#EDE6D8;"></div>
+                  <div style="height:16px; background:#EDE6D8;"></div>
+                  <div style="height:16px; background:#EDE6D8;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DESIGN SYSTEM ============ -->
+  <section id="design-system" data-screen-label="Design System" style="padding: 96px 48px;">
+    <div style="max-width: 1120px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">04 — Design System</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; margin: 0 0 56px; max-width: 700px;">A linguagem visual, peça por peça.</h2>
+
+      <!-- Cores -->
+      <div style="margin-bottom: 64px;">
+        <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Paleta de cores</div>
+        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px;">
+          <div><div style="height: 88px; background: #F5F1EA; border: 1px solid #DCD4C4;"></div><div style="font-size: 13px; margin-top: 8px; font-weight: 600;">Ivory / BG</div><div style="font-size: 12px; color: #6B6459;">#F5F1EA</div></div>
+          <div><div style="height: 88px; background: #EDE6D8; border: 1px solid #DCD4C4;"></div><div style="font-size: 13px; margin-top: 8px; font-weight: 600;">Sand / BG alt</div><div style="font-size: 12px; color: #6B6459;">#EDE6D8</div></div>
+          <div><div style="height: 88px; background: #1B1814;"></div><div style="font-size: 13px; margin-top: 8px; font-weight: 600;">Ink / Texto</div><div style="font-size: 12px; color: #6B6459;">#1B1814</div></div>
+          <div><div style="height: 88px; background: #6B6459;"></div><div style="font-size: 13px; margin-top: 8px; font-weight: 600;">Ink Muted</div><div style="font-size: 12px; color: #6B6459;">#6B6459</div></div>
+          <div><div style="height: 88px; background: #A9814A;"></div><div style="font-size: 13px; margin-top: 8px; font-weight: 600;">Gold / Destaque</div><div style="font-size: 12px; color: #6B6459;">#A9814A</div></div>
+          <div><div style="height: 88px; background: #7A2E32;"></div><div style="font-size: 13px; margin-top: 8px; font-weight: 600;">Bordô / Ação</div><div style="font-size: 12px; color: #6B6459;">#7A2E32</div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 16px;">
+          <div><div style="height: 48px; background: #2F5233; border-radius: 999px;"></div><div style="font-size: 12px; margin-top: 6px; color: #6B6459;">Sucesso #2F5233</div></div>
+          <div><div style="height: 48px; background: #B8492E; border-radius: 999px;"></div><div style="font-size: 12px; margin-top: 6px; color: #6B6459;">Erro #B8492E</div></div>
+          <div><div style="height: 48px; background: #DCD4C4; border-radius: 999px;"></div><div style="font-size: 12px; margin-top: 6px; color: #6B6459;">Hairline #DCD4C4</div></div>
+          <div><div style="height: 48px; background: #FFFFFF; border: 1px solid #DCD4C4; border-radius: 999px;"></div><div style="font-size: 12px; margin-top: 6px; color: #6B6459;">Superfície #FFFFFF</div></div>
+        </div>
+        <p style="font-size: 13px; color: #6B6459; margin-top: 16px; max-width: 640px;">Uso: ivory/sand para fundos, ink para texto e ações primárias, gold como acento pontual (linhas, ícones, hover), bordô reservado para CTAs de conversão e estados de "exclusivo/vendido". Nunca mais de 2 cores de destaque na mesma tela.</p>
+      </div>
+
+      <!-- Tipografia -->
+      <div style="margin-bottom: 64px;">
+        <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Tipografia — Instrument Serif (display) + Work Sans (UI)</div>
+        <div style="border-top: 1px solid #DCD4C4;">
+          <div style="display: grid; grid-template-columns: 140px 1fr 200px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid #DCD4C4;">
+            <div style="font-size: 12px; color: #6B6459;">Display / H1</div>
+            <div style="font-family: 'Instrument Serif', serif; font-size: 64px; line-height: 1.05;">Obra em destaque</div>
+            <div style="font-size: 12px; color: #6B6459;">64 / 400 / -1%</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 140px 1fr 200px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid #DCD4C4;">
+            <div style="font-size: 12px; color: #6B6459;">H2</div>
+            <div style="font-family: 'Instrument Serif', serif; font-size: 40px;">Séries &amp; coleções</div>
+            <div style="font-size: 12px; color: #6B6459;">40 / 400</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 140px 1fr 200px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid #DCD4C4;">
+            <div style="font-size: 12px; color: #6B6459;">H3</div>
+            <div style="font-family: 'Instrument Serif', serif; font-size: 28px;">Sobre a artista</div>
+            <div style="font-size: 12px; color: #6B6459;">28 / 400</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 140px 1fr 200px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid #DCD4C4;">
+            <div style="font-size: 12px; color: #6B6459;">Body L</div>
+            <div style="font-family: 'Work Sans', sans-serif; font-size: 18px;">Texto de introdução e narrativa curatorial das obras.</div>
+            <div style="font-size: 12px; color: #6B6459;">18 / 400 / 1.6</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 140px 1fr 200px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid #DCD4C4;">
+            <div style="font-size: 12px; color: #6B6459;">Body M</div>
+            <div style="font-family: 'Work Sans', sans-serif; font-size: 16px;">Texto padrão de interface, listas e formulários.</div>
+            <div style="font-size: 12px; color: #6B6459;">16 / 400 / 1.6</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 140px 1fr 200px; align-items: baseline; padding: 18px 0;">
+            <div style="font-size: 12px; color: #6B6459;">Overline</div>
+            <div style="font-family: 'Work Sans', sans-serif; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;">Edição limitada 3/10</div>
+            <div style="font-size: 12px; color: #6B6459;">12 / 600 / caps</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid & Espaçamento -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-bottom: 64px;">
+        <div>
+          <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Grid</div>
+          <ul style="margin: 0; padding-left: 18px; font-size: 14px; color: #3A342C;">
+            <li style="margin-bottom: 6px;">12 colunas, max-width 1440px</li>
+            <li style="margin-bottom: 6px;">Margem: 96px desktop · 48px tablet · 24px mobile</li>
+            <li>Gutter: 32px desktop · 24px tablet · 16px mobile</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Espaçamento (base 4px)</div>
+          <div style="display: flex; align-items: flex-end; gap: 10px;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width: 16px; height: 4px; background:#A9814A;"></div><div style="font-size:10px; color:#6B6459;">4</div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width: 16px; height: 8px; background:#A9814A;"></div><div style="font-size:10px; color:#6B6459;">8</div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width: 16px; height: 16px; background:#A9814A;"></div><div style="font-size:10px; color:#6B6459;">16</div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width: 16px; height: 24px; background:#A9814A;"></div><div style="font-size:10px; color:#6B6459;">24</div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width: 16px; height: 32px; background:#A9814A;"></div><div style="font-size:10px; color:#6B6459;">32</div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width: 16px; height: 48px; background:#A9814A;"></div><div style="font-size:10px; color:#6B6459;">48</div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width: 16px; height: 64px; background:#A9814A;"></div><div style="font-size:10px; color:#6B6459;">64</div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width: 16px; height: 96px; background:#A9814A;"></div><div style="font-size:10px; color:#6B6459;">96</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Raio, borda, sombra -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px; margin-bottom: 64px;">
+        <div>
+          <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Raio (deliberadamente contido)</div>
+          <div style="display:flex; gap:12px; align-items:flex-end;">
+            <div style="width:56px; height:56px; background:#EDE6D8; border-radius:0px; display:flex; align-items:flex-end; justify-content:center; font-size:9px; color:#6B6459; padding-bottom:4px;">0</div>
+            <div style="width:56px; height:56px; background:#EDE6D8; border-radius:2px; display:flex; align-items:flex-end; justify-content:center; font-size:9px; color:#6B6459; padding-bottom:4px;">2</div>
+            <div style="width:56px; height:56px; background:#EDE6D8; border-radius:6px; display:flex; align-items:flex-end; justify-content:center; font-size:9px; color:#6B6459; padding-bottom:4px;">6</div>
+            <div style="width:56px; height:56px; background:#EDE6D8; border-radius:999px; display:flex; align-items:flex-end; justify-content:center; font-size:9px; color:#6B6459; padding-bottom:4px;">pill</div>
+          </div>
+          <p style="font-size: 13px; color: #6B6459; margin-top: 12px;">Imagens/molduras: 0. Cards/inputs: 2–6px. Tags e botões: pill. Nunca cantos muito arredondados — mantém o rigor editorial.</p>
+        </div>
+        <div>
+          <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Bordas</div>
+          <div style="width:100%; height:56px; border: 1px solid #DCD4C4; margin-bottom:8px;"></div>
+          <div style="width:100%; height:56px; border: 1px solid #1B1814;"></div>
+          <p style="font-size: 13px; color: #6B6459; margin-top: 12px;">Hairline #DCD4C4 para separadores/cards; Ink 1px para foco e ênfase. Cards usam <em>borda</em>, não sombra, para separar-se do fundo.</p>
+        </div>
+        <div>
+          <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Sombra (uso mínimo)</div>
+          <div style="width:100%; height:56px; background:#fff; box-shadow: 0 8px 24px rgba(27,24,20,0.10); margin-bottom: 16px;"></div>
+          <p style="font-size: 13px; color: #6B6459;">Reservada para elementos flutuantes: modais, dropdowns, drawer de filtro/carrinho. Nunca em cards de obra no grid.</p>
+        </div>
+      </div>
+
+      <!-- Botões -->
+      <div style="margin-bottom: 64px;">
+        <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Botões</div>
+        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+          <button style="background: #1B1814; color: #F5F1EA; border: none; padding: 14px 28px; font-family: 'Work Sans', sans-serif; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer;">Solicitar reserva</button>
+          <button style="background: transparent; color: #1B1814; border: 1px solid #1B1814; padding: 14px 28px; font-family: 'Work Sans', sans-serif; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer;">Ver detalhes</button>
+          <button style="background: transparent; color: #1B1814; border: none; padding: 8px 0; font-family: 'Work Sans', sans-serif; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; cursor: pointer;">Ver toda a série →</button>
+          <button style="background: #7A2E32; color: #F5F1EA; border: none; padding: 14px 28px; font-family: 'Work Sans', sans-serif; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer;">Comprar edição limitada</button>
+          <button disabled style="background: #DCD4C4; color: #9C9280; border: none; padding: 14px 28px; font-family: 'Work Sans', sans-serif; font-size: 14px; border-radius: 2px;">Vendida</button>
+        </div>
+        <p style="font-size: 13px; color: #6B6459; margin-top: 16px;">Primário (ink): ação principal por tela. Secundário (outline): navegação/detalhe. Terciário (link sublinhado): ações de baixa hierarquia. Bordô: reservado a compra direta de edição limitada. Desabilitado: obra vendida/indisponível.</p>
+      </div>
+
+      <!-- Cards -->
+      <div style="margin-bottom: 64px;">
+        <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Card de obra</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 220px); gap: 24px;">
+          <div style="border: 1px solid #DCD4C4; background: #fff;">
+            <div style="height: 260px; background: #D8CFBC; display:flex; align-items:center; justify-content:center; font-size:11px; color:#5C4A3A;">imagem 4:5</div>
+            <div style="padding: 14px;">
+              <div style="font-size: 15px; font-weight: 500;">Retrato ao Meio-dia</div>
+              <div style="font-size: 12px; color: #6B6459; margin-top: 2px;">Fotografia fine art · Papel algodão · 2025</div>
+              <div style="display:flex; justify-content: space-between; align-items:center; margin-top: 10px;">
+                <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #2F5233;">Disponível</span>
+                <span style="font-size: 13px;">R$ 4.200</span>
+              </div>
+            </div>
+          </div>
+          <div style="border: 1px solid #DCD4C4; background: #fff; opacity: 0.7;">
+            <div style="height: 260px; background: #D8CFBC; display:flex; align-items:center; justify-content:center; font-size:11px; color:#5C4A3A;">imagem 4:5</div>
+            <div style="padding: 14px;">
+              <div style="font-size: 15px; font-weight: 500;">Silêncio Azul</div>
+              <div style="font-size: 12px; color: #6B6459; margin-top: 2px;">Fotografia fine art · Metacrilato · 2024</div>
+              <div style="margin-top: 10px;"><span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #7A2E32;">Vendida</span></div>
+            </div>
+          </div>
+          <div style="border: 1px solid #DCD4C4; background: #fff;">
+            <div style="height: 260px; background: #D8CFBC; display:flex; align-items:center; justify-content:center; font-size:11px; color:#5C4A3A;">imagem 4:5</div>
+            <div style="padding: 14px;">
+              <div style="font-size: 15px; font-weight: 500;">Jardim Interno</div>
+              <div style="font-size: 12px; color: #6B6459; margin-top: 2px;">Edição limitada · 3/10</div>
+              <div style="display:flex; justify-content: space-between; align-items:center; margin-top: 10px;">
+                <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #A9814A;">Sob consulta</span>
+                <span style="font-size: 13px;">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inputs & Forms -->
+      <div>
+        <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459; margin-bottom: 20px;">Inputs &amp; Formulários</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 720px;">
+          <div>
+            <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Nome</label>
+            <input type="text" placeholder="Seu nome" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+          </div>
+          <div>
+            <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">E-mail</label>
+            <input type="email" placeholder="voce@email.com" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #A9814A; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+          </div>
+        </div>
+        <div style="margin-top: 20px; max-width: 720px;">
+          <label style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Mensagem</label>
+          <textarea placeholder="Conte sobre o espaço onde a obra será exibida..." style="width: 100%; box-sizing: border-box; border: 1px solid #DCD4C4; background: #fff; padding: 12px; font-family: 'Work Sans', sans-serif; font-size: 15px; min-height: 80px; outline: none; border-radius: 2px;"></textarea>
+        </div>
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+          <span style="border: 1px solid #1B1814; background: #1B1814; color: #F5F1EA; border-radius: 999px; padding: 8px 18px; font-size: 13px;">40x50cm</span>
+          <span style="border: 1px solid #DCD4C4; color: #1B1814; border-radius: 999px; padding: 8px 18px; font-size: 13px;">60x80cm</span>
+          <span style="border: 1px solid #DCD4C4; color: #1B1814; border-radius: 999px; padding: 8px 18px; font-size: 13px;">100x100cm</span>
+        </div>
+        <p style="font-size: 13px; color: #6B6459; margin-top: 16px;">Inputs de linha única (underline) para tom editorial; textarea e selects de múltiplas opções usam borda completa. Seletor de tamanho/material como pills (radio group), estado ativo em ink sólido.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMPONENTES ============ -->
+  <section id="componentes" data-screen-label="Biblioteca de Componentes" style="background: #EDE6D8; padding: 96px 48px;">
+    <div style="max-width: 1120px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">05 — Biblioteca de Componentes</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; margin: 0 0 56px; max-width: 700px;">Todos os componentes reutilizáveis.</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;">
+        <div>
+          <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; color: #A9814A; margin-bottom: 12px;">Navegação</div>
+          <ul style="margin:0; padding-left: 16px; font-size: 14px; color: #3A342C;"><li>Header / Nav</li><li>Mega menu de séries</li><li>Breadcrumb</li><li>Footer</li><li>Menu mobile (drawer)</li></ul>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; color: #A9814A; margin-bottom: 12px;">Obra &amp; Galeria</div>
+          <ul style="margin:0; padding-left: 16px; font-size: 14px; color: #3A342C;"><li>Artwork Card</li><li>Collection Tile</li><li>Filter Bar / Filter Drawer</li><li>Gallery Grid</li><li>Lightbox / Zoom Viewer</li><li>Status Badge (disponível/vendida/edição)</li></ul>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; color: #A9814A; margin-bottom: 12px;">Interface geral</div>
+          <ul style="margin:0; padding-left: 16px; font-size: 14px; color: #3A342C;"><li>Botão (primário/secundário/terciário)</li><li>Input / Textarea / Select</li><li>Radio Pills (tamanho/material)</li><li>Modal</li><li>Toast/Notificação</li><li>Tooltip</li><li>Pagination / Load more</li><li>Empty state</li><li>Loading skeleton</li></ul>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; color: #A9814A; margin-bottom: 12px;">Admin</div>
+          <ul style="margin:0; padding-left: 16px; font-size: 14px; color: #3A342C;"><li>Sidebar Nav</li><li>Data Table</li><li>KPI / Stat Card</li><li>Formulário de cadastro de obra</li><li>Upload de imagens (drag &amp; drop)</li><li>Status Tag (pedido)</li><li>Gráfico de vendas</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ANIMAÇÕES ============ -->
+  <section id="animacoes" data-screen-label="Animações" style="padding: 96px 48px;">
+    <div style="max-width: 1120px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">06 — Animações</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; margin: 0 0 56px; max-width: 700px;">Movimento discreto, nunca decorativo.</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #DCD4C4;">
+        <div style="background:#F5F1EA; padding: 24px;"><div style="font-weight:600; margin-bottom: 6px;">Entrada</div><div style="font-size:14px; color:#3A342C;">Fade + translateY(12px)→0, 500ms, cubic-bezier(0.16,1,0.3,1). Grids com stagger de 60ms por item.</div></div>
+        <div style="background:#F5F1EA; padding: 24px;"><div style="font-weight:600; margin-bottom: 6px;">Hover</div><div style="font-size:14px; color:#3A342C;">Imagem: scale(1.03), 600ms ease-out. Botão: preenchimento por wipe da esquerda, 250ms. Card: troca de cor de borda (hairline → ink), sem sombra pop.</div></div>
+        <div style="background:#F5F1EA; padding: 24px;"><div style="font-weight:600; margin-bottom: 6px;">Scroll</div><div style="font-size:14px; color:#3A342C;">Reveal-on-scroll (IntersectionObserver) fade+up por seção. Header encolhe (80px→56px) ao rolar. Parallax sutil (0.9x) apenas no hero da Home.</div></div>
+        <div style="background:#F5F1EA; padding: 24px;"><div style="font-weight:600; margin-bottom: 6px;">Loading</div><div style="font-size:14px; color:#3A342C;">Skeleton shimmer (gradiente diagonal) nos cards de galeria. Spinner de linha fina rotativo (não bolinhas) em ações do admin.</div></div>
+        <div style="background:#F5F1EA; padding: 24px; grid-column: span 2;"><div style="font-weight:600; margin-bottom: 6px;">Transição de página</div><div style="font-size:14px; color:#3A342C;">Cross-fade 350ms entre rotas. Da Galeria → Página da Obra: a imagem do card expande com transição compartilhada (view transition) até a posição da imagem principal, reforçando continuidade espacial. Respeita <code>prefers-reduced-motion</code> — nesse caso, apenas fade sem movimento.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESPONSIVIDADE ============ -->
+  <section id="responsivo" data-screen-label="Responsividade" style="background: #EDE6D8; padding: 96px 48px;">
+    <div style="max-width: 1120px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">07 — Responsividade</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; margin: 0 0 56px; max-width: 700px;">Desktop → Tablet → Mobile.</h2>
+      <div style="font-size: 13px; color: #6B6459; margin-bottom: 24px;">Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile &lt;768px</div>
+      <div style="display: grid; grid-template-columns: 140px 1fr 1fr 1fr; gap: 0; border-top: 1px solid #DCD4C4;">
+        <div style="padding: 16px 12px; font-weight: 600; font-size: 13px;"></div>
+        <div style="padding: 16px 12px; font-weight: 600; font-size: 13px;">Desktop</div>
+        <div style="padding: 16px 12px; font-weight: 600; font-size: 13px;">Tablet</div>
+        <div style="padding: 16px 12px; font-weight: 600; font-size: 13px;">Mobile</div>
+
+        <div style="padding: 16px 12px; font-weight: 600; font-size: 13px; border-top: 1px solid #DCD4C4;">Home</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Hero full-bleed 100vh, 3 obras em destaque lado a lado</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Hero 70vh, obras em destaque 2 colunas + scroll</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Hero 100vw × 85vh, obras em carrossel de 1 item por vez (swipe)</div>
+
+        <div style="padding: 16px 12px; font-weight: 600; font-size: 13px; border-top: 1px solid #DCD4C4;">Galeria</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Grade assimétrica 3 col, filtros em barra horizontal fixa</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Grade 2 col, filtros colapsam em botão "Filtrar" → drawer lateral</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Grade 1 col (imagem cheia), filtros em bottom sheet</div>
+
+        <div style="padding: 16px 12px; font-weight: 600; font-size: 13px; border-top: 1px solid #DCD4C4;">Página da Obra</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Split 60/40 (imagem/info), lado a lado</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Split 55/45, ainda lado a lado</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Empilhado: imagem primeiro (full width), info abaixo; CTA de reserva fixo no rodapé da tela (sticky)</div>
+
+        <div style="padding: 16px 12px; font-weight: 600; font-size: 13px; border-top: 1px solid #DCD4C4;">Admin</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Sidebar fixa + tabelas completas com todas colunas</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Sidebar colapsável (ícones), tabelas com colunas prioritárias</div>
+        <div style="padding: 16px 12px; font-size: 13px; border-top: 1px solid #DCD4C4;">Navegação inferior por abas; tabelas viram lista de cards empilhados</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ACESSIBILIDADE ============ -->
+  <section id="acessibilidade" data-screen-label="Acessibilidade" style="padding: 96px 48px;">
+    <div style="max-width: 1120px; margin: 0 auto;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">08 — Acessibilidade</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; margin: 0 0 56px; max-width: 700px;">WCAG 2.1 AA como piso, não teto.</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;">
+        <div>
+          <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; color: #A9814A; margin-bottom: 12px;">Contraste</div>
+          <ul style="margin:0; padding-left: 16px; font-size: 14px; color: #3A342C;"><li>Ink #1B1814 sobre Ivory #F5F1EA ≈ 15.8:1</li><li>Gold #A9814A só em elementos ≥18px ou não-textuais (falha AA em texto pequeno)</li><li>Estados de erro/sucesso sempre acompanhados de ícone + texto, nunca só cor</li></ul>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; color: #A9814A; margin-bottom: 12px;">Teclado</div>
+          <ul style="margin:0; padding-left: 16px; font-size: 14px; color: #3A342C;"><li>Ordem de tabulação segue ordem visual</li><li>Skip-to-content link antes do header</li><li>Foco visível: outline 2px gold, offset 2px, em todo elemento interativo</li><li>Modais/drawers: trap de foco + fechamento com Esc</li></ul>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; color: #A9814A; margin-bottom: 12px;">ARIA</div>
+          <ul style="margin:0; padding-left: 16px; font-size: 14px; color: #3A342C;"><li>nav com role="navigation" e aria-label</li><li>Filtros: aria-expanded no toggle, região com aria-live para contagem de resultados</li><li>Modal: role="dialog", aria-modal="true"</li><li>Lightbox: aria-label descritivo por imagem</li></ul>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; text-transform: uppercase; color: #A9814A; margin-bottom: 12px;">Conteúdo</div>
+          <ul style="margin:0; padding-left: 16px; font-size: 14px; color: #3A342C;"><li>Alt text descritivo por obra (técnica + composição), não decorativo</li><li>Hierarquia de headings sequencial (sem pular níveis)</li><li>Formulários com label associado, nunca placeholder-only</li><li>Respeita prefers-reduced-motion em todas as animações</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <section style="background: #1B1814; color: #E9E3D6; padding: 64px 48px;">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end;">
+      <div>
+        <div style="font-family: 'Instrument Serif', serif; font-size: 24px; margin-bottom: 8px;">Próximos passos</div>
+        <div style="font-size: 14px; color: #B8AF9E; max-width: 560px;">Este documento está pronto para handoff. Sugestão de sequência de implementação: Design System (tokens) → Home → Galeria → Página da Obra → Admin.</div>
+      </div>
+      <div style="font-size: 12px; color: #6B6459;">v1.0 — Julho 2026</div>
+    </div>
+  </section>
+
+</div>
+
+</x-dc>
+</body>
+</html>

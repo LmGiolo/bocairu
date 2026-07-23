@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="./image-slot.js"></script>
+  <style>
+    body { margin: 0; background: #F5F1EA; }
+    ::selection { background: #A9814A; color: #F5F1EA; }
+    a { color: #7A2E32; }
+    a:hover { color: #5C1F24; }
+    input:focus, button:focus { outline: 2px solid #A9814A; outline-offset: 2px; }
+  </style>
+</helmet>
+
+<div style="font-family: 'Work Sans', sans-serif; color: #1B1814; background: #F5F1EA; min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr;">
+
+  <!-- ============ LADO IMAGEM ============ -->
+  <div style="position: relative; min-height: 100vh;">
+    <image-slot id="auth-artwork" shape="rect" placeholder="Obra que o cliente está adquirindo" style="position: absolute; inset: 0; width: 100%; height: 100%;"></image-slot>
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(15,13,10,0.7) 100%); pointer-events: none;"></div>
+    <a href="{{ backLink }}" style="position: absolute; top: 32px; left: 32px; color: #F5F1EA; text-decoration: none; font-size: 13px; letter-spacing: 0.04em; display: flex; align-items: center; gap: 8px; opacity: 0.9;" style-hover="opacity:1;">{{ backLabel }}</a>
+    <sc-if value="{{ isPurchaseContext }}" hint-placeholder-val="{{ true }}">
+      <div style="position: absolute; left: 40px; bottom: 40px; right: 40px; color: #F5F1EA;">
+        <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #E9C98A; margin-bottom: 12px;">Você está adquirindo</div>
+        <div style="font-family: 'Instrument Serif', serif; font-size: 30px; margin-bottom: 6px;">Retrato ao Meio-dia</div>
+        <div style="font-size: 14px; color: #E9E3D6;">Fotografia fine art · Papel algodão · R$ 4.200</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isAccountContext }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; left: 40px; bottom: 40px; right: 40px; color: #F5F1EA;">
+        <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #E9C98A; margin-bottom: 12px;">Bocairú</div>
+        <div style="font-family: 'Instrument Serif', serif; font-size: 30px; margin-bottom: 6px;">Sua conta, suas obras.</div>
+        <div style="font-size: 14px; color: #E9E3D6;">Acompanhe pedidos, endereços e favoritos em um só lugar.</div>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- ============ LADO FORM ============ -->
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 64px 48px;">
+    <div style="width: 100%; max-width: 380px;">
+      <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; margin-bottom: 40px; text-align: center;">BOCAIRÚ</div>
+
+      <div style="display: flex; border-bottom: 1px solid #DCD4C4; margin-bottom: 36px;">
+        <button onClick="{{ goEntrar }}" style="flex: 1; background: none; border: none; padding: 14px 0; font-size: 14px; letter-spacing: 0.02em; cursor: pointer; color: {{ entrarColor }}; border-bottom: 2px solid {{ entrarBorder }}; margin-bottom: -1px; transition: color 200ms ease, border-color 200ms ease;">Entrar</button>
+        <button onClick="{{ goCriarConta }}" style="flex: 1; background: none; border: none; padding: 14px 0; font-size: 14px; letter-spacing: 0.02em; cursor: pointer; color: {{ criarColor }}; border-bottom: 2px solid {{ criarBorder }}; margin-bottom: -1px; transition: color 200ms ease, border-color 200ms ease;">Criar conta</button>
+      </div>
+
+      <!-- ENTRAR -->
+      <sc-if value="{{ isEntrar }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 28px; margin: 0 0 8px;">Bem-vinda de volta.</h1>
+        <p style="font-size: 14px; color: #6B6459; margin: 0 0 32px;">Entre para concluir a aquisição da sua obra.</p>
+        <form onSubmit="{{ handleSubmit }}" style="display: flex; flex-direction: column; gap: 22px;">
+          <div>
+            <label for="login-email" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">E-mail</label>
+            <input id="login-email" type="email" required placeholder="voce@email.com" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+          </div>
+          <div>
+            <label for="login-senha" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Senha</label>
+            <input id="login-senha" type="password" required placeholder="••••••••" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+          </div>
+          <a href="#" style="font-size: 13px; align-self: flex-end; text-decoration: underline; text-underline-offset: 3px;">Esqueci minha senha</a>
+          <button type="submit" style="background: #1B1814; color: #F5F1EA; border: none; padding: 15px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 200ms ease;" style-hover="background:#2C2721;">Entrar e continuar</button>
+        </form>
+      </sc-if>
+
+      <!-- CRIAR CONTA -->
+      <sc-if value="{{ isCriarConta }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 28px; margin: 0 0 8px;">Crie sua conta.</h1>
+        <p style="font-size: 14px; color: #6B6459; margin: 0 0 32px;">Acompanhe pedidos, endereços e obras favoritas em um só lugar.</p>
+        <form onSubmit="{{ handleSubmit }}" style="display: flex; flex-direction: column; gap: 22px;">
+          <div>
+            <label for="reg-nome" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Nome completo</label>
+            <input id="reg-nome" type="text" required placeholder="Seu nome" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+          </div>
+          <div>
+            <label for="reg-email" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">E-mail</label>
+            <input id="reg-email" type="email" required placeholder="voce@email.com" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+          </div>
+          <div>
+            <label for="reg-senha" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 6px;">Senha</label>
+            <input id="reg-senha" type="password" required placeholder="Mínimo 8 caracteres" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none;" />
+          </div>
+          <button type="submit" style="background: #1B1814; color: #F5F1EA; border: none; padding: 15px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 200ms ease;" style-hover="background:#2C2721;">Criar conta e continuar</button>
+        </form>
+      </sc-if>
+
+      <p style="font-size: 12px; color: #6B6459; text-align: center; margin-top: 32px;">Ao continuar, você concorda com os <a href="#" style="color:#1B1814;">Termos</a> e a <a href="#" style="color:#1B1814;">Privacidade</a> da Bocairú.</p>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode: 'entrar' };
+
+  getRedirectTarget() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('redirect') === 'account' ? 'Minha Conta.dc.html' : 'Checkout.dc.html';
+  }
+
+  renderVals() {
+    const isEntrar = this.state.mode === 'entrar';
+    const isAccountContext = new URLSearchParams(window.location.search).get('redirect') === 'account';
+    return {
+      isEntrar,
+      isCriarConta: !isEntrar,
+      isAccountContext,
+      isPurchaseContext: !isAccountContext,
+      backLink: isAccountContext ? 'Home.dc.html' : 'Pagina da Obra.dc.html',
+      backLabel: isAccountContext ? '← Voltar à Home' : '← Voltar à obra',
+      entrarColor: isEntrar ? '#1B1814' : '#6B6459',
+      entrarBorder: isEntrar ? '#1B1814' : 'transparent',
+      criarColor: !isEntrar ? '#1B1814' : '#6B6459',
+      criarBorder: !isEntrar ? '#1B1814' : 'transparent',
+      goEntrar: () => this.setState({ mode: 'entrar' }),
+      goCriarConta: () => this.setState({ mode: 'criar' }),
+      handleSubmit: (e) => {
+        e.preventDefault();
+        window.localStorage.setItem('bocairu_auth', '1');
+        window.location.href = this.getRedirectTarget();
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

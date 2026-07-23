@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="./image-slot.js"></script>
+  <style>
+    body { margin: 0; background: #F5F1EA; }
+    ::selection { background: #A9814A; color: #F5F1EA; }
+    a { color: #7A2E32; }
+    a:hover { color: #5C1F24; }
+    input:focus, button:focus, select:focus { outline: 2px solid #A9814A; outline-offset: 2px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</helmet>
+
+<div style="font-family: 'Work Sans', sans-serif; color: #1B1814; background: #F5F1EA; min-height: 100vh;" data-screen-label="Checkout">
+
+  <!-- ============ HEADER ============ -->
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 28px 48px;">
+    <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px;">BOCAIRÚ</div>
+    <a href="Pagina da Obra.dc.html" style="font-size: 13px; color: #6B6459; text-decoration: none;" style-hover="color:#1B1814;">Cancelar e voltar à obra</a>
+  </header>
+
+  <!-- ============ STEPPER ============ -->
+  <sc-if value="{{ showStepper }}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; justify-content: center; gap: 0; padding: 32px 24px 12px;">
+      <div onClick="{{ goToEndereco }}" style="display: flex; align-items: center; gap: 12px; cursor: {{ stepCursor.0 }};">
+        <div style="width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; background: {{ stepBg.0 }}; color: {{ stepColor.0 }}; border: 1px solid {{ stepBorder.0 }}; transition: background 250ms ease, color 250ms ease, border-color 250ms ease;">1</div>
+        <span style="font-size: 12.5px; letter-spacing: 0.04em; color: {{ stepLabelColor.0 }};">Endereço</span>
+      </div>
+      <div style="width: 72px; height: 1px; background: #DCD4C4; margin: 0 20px; align-self: center;"></div>
+      <div onClick="{{ goToResumoFromStepper }}" style="display: flex; align-items: center; gap: 12px; cursor: {{ stepCursor.1 }};">
+        <div style="width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; background: {{ stepBg.1 }}; color: {{ stepColor.1 }}; border: 1px solid {{ stepBorder.1 }}; transition: background 250ms ease, color 250ms ease, border-color 250ms ease;">2</div>
+        <span style="font-size: 12.5px; letter-spacing: 0.04em; color: {{ stepLabelColor.1 }};">Resumo</span>
+      </div>
+      <div style="width: 72px; height: 1px; background: #DCD4C4; margin: 0 20px; align-self: center;"></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; background: {{ stepBg.2 }}; color: {{ stepColor.2 }}; border: 1px solid {{ stepBorder.2 }}; transition: background 250ms ease, color 250ms ease, border-color 250ms ease;">3</div>
+        <span style="font-size: 12.5px; letter-spacing: 0.04em; color: {{ stepLabelColor.2 }};">Pagamento</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="max-width: 620px; margin: 0 auto; padding: 56px 32px 140px;">
+
+    <!-- ============ STEP 1: ENDEREÇO ============ -->
+    <sc-if value="{{ isStepEndereco }}" hint-placeholder-val="{{ true }}">
+      <div style="animation: riseIn 450ms cubic-bezier(0.16,1,0.3,1) both;">
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">Aquisição · Etapa 1</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 34px; margin: 0 0 12px;">Para onde enviamos a obra?</h1>
+      <p style="font-size: 14.5px; color: #6B6459; margin: 0 0 48px;">Escolha um endereço salvo ou cadastre um novo.</p>
+
+      <div style="display: flex; flex-direction: column; gap: 0; margin-bottom: 12px;">
+        <div onClick="{{ selectAddr1 }}" style="border-bottom: 1px solid #DCD4C4; padding: 22px 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; transition: opacity 200ms ease;">
+          <div>
+            <div style="font-size: 14.5px; font-weight: 500; margin-bottom: 5px;">Casa <span style="font-size: 11px; color: #A9814A; text-transform: uppercase; letter-spacing: 0.04em; margin-left: 8px;">Padrão</span></div>
+            <div style="font-size: 13px; color: #6B6459; line-height: 1.5;">Rua das Palmeiras, 240 · Jardim Botânico · Rio de Janeiro, RJ · 22460-000</div>
+          </div>
+          <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid {{ addr1Border }}; background: {{ addr1Dot }}; flex-shrink: 0; margin-top: 2px; transition: background 200ms ease, border-color 200ms ease;"></div>
+        </div>
+        <div onClick="{{ selectAddr2 }}" style="border-bottom: 1px solid #DCD4C4; padding: 22px 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; transition: opacity 200ms ease;">
+          <div>
+            <div style="font-size: 14.5px; font-weight: 500; margin-bottom: 5px;">Escritório</div>
+            <div style="font-size: 13px; color: #6B6459; line-height: 1.5;">Av. Rio Branco, 156, sala 802 · Centro · Rio de Janeiro, RJ · 20040-020</div>
+          </div>
+          <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid {{ addr2Border }}; background: {{ addr2Dot }}; flex-shrink: 0; margin-top: 2px; transition: background 200ms ease, border-color 200ms ease;"></div>
+        </div>
+      </div>
+
+      <button onClick="{{ toggleNewAddress }}" style="background: none; border: none; padding: 20px 4px; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; color: #1B1814; margin-bottom: 8px; display: block;">{{ newAddressToggleLabel }}</button>
+
+      <sc-if value="{{ showNewAddressForm }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 8px 4px 32px; display: flex; flex-direction: column; gap: 22px; animation: riseIn 350ms cubic-bezier(0.16,1,0.3,1) both;">
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+            <div>
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 8px;">CEP</label>
+              <input type="text" placeholder="00000-000" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 200ms ease;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 8px;">Rua</label>
+              <input type="text" placeholder="Nome da rua" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 200ms ease;" />
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div>
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 8px;">Número</label>
+              <input type="text" placeholder="123" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 200ms ease;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 8px;">Complemento</label>
+              <input type="text" placeholder="Apto, bloco..." style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 200ms ease;" />
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+            <div>
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 8px;">Cidade</label>
+              <input type="text" placeholder="Cidade" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 200ms ease;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; display:block; margin-bottom: 8px;">UF</label>
+              <input type="text" placeholder="RJ" style="width: 100%; box-sizing: border-box; border: none; border-bottom: 1px solid #DCD4C4; background: transparent; padding: 10px 2px; font-family: 'Work Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 200ms ease;" />
+            </div>
+          </div>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;">
+            <input type="checkbox" style="width: 16px; height: 16px; accent-color: #1B1814;" />
+            Definir como endereço padrão
+          </label>
+        </div>
+      </sc-if>
+
+      <div style="padding-top: 24px;">
+        <button onClick="{{ goToResumo }}" style="background: #1B1814; color: #F5F1EA; border: none; padding: 16px 36px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 250ms ease, transform 150ms ease;" style-hover="background:#2C2721;" style-active="transform:scale(0.98);">Continuar para o resumo</button>
+      </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ STEP 2: RESUMO ============ -->
+    <sc-if value="{{ isStepResumo }}" hint-placeholder-val="{{ false }}">
+      <div style="animation: riseIn 450ms cubic-bezier(0.16,1,0.3,1) both;">
+      <button onClick="{{ backToEndereco }}" style="background: none; border: none; padding: 0; font-size: 13px; color: #6B6459; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 20px;" style-hover="color:#1B1814;">← Voltar para endereço</button>
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">Aquisição · Etapa 2</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 34px; margin: 0 0 48px;">Confirme sua aquisição.</h1>
+
+      <div style="display: flex; gap: 24px; padding-bottom: 32px; border-bottom: 1px solid #DCD4C4; margin-bottom: 28px;">
+        <div style="width: 96px; height: 96px; flex-shrink: 0;"><image-slot id="checkout-thumb" shape="rect" placeholder="Obra" style="width:100%; height:100%; display:block;"></image-slot></div>
+        <div style="flex: 1;">
+          <div style="font-family: 'Instrument Serif', serif; font-size: 21px; margin-bottom: 6px;">Retrato ao Meio-dia</div>
+          <div style="font-size: 13px; color: #6B6459; line-height: 1.6;">Fotografia fine art · Papel algodão · 60 × 80 cm<br/>Original única · Certificado assinado à mão</div>
+        </div>
+        <div style="font-family: 'Instrument Serif', serif; font-size: 19px; align-self: center;">R$ 4.200</div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 24px; border-bottom: 1px solid #DCD4C4; margin-bottom: 24px;">
+        <div>
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B6459; margin-bottom: 6px;">Entregar em</div>
+          <div style="font-size: 14px;">Rua das Palmeiras, 240 · Jardim Botânico · Rio de Janeiro, RJ</div>
+        </div>
+        <button onClick="{{ backToEndereco }}" style="background: none; border: none; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; color: #1B1814;">Alterar</button>
+      </div>
+
+      <div style="margin-bottom: 40px; font-size: 14.5px;">
+        <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span style="color: #6B6459;">Obra</span><span>R$ 4.200</span></div>
+        <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span style="color: #6B6459;">Frete e seguro</span><span>R$ 180</span></div>
+        <div style="display: flex; justify-content: space-between; padding: 16px 0 0; border-top: 1px solid #DCD4C4; margin-top: 8px; font-family: 'Instrument Serif', serif; font-size: 20px;"><span>Total</span><span>R$ 4.380</span></div>
+      </div>
+
+      <button onClick="{{ goToPagamento }}" style="background: #1B1814; color: #F5F1EA; border: none; padding: 16px 36px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 250ms ease, transform 150ms ease;" style-hover="background:#2C2721;" style-active="transform:scale(0.98);">Continuar para o pagamento</button>
+      </div>
+    </sc-if>
+
+    <!-- ============ STEP 3: PAGAMENTO ============ -->
+    <sc-if value="{{ isStepPagamento }}" hint-placeholder-val="{{ false }}">
+      <div style="animation: riseIn 450ms cubic-bezier(0.16,1,0.3,1) both;">
+      <button onClick="{{ backToResumo }}" style="background: none; border: none; padding: 0; font-size: 13px; color: #6B6459; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 20px;" style-hover="color:#1B1814;">← Voltar para o resumo</button>
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">Aquisição · Etapa 3</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 34px; margin: 0 0 12px;">Forma de pagamento.</h1>
+      <p style="font-size: 14px; color: #6B6459; margin: 0 0 44px;">O pagamento é processado em ambiente seguro fora do nosso site. Você retorna automaticamente após a confirmação.</p>
+
+      <div style="display: flex; flex-direction: column; margin-bottom: 40px;">
+        <div onClick="{{ selectCartao }}" style="border-bottom: 1px solid #DCD4C4; padding: 22px 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 14.5px; font-weight: 500;">Cartão de crédito</div>
+            <div style="font-size: 13px; color: #6B6459; margin-top: 3px;">Em até 12x, via Mercado Pago</div>
+          </div>
+          <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid {{ cartaoBorder }}; background: {{ cartaoDot }}; transition: background 200ms ease, border-color 200ms ease;"></div>
+        </div>
+        <div onClick="{{ selectPix }}" style="border-bottom: 1px solid #DCD4C4; padding: 22px 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 14.5px; font-weight: 500;">Pix</div>
+            <div style="font-size: 13px; color: #6B6459; margin-top: 3px;">Aprovação imediata, via Mercado Pago</div>
+          </div>
+          <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid {{ pixBorder }}; background: {{ pixDot }}; transition: background 200ms ease, border-color 200ms ease;"></div>
+        </div>
+      </div>
+
+      <button onClick="{{ startRedirect }}" style="background: #1B1814; color: #F5F1EA; border: none; padding: 17px 36px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 250ms ease, transform 150ms ease;" style-hover="background:#2C2721;" style-active="transform:scale(0.98);">Finalizar e ir para pagamento</button>
+      <div style="margin-top: 18px; font-size: 12.5px; color: #6B6459;">Total a pagar: R$ 4.380</div>
+      </div>
+    </sc-if>
+
+    <!-- ============ REDIRECIONANDO ============ -->
+    <sc-if value="{{ isRedirecting }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 120px 24px;">
+        <div style="width: 34px; height: 34px; border: 2px solid #DCD4C4; border-top-color: #1B1814; border-radius: 50%; animation: spin 900ms linear infinite; margin-bottom: 32px;"></div>
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 24px; margin: 0 0 12px;">Direcionando para o ambiente seguro de pagamento…</h2>
+        <p style="font-size: 14px; color: #6B6459; max-width: 380px;">Retrato ao Meio-dia · R$ 4.380 · processado via Mercado Pago</p>
+      </div>
+    </sc-if>
+
+    <!-- ============ CONFIRMAÇÃO ============ -->
+    <sc-if value="{{ isConfirmado }}" hint-placeholder-val="{{ false }}">
+      <div style="animation: riseIn 500ms cubic-bezier(0.16,1,0.3,1) both;">
+      <div style="text-align: center; padding: 40px 24px 24px;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: #EAF1EA; color: #2F5233; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 28px;">✓</div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 16px;">Pedido #BC-2026-0142</div>
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 32px; margin: 0 0 12px;">A obra é sua.</h1>
+        <p style="font-size: 15px; color: #6B6459; max-width: 420px; margin: 0 auto 56px;">Acompanhe cada etapa da produção em Minha Conta → Meus Pedidos.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 48px;">
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="color: #2F5233;">✔</span><span style="font-size: 14.5px;">Pedido recebido</span></div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="color: #2F5233;">✔</span><span style="font-size: 14.5px;">Pagamento aprovado</span></div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="color: #A9814A;">○</span><span style="font-size: 14.5px; color: #6B6459;">Preparando certificado de autenticidade</span></div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="color: #DCD4C4;">○</span><span style="font-size: 14.5px; color: #9C9280;">Embalagem</span></div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="color: #DCD4C4;">○</span><span style="font-size: 14.5px; color: #9C9280;">Em transporte</span></div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="color: #DCD4C4;">○</span><span style="font-size: 14.5px; color: #9C9280;">Entregue</span></div>
+      </div>
+      <div style="display: flex; gap: 18px; justify-content: center;">
+        <a href="Minha Conta.dc.html" style="text-decoration: none; background: #1B1814; color: #F5F1EA; padding: 15px 30px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; transition: background 250ms ease;" style-hover="background:#2C2721;">Ver meus pedidos</a>
+        <a href="Home.dc.html" style="text-decoration: none; border: 1px solid #1B1814; color: #1B1814; padding: 15px 30px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px;">Voltar à galeria</a>
+      </div>
+      </div>
+    </sc-if>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    step: 'endereco', // endereco | resumo | pagamento | redirecting | confirmado
+    selectedAddress: 'addr1',
+    showNewAddressForm: false,
+    paymentMethod: 'cartao'
+  };
+
+  componentWillUnmount() {
+    if (this._redirectTimer) clearTimeout(this._redirectTimer);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const stepIndex = { endereco: 0, resumo: 1, pagamento: 2, redirecting: 2, confirmado: 2 }[s.step];
+
+    const stepBg = [], stepColor = [], stepBorder = [], stepLabelColor = [];
+    for (let i = 0; i < 3; i++) {
+      const active = i === stepIndex;
+      const done = i < stepIndex;
+      stepBg.push(active || done ? '#1B1814' : 'transparent');
+      stepColor.push(active || done ? '#F5F1EA' : '#6B6459');
+      stepBorder.push(active || done ? '#1B1814' : '#DCD4C4');
+      stepLabelColor.push(active ? '#1B1814' : '#6B6459');
+    }
+
+    const radio = (selected) => selected ? '#1B1814' : 'transparent';
+    const stepCursor = [stepIndex > 0 ? 'pointer' : 'default', stepIndex > 1 ? 'pointer' : 'default'];
+
+    return {
+      stepCursor,
+      goToEndereco: () => { if (stepIndex > 0) this.setState({ step: 'endereco' }); },
+      goToResumoFromStepper: () => { if (stepIndex > 1) this.setState({ step: 'resumo' }); },
+      backToResumo: () => this.setState({ step: 'resumo' }),
+      showStepper: s.step === 'endereco' || s.step === 'resumo' || s.step === 'pagamento',
+      isStepEndereco: s.step === 'endereco',
+      isStepResumo: s.step === 'resumo',
+      isStepPagamento: s.step === 'pagamento',
+      isRedirecting: s.step === 'redirecting',
+      isConfirmado: s.step === 'confirmado',
+      stepBg, stepColor, stepBorder, stepLabelColor,
+
+      addr1Border: s.selectedAddress === 'addr1' ? '#1B1814' : '#DCD4C4',
+      addr2Border: s.selectedAddress === 'addr2' ? '#1B1814' : '#DCD4C4',
+      addr1Dot: radio(s.selectedAddress === 'addr1'),
+      addr2Dot: radio(s.selectedAddress === 'addr2'),
+      selectAddr1: () => this.setState({ selectedAddress: 'addr1' }),
+      selectAddr2: () => this.setState({ selectedAddress: 'addr2' }),
+
+      showNewAddressForm: s.showNewAddressForm,
+      newAddressToggleLabel: s.showNewAddressForm ? '− Ocultar formulário' : '+ Adicionar novo endereço',
+      toggleNewAddress: () => this.setState({ showNewAddressForm: !s.showNewAddressForm }),
+
+      goToResumo: () => this.setState({ step: 'resumo' }),
+      backToEndereco: () => this.setState({ step: 'endereco' }),
+      goToPagamento: () => this.setState({ step: 'pagamento' }),
+
+      cartaoBorder: s.paymentMethod === 'cartao' ? '#1B1814' : '#DCD4C4',
+      pixBorder: s.paymentMethod === 'pix' ? '#1B1814' : '#DCD4C4',
+      cartaoDot: radio(s.paymentMethod === 'cartao'),
+      pixDot: radio(s.paymentMethod === 'pix'),
+      selectCartao: () => this.setState({ paymentMethod: 'cartao' }),
+      selectPix: () => this.setState({ paymentMethod: 'pix' }),
+
+      startRedirect: () => {
+        this.setState({ step: 'redirecting' });
+        this._redirectTimer = setTimeout(() => this.setState({ step: 'confirmado' }), 2200);
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

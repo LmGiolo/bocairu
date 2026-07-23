@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="./image-slot.js"></script>
+  <style>
+    body { margin: 0; background: #F5F1EA; }
+    ::selection { background: #A9814A; color: #F5F1EA; }
+    a { color: #7A2E32; }
+    a:hover { color: #5C1F24; }
+    input:focus, button:focus { outline: 2px solid #A9814A; outline-offset: 2px; }
+    ::first-letter.dropcap {}
+  </style>
+</helmet>
+
+<div style="font-family: 'Work Sans', sans-serif; color: #1B1814; background: #F5F1EA;">
+
+  <!-- ============ HEADER ============ -->
+  <header style="position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(245,241,234,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #DCD4C4;">
+    <a href="Home.dc.html" style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; letter-spacing: 0.04em; color: #1B1814; text-decoration: none;">BOCAIRÚ</a>
+    <div style="display: flex; align-items: center; gap: 40px;">
+    <nav aria-label="Navegação principal" style="display: flex; gap: 40px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;">
+      <a href="Home.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Home</a>
+      <a href="Galeria.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Galeria</a>
+      <a href="Colecoes.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Coleções</a>
+      <a href="A Artista.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">A Artista</a>
+      <a href="Encomendas e Consultoria.dc.html" style="color: #1B1814; text-decoration: none; opacity: 0.85;" style-hover="opacity:1;">Encomendas</a>
+    </nav>
+    <a href="{{ accountHref }}" aria-label="Minha conta" title="Minha conta" style="color: #1B1814; opacity: 0.85; transition: opacity 250ms ease; display: flex; align-items: center;" style-hover="opacity:1;">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5"></path></svg>
+    </a>
+  </div>
+  </header>
+
+  <!-- ============ BREADCRUMB ============ -->
+  <div style="max-width: 1360px; margin: 0 auto; padding: 40px 96px 0; display: flex; flex-direction: column; gap: 20px;" data-screen-label="Página da Obra">
+    <a href="Galeria.dc.html" style="display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: #1B1814; text-decoration: none; border: 1px solid #DCD4C4; border-radius: 999px; padding: 10px 20px; transition: border-color 280ms ease, background 280ms ease;" style-hover="border-color:#1B1814;background:#fff;">← Voltar à galeria</a>
+    <div style="font-size: 13px; color: #6B6459;">
+      <a href="Galeria.dc.html" style="color: #6B6459; text-decoration: none;" style-hover="color:#1B1814;">Galeria</a> / <a href="Galeria.dc.html?serie=retratos" style="color: #6B6459; text-decoration: none;" style-hover="color:#1B1814;">Retratos</a> / <span style="color: #1B1814;">Retrato ao Meio-dia</span>
+    </div>
+  </div>
+
+  <!-- ============ SPLIT: IMAGEM + FICHA ============ -->
+  <section style="max-width: 1360px; margin: 0 auto; padding: 32px 96px 0; display: grid; grid-template-columns: 1.15fr 1fr; gap: 88px; align-items: start;">
+
+    <!-- Imagem -->
+    <div style="position: sticky; top: 96px;">
+      <div style="overflow: hidden; border: 1px solid #DCD4C4; cursor: zoom-in;">
+        <image-slot id="obra-principal" shape="rect" placeholder="Imagem principal da obra em alta resolução" style="width: 100%; aspect-ratio: 4/5; display: block; transition: transform 600ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.035);"></image-slot>
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <div style="width: 84px; height: 84px; border: 1px solid #1B1814; opacity: 1; transition: opacity 250ms ease; cursor: pointer;"><image-slot id="obra-thumb-1" shape="rect" placeholder="Detalhe 1" style="width: 100%; height: 100%; display: block;"></image-slot></div>
+        <div style="width: 84px; height: 84px; border: 1px solid #DCD4C4; opacity: 0.75; transition: opacity 250ms ease, border-color 250ms ease; cursor: pointer;" style-hover="opacity:1;border-color:#1B1814;"><image-slot id="obra-thumb-2" shape="rect" placeholder="Detalhe 2" style="width: 100%; height: 100%; display: block;"></image-slot></div>
+        <div style="width: 84px; height: 84px; border: 1px solid #DCD4C4; opacity: 0.75; transition: opacity 250ms ease, border-color 250ms ease; cursor: pointer;" style-hover="opacity:1;border-color:#1B1814;"><image-slot id="obra-thumb-3" shape="rect" placeholder="Obra ambientada" style="width: 100%; height: 100%; display: block;"></image-slot></div>
+      </div>
+    </div>
+
+    <!-- Ficha -->
+    <div>
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">Série Retratos</div>
+      <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 46px; line-height: 1.1; margin: 0 0 10px;">Retrato ao Meio-dia</h1>
+      <div style="font-size: 15px; color: #6B6459; margin-bottom: 40px;">Bocairú, 2025</div>
+
+      <p style="font-size: 16px; line-height: 1.75; color: #3A342C; margin: 0 0 40px; max-width: 480px;">Registrada durante uma tarde inteira de observação, a imagem organiza luz dura e sombra curta em uma composição que recusa o espetáculo — presença sem performance.</p>
+
+      <!-- Seletor de tamanho -->
+      <div style="margin-bottom: 32px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px;">
+          <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B6459;">Tamanho</span>
+          <span style="font-size: 13px; color: #1B1814;">{{ selectedSize.label }}</span>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <sc-for list="{{ sizes }}" as="sz" hint-placeholder-count="3">
+            <button onClick="{{ sz.onSelect }}" style="background: {{ sz.pillBg }}; color: {{ sz.pillColor }}; border: 1px solid {{ sz.pillBorder }}; border-radius: 3px; padding: 13px 18px; font-size: 13.5px; font-family: 'Work Sans', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; transition: background 220ms ease, color 220ms ease, border-color 220ms ease, transform 150ms ease; min-width: 108px;" style-hover="transform:translateY(-1px);" style-active="transform:translateY(0px) scale(0.98);">
+              <span style="font-weight: 500;">{{ sz.label }}</span>
+              <span style="font-size: 11px; opacity: 0.75;">{{ sz.statusShort }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- Ficha técnica -->
+      <div style="border-top: 1px solid #DCD4C4; border-bottom: 1px solid #DCD4C4; padding: 24px 0; margin-bottom: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; font-size: 14px;">
+        <div><span style="color: #6B6459;">Técnica</span></div><div>Fotografia fine art</div>
+        <div><span style="color: #6B6459;">Material</span></div><div>Papel algodão 100%, tintas pigmentadas</div>
+        <div><span style="color: #6B6459;">Impressão</span></div><div>Giclée de padrão museológico</div>
+        <div><span style="color: #6B6459;">Papel</span></div><div>Hahnemühle Photo Rag, 308g</div>
+        <div><span style="color: #6B6459;">Dimensões</span></div><div>{{ selectedSize.label }}</div>
+        <div><span style="color: #6B6459;">Edição</span></div><div>{{ selectedSize.editionLabel }}</div>
+        <div><span style="color: #6B6459;">Assinatura</span></div><div>Assinada e numerada no verso, a grafite</div>
+        <div><span style="color: #6B6459;">Certificado</span></div><div>Autenticidade assinada à mão pela artista</div>
+      </div>
+
+      <!-- Preço + CTA -->
+      <div style="margin-bottom: 24px;">
+        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: {{ selectedSize.statusColor }}; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 8px;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ selectedSize.statusColor }}; display: inline-block;"></span>
+          {{ selectedSize.statusLabel }}
+        </div>
+
+        <sc-if value="{{ isAvailable }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+            <div style="font-family: 'Instrument Serif', serif; font-size: 26px;">R$ {{ selectedSize.priceLabel }}</div>
+            <a href="Autenticacao.dc.html" style="text-decoration: none; background: #1B1814; color: #F5F1EA; border: none; padding: 17px 36px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 250ms ease, transform 150ms ease; display: inline-block;" style-hover="background:#2C2721;" style-active="transform:scale(0.98);">Adquirir esta obra</a>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isSold }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <button disabled style="background: #EDE6D8; color: #9C9280; border: none; padding: 17px 36px; font-size: 14px; border-radius: 2px; cursor: not-allowed;">Vendida</button>
+            <a href="Galeria.dc.html?serie=retratos" style="font-size: 14px; text-decoration: underline; text-underline-offset: 4px;">Ver obras semelhantes →</a>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isOnRequest }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <a href="Encomendas e Consultoria.dc.html" style="text-decoration: none; background: transparent; color: #1B1814; border: 1px solid #1B1814; padding: 16px 34px; font-size: 14px; letter-spacing: 0.03em; border-radius: 2px; cursor: pointer; transition: background 250ms ease, color 250ms ease; display: inline-block;" style-hover="background:#1B1814;color:#F5F1EA;">Falar sobre esta obra</a>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #6B6459; padding-top: 22px; border-top: 1px solid #DCD4C4;">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: #A9814A; display: inline-block;"></span>
+        Impressão sob encomenda · pronta para envio em {{ selectedSize.shipDays }}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HISTÓRIA DA OBRA ============ -->
+  <section style="max-width: 1360px; margin: 0 auto; padding: 160px 96px; display: grid; grid-template-columns: 1fr 0.8fr; gap: 88px; align-items: center;">
+    <div>
+      <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">História da obra</div>
+      <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 32px; margin: 0 0 28px; max-width: 460px;">Uma tarde inteira até o gesto se aquietar.</h2>
+      <p style="font-size: 17px; line-height: 1.8; color: #3A342C; margin: 0 0 20px;">Bocairú retornou ao mesmo pátio por três dias seguidos antes de fazer este retrato. A luz do meio-dia, dura demais para o retrato convencional, tornou-se aqui o próprio assunto: ela recorta o rosto sem suavizá-lo, revelando textura e permanência em vez de beleza construída.</p>
+      <p style="font-size: 17px; line-height: 1.8; color: #3A342C; margin: 0;">Não houve direção de pose. A artista esperou até que a presença da câmera deixasse de alterar o comportamento de quem era fotografado — só então o obturador foi acionado, uma única vez.</p>
+    </div>
+    <image-slot id="obra-historia" shape="rect" placeholder="Bastidor da sessão / contexto da obra" style="width: 100%; aspect-ratio: 4/5; display: block;"></image-slot>
+  </section>
+
+  <!-- ============ CERTIFICADO & AUTENTICIDADE ============ -->
+  <section style="background: #EDE6D8; padding: 120px 96px;">
+    <div style="max-width: 1360px; margin: 0 auto; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 80px; align-items: center;">
+      <div style="background: #FBF9F4; border: 1px solid #DCD4C4; padding: 44px 40px; position: relative;">
+        <div style="position: absolute; top: 20px; right: 20px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid #A9814A; display: flex; align-items: center; justify-content: center; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 15px; color: #A9814A;">B</div>
+        <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 24px;">Certificado de Autenticidade</div>
+        <div style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; margin-bottom: 28px;">Retrato ao Meio-dia</div>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13px; color: #3A342C; border-top: 1px solid #DCD4C4; padding-top: 24px;">
+          <div style="display: flex; justify-content: space-between;"><span style="color: #6B6459;">Dimensões</span><span>{{ selectedSize.label }}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span style="color: #6B6459;">Edição</span><span>{{ selectedSize.editionLabel }}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span style="color: #6B6459;">Ano</span><span>2025</span></div>
+        </div>
+        <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #DCD4C4; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; color: #1B1814;">Bocairú</div>
+        <div style="font-size: 11px; color: #6B6459; margin-top: 4px;">Assinatura da artista</div>
+      </div>
+      <div>
+        <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #A9814A; font-weight: 600; margin-bottom: 20px;">Garantia de originalidade</div>
+        <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 32px; margin: 0 0 24px; max-width: 460px;">Toda obra chega numerada e assinada à mão.</h2>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; gap: 16px; align-items: flex-start;"><span style="color: #A9814A; font-family: 'Instrument Serif', serif; font-size: 20px; flex-shrink: 0;">—</span><span style="font-size: 15px; line-height: 1.6; color: #3A342C;">Assinatura original a grafite no verso, com data e numeração da edição, quando aplicável.</span></div>
+          <div style="display: flex; gap: 16px; align-items: flex-start;"><span style="color: #A9814A; font-family: 'Instrument Serif', serif; font-size: 20px; flex-shrink: 0;">—</span><span style="font-size: 15px; line-height: 1.6; color: #3A342C;">Certificado impresso e assinado, enviado junto à obra, com registro no arquivo da artista.</span></div>
+          <div style="display: flex; gap: 16px; align-items: flex-start;"><span style="color: #A9814A; font-family: 'Instrument Serif', serif; font-size: 20px; flex-shrink: 0;">—</span><span style="font-size: 15px; line-height: 1.6; color: #3A342C;">Impressão de padrão museológico, com estabilidade de cor superior a 80 anos.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ OBRAS RELACIONADAS ============ -->
+  <section style="max-width: 1360px; margin: 0 auto; padding: 140px 96px 100px;">
+    <h2 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 32px; margin: 0 0 44px;">Da mesma série.</h2>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px;">
+      <div>
+        <a href="Pagina da Obra.dc.html" style="text-decoration: none; color: inherit;"><div style="overflow: hidden; border: 1px solid #DCD4C4;"><image-slot id="rel-1" shape="rect" placeholder="Obra relacionada" style="width: 100%; aspect-ratio: 4/5; display: block; transition: transform 600ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.045);"></image-slot></div></a>
+        <div style="padding-top: 14px; font-size: 14px; font-weight: 500;">Véspera</div>
+        <div style="font-size: 12px; color: #6B6459;">Edição 7/10</div>
+      </div>
+      <div>
+        <a href="Pagina da Obra.dc.html" style="text-decoration: none; color: inherit;"><div style="overflow: hidden; border: 1px solid #DCD4C4;"><image-slot id="rel-2" shape="rect" placeholder="Obra relacionada" style="width: 100%; aspect-ratio: 4/5; display: block; transition: transform 600ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.045);"></image-slot></div></a>
+        <div style="padding-top: 14px; font-size: 14px; font-weight: 500;">Entre Redes</div>
+        <div style="font-size: 12px; color: #6B6459;">Papel algodão</div>
+      </div>
+      <div>
+        <a href="Pagina da Obra.dc.html" style="text-decoration: none; color: inherit;"><div style="overflow: hidden; border: 1px solid #DCD4C4;"><image-slot id="rel-3" shape="rect" placeholder="Obra relacionada" style="width: 100%; aspect-ratio: 4/5; display: block; transition: transform 600ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.045);"></image-slot></div></a>
+        <div style="padding-top: 14px; font-size: 14px; font-weight: 500;">Sombra Longa</div>
+        <div style="font-size: 12px; color: #6B6459;">Papel algodão</div>
+      </div>
+      <div>
+        <a href="Pagina da Obra.dc.html" style="text-decoration: none; color: inherit;"><div style="overflow: hidden; border: 1px solid #DCD4C4;"><image-slot id="rel-4" shape="rect" placeholder="Obra relacionada" style="width: 100%; aspect-ratio: 4/5; display: block; transition: transform 600ms cubic-bezier(0.16,1,0.3,1);" style-hover="transform:scale(1.045);"></image-slot></div></a>
+        <div style="padding-top: 14px; font-size: 14px; font-weight: 500;">Terreiro</div>
+        <div style="font-size: 12px; color: #6B6459;">Fotografia fine art</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="background: #1B1814; color: #B8AF9E; padding: 64px 96px 40px;">
+    <div style="max-width: 1360px; margin: 0 auto; border-top: 1px solid rgba(245,241,234,0.12); padding-top: 24px; font-size: 12px; color: #6B6459;">© 2026 Bocairú. Todos os direitos reservados.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1440}, &quot;defaultSize&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;50x70&quot;, &quot;options&quot;: [&quot;30x40&quot;, &quot;50x70&quot;, &quot;70x100&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Obra&quot;}}">
+class Component extends DCLogic {
+  static SIZES = [
+    { id: '30x40', label: '30 × 40 cm', price: 2400, status: 'disponivel', shipDays: '7 dias úteis' },
+    { id: '50x70', label: '50 × 70 cm', price: 4200, status: 'disponivel', shipDays: '10 dias úteis' },
+    { id: '70x100', label: '70 × 100 cm', price: 6800, status: 'disponivel', shipDays: '15–20 dias úteis' }
+  ];
+
+  state = {
+    selectedSizeId: (this.props && this.props.defaultSize) || '50x70',
+    isLoggedIn: false
+  };
+
+  componentDidMount() {
+    this.setState({ isLoggedIn: window.localStorage.getItem('bocairu_auth') === '1' });
+  }
+
+  formatPrice(n) {
+    return n.toLocaleString('pt-BR');
+  }
+
+  buildSize(raw, selected) {
+    const status = 'disponivel';
+    const isAvailable = status === 'disponivel';
+    const isSold = status === 'vendida';
+    const isOnRequest = status === 'consulta';
+    const statusColor = isAvailable ? '#2F5233' : isSold ? '#7A2E32' : '#A9814A';
+    const statusLabel = isAvailable ? 'Disponível' : isSold ? 'Vendida' : 'Sob consulta';
+    const statusShort = isAvailable ? 'Disponível' : isSold ? 'Vendida' : 'Consulta';
+    const editionLabel = 'Original única';
+
+    const isSelected = raw.id === selected;
+    return {
+      id: raw.id,
+      label: raw.label,
+      price: raw.price,
+      priceLabel: this.formatPrice(raw.price),
+      status, isAvailable, isSold, isOnRequest,
+      statusColor, statusLabel, statusShort,
+      editionLabel,
+      shipDays: raw.shipDays,
+      pillBg: isSelected ? '#1B1814' : '#FBF9F4',
+      pillColor: isSelected ? '#F5F1EA' : '#1B1814',
+      pillBorder: isSelected ? '#1B1814' : '#DCD4C4',
+      onSelect: () => this.setState({ selectedSizeId: raw.id })
+    };
+  }
+
+  renderVals() {
+    const selectedId = this.state.selectedSizeId;
+    const sizes = Component.SIZES.map((raw) => this.buildSize(raw, selectedId));
+    const selectedSize = sizes.find((s) => s.id === selectedId) || sizes[0];
+
+    return {
+      accountHref: this.state.isLoggedIn ? 'Minha Conta.dc.html' : 'Autenticacao.dc.html?redirect=account',
+      sizes,
+      selectedSize,
+      isAvailable: selectedSize.isAvailable,
+      isSold: selectedSize.isSold,
+      isOnRequest: selectedSize.isOnRequest
+    };
+  }
+}
+
+</script>
+</body>
+</html>
