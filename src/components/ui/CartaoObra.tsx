@@ -10,8 +10,15 @@ type Props = {
   alt?: string
   status?: string
   precoLabel?: string
-  /** Proporção real da obra — a grade nunca força crop quadrado. */
-  aspectRatio?: string
+  /**
+   * Dimensões em pixels da imagem web (colunas `largura_px`/`altura_px` de
+   * `obras`, gravadas no upload a partir do que o sharp devolve depois de
+   * rotacionar e redimensionar). A grade nunca força crop quadrado — sem
+   * as duas, cai num 4/5 razoável (obras cadastradas antes dessas colunas
+   * existirem).
+   */
+  larguraPx?: number | null
+  alturaPx?: number | null
 }
 
 export default function CartaoObra({
@@ -22,8 +29,11 @@ export default function CartaoObra({
   alt,
   status,
   precoLabel,
-  aspectRatio = '4 / 5',
+  larguraPx,
+  alturaPx,
 }: Props) {
+  const aspectRatio = larguraPx && alturaPx ? `${larguraPx} / ${alturaPx}` : '4 / 5'
+
   return (
     <div className="group">
       <Link href={href} className="block overflow-hidden border border-linho">

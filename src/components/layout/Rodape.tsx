@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function Rodape() {
   return (
-    <footer className="mt-16 bg-tinta px-6 py-16 text-pedra md:px-12">
+    <footer className="mt-16 bg-tinta px-6 py-16 text-pedra md:px-12 lg:px-24">
       <div className="mx-auto grid max-w-[1440px] gap-12 pb-10 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <div className="mb-3 font-serif text-2xl italic text-areia">

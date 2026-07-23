@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 
-import { precoParaCentavos } from '@/lib/obras/formulario'
+import { precoParaCentavos, formatarCentavos } from '@/lib/obras/formulario'
 
 // Uma linha da lista de tamanhos, do jeito que ela existe na tela.
 //
@@ -43,14 +43,6 @@ const FICHA_VAZIA: Ficha = {
 function linhaNova(id: number): LinhaTamanho {
   // Nasce disponível: é o caso comum, e espelha o default da coluna.
   return { id, rotulo: '', preco: '', disponivel: true, prazo_dias: '' }
-}
-
-// Formata centavos de volta pra moeda, só pra conferência na tela.
-function formatarCentavos(centavos: number) {
-  return (centavos / 100).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
 }
 
 export default function FormularioObra() {

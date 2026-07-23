@@ -14,7 +14,7 @@ const NAVEGACAO = [
 
 export default function Cabecalho() {
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between gap-6 border-b border-linho bg-areia/95 px-6 py-5 backdrop-blur md:px-12">
+    <header className="sticky top-0 z-50 flex items-center justify-between gap-6 border-b border-linho bg-areia/95 px-6 py-5 backdrop-blur md:px-12 lg:px-24">
       <Link
         href="/"
         className="font-serif text-2xl italic tracking-wide text-tinta"

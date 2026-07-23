@@ -96,6 +96,19 @@ export function precoParaCentavos(entrada: string): number | null {
 }
 
 /**
+ * Caminho inverso de `precoParaCentavos`: centavos guardados no banco de
+ * volta pra moeda formatada ("R$ 4.200,00"). Usado tanto na conferência do
+ * formulário do admin quanto no preço mostrado na Página da Obra — mesmo
+ * código dos dois lados, mesma regra de arredondamento.
+ */
+export function formatarCentavos(centavos: number): string {
+  return (centavos / 100).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  })
+}
+
+/**
  * Lê um campo de texto opcional do FormData: apara os espaços, confere o
  * tamanho e devolve null quando vazio.
  *

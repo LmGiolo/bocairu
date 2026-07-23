@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
   // ─────────────────────────────────────────────────────────────
   // 2) Gera a versão web: redimensionada e comprimida, sem marca d'água
   // ─────────────────────────────────────────────────────────────
-  const bytesWeb = await sharp(bytesOriginal)
+  const { data: bytesWeb, info: infoWeb } = await sharp(bytesOriginal)
     // Aplica a rotação que estava só anotada no EXIF. Sem isso, foto
     // tirada deitada aparece deitada depois que os metadados somem.
     .rotate()
@@ -130,7 +130,12 @@ export async function POST(request: NextRequest) {
     // Qualidade 82 em webp: praticamente indistinguível do original em
     // tela, com uma fração do peso.
     .webp({ quality: 82 })
-    .toBuffer()
+    // resolveWithObject também devolve `info`, com a largura/altura finais
+    // — depois de rotacionar e redimensionar, ou seja, a proporção que a
+    // tela vai mostrar. `metadados.width/height` (acima) é a dimensão
+    // bruta do arquivo, de antes da rotação, e vem trocada em fotos
+    // verticais com EXIF de 90°/270°.
+    .toBuffer({ resolveWithObject: true })
 
   // ─────────────────────────────────────────────────────────────
   // 3) A PARTIR DAQUI TUDO TEM VOLTA
@@ -205,6 +210,8 @@ export async function POST(request: NextRequest) {
       status: 'publicada',
       imagem_web: dadosUrl.publicUrl,
       imagem_alta: caminhoAlta,
+      largura_px: infoWeb.width,
+      altura_px: infoWeb.height,
     })
     .select()
     .single()
