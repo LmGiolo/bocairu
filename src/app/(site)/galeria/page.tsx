@@ -1,12 +1,22 @@
 import { createClient } from '@/lib/supabase/server'
+import GaleriaInterativa from '@/components/galeria/GaleriaInterativa'
 
-export default async function Galeria() {
+export default async function Galeria({
+  searchParams,
+}: {
+  searchParams: Promise<{ [chave: string]: string | string[] | undefined }>
+}) {
+  const { serie } = await searchParams
   const supabase = await createClient()
 
-  // Busca todas as obras. O RLS garante que só vêm as "publicada".
+  // Busca tudo de uma vez — "catálogo curado, não vasto" (handoff §1), não
+  // dá pra justificar paginação de servidor aqui. O RLS garante que só
+  // vêm as obras "publicada"; não filtramos status no código.
   const { data: obras, error } = await supabase
     .from('obras')
-    .select('*')
+    .select(
+      'id, titulo, ano, tecnica, serie, imagem_web, largura_px, altura_px, tamanhos(rotulo, preco_centavos, disponivel)'
+    )
     .order('ordem', { ascending: true })
 
   if (error) {
@@ -14,29 +24,9 @@ export default async function Galeria() {
   }
 
   return (
-    <main style={{ padding: 40, fontFamily: 'sans-serif' }}>
-      <h1>Galeria</h1>
-
-      {obras.length === 0 ? (
-        <p>Nenhuma obra publicada ainda.</p>
-      ) : (
-        <ul>
-          {obras.map((obra) => (
-            <li key={obra.id} style={{ marginBottom: 24 }}>
-              {obra.imagem_web && (
-                <img
-                  src={obra.imagem_web}
-                  alt={obra.titulo}
-                  style={{ width: 300, height: 'auto', display: 'block' }}
-                />
-              )}
-              <strong>{obra.titulo}</strong> — {obra.ano}
-              <br />
-              {obra.descricao}
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+    <GaleriaInterativa
+      obras={obras}
+      serieInicial={typeof serie === 'string' ? serie : null}
+    />
   )
 }
