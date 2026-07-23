@@ -176,25 +176,42 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
 ### Pronto e testado
 
 - **Fundação:** Next.js (App Router, TypeScript, Tailwind v4, `src/`) + Supabase.
-- **Banco:** tabelas `perfis`, `obras`, `tamanhos`, `pedidos`, `pedido_itens`,
-  com RLS ativo em todas.
+- **Banco:** tabelas `perfis`, `obras` (+ `largura_px`/`altura_px`), `tamanhos`,
+  `pedidos`, `pedido_itens`, com RLS ativo em todas.
 - **Auth:** login e-mail+senha em `/entrar`; `/admin` protegida por dupla
   checagem (sessão + `perfis.papel = 'admin'`).
 - **Upload:** rota `/api/obras` processa a imagem com `sharp` — versão web
   (webp q82, lado máx 2000px) no bucket público `obras-web`, original no
-  bucket privado `obras-alta`. Compensação (pilha de desfazer) se algo falha.
+  bucket privado `obras-alta`. Grava `largura_px`/`altura_px` a partir do
+  `info` que o sharp devolve depois de `.rotate()` + `.resize()` (proporção
+  já corrigida pro que a tela mostra). Compensação (pilha de desfazer) se
+  algo falha.
 - **Admin:** `FormularioObra.tsx` cadastra obra completa com ficha técnica e
   lista dinâmica de tamanhos.
-- **`/galeria`:** versão crua e provisória (estilos inline). **Será substituída.**
+- **Design System (tokens):** paleta editorial e tipografia (Instrument
+  Serif + Work Sans) em `globals.css`/`layout.tsx`.
+- **Componentes base:** Cabeçalho, Rodapé (`src/components/layout/`), Botão
+  (4 variantes) e CartaoObra (`src/components/ui/`). Páginas públicas
+  agrupadas em `src/app/(site)/` — ganham Cabeçalho/Rodapé automaticamente;
+  `/admin` e `/entrar` ficam fora desse grupo, sem esse chrome.
+- **`/obras/[id]`:** Página da Obra completa — split-screen com proporção
+  real da imagem, seletor de tamanho, ficha técnica, preço/CTA, certificado
+  de autenticidade, obras relacionadas da mesma série. O tamanho selecionado
+  fica sincronizado entre esses blocos via `ContextoTamanho`
+  (`src/components/obra/`).
+- **`/galeria`:** grade em mosaico real (CSS `columns`, sem crop quadrado),
+  filtros de coleção/tamanho/orientação/faixa de preço montados
+  dinamicamente a partir do que existe no catálogo (nada hardcoded), busca
+  por título. `src/components/galeria/`.
 
 ### A construir
 
-1. **Design System (tokens)** — paleta e tipografia no `globals.css` / `layout.tsx`
-2. **Página da Obra** ← prioridade
-3. **Galeria** (grade assimétrica)
-4. **Home**
-5. Carrinho / checkout (total sempre recalculado no servidor)
-6. Pagamento (Mercado Pago — Pix + cartão)
+1. **Home** ← prioridade
+2. Página de Série/Coleção
+3. A Artista
+4. Carrinho / checkout (total sempre recalculado no servidor)
+5. Pagamento (Mercado Pago — Pix + cartão)
+6. Refinar Admin (estilos + lista de obras pra editar/despublicar)
 7. Deploy (Vercel)
 
 ---
@@ -214,15 +231,34 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   que a usa importa `server-only`.
 - **RLS é a fonte da verdade** para filtrar obras publicadas. Não adicionar
   filtro de `status` no código da galeria.
+- **Proporção real da imagem** vem de `obras.largura_px`/`altura_px`
+  (gravadas no upload, ver §7). CartaoObra e a Página da Obra usam essa
+  proporção; cai num `4/5` só quando as colunas são `null` (obras
+  cadastradas antes delas existirem). Não forçar crop quadrado em lugar
+  nenhum da vitrine.
+- **Só uma imagem por obra.** Sem tabela de fotos múltiplas no schema — por
+  isso a Página da Obra não tem tira de miniaturas nem uma segunda foto na
+  seção "História da obra". Adicionar isso é mudança de schema, não decisão
+  de tela.
+- **Disponibilidade é só `tamanhos.disponivel`.** A obra em si nunca
+  "esgota" (sob encomenda, sem tiragem — ver acima); não introduzir estado
+  de "vendida" nem "sob consulta" pra obra inteira, só disponível/
+  indisponível por tamanho.
+- **CTA "Adquirir esta obra" aponta pra `/entrar`** como placeholder até o
+  Checkout/Reserva (item da seção 7) existir de verdade.
+- **Filtros da Galeria seguem o protótipo, não o texto desta seção 3**
+  (que diverge do que foi de fato construído): Coleção, Tamanho, Orientação
+  e faixa de preço. Sem filtro de técnica nem de disponibilidade.
 
 ---
 
 ## 9. Schema relevante
 
 **`obras`:** `id`, `titulo`, `descricao`, `ano`, `imagem_web` (URL pública),
-`imagem_alta` (caminho no bucket privado), `status`, `ordem`, `serie`,
-`historia`, `historia_titulo`, `tecnica`, `material`, `impressao`, `papel`,
-`criado_em`, `atualizado_em`
+`imagem_alta` (caminho no bucket privado), `largura_px`, `altura_px`
+(dimensões da imagem web, nullable — obras antigas ainda não têm), `status`,
+`ordem`, `serie`, `historia`, `historia_titulo`, `tecnica`, `material`,
+`impressao`, `papel`, `criado_em`, `atualizado_em`
 
 **`tamanhos`:** `id`, `obra_id` (FK → obras), `rotulo`, `largura_cm`,
 `altura_cm`, `preco_centavos`, `ativo`, `ordem`, `disponivel`, `prazo_dias`,
