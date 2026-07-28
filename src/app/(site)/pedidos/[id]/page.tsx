@@ -3,25 +3,8 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Botao from '@/components/ui/Botao'
 import { formatarCentavos } from '@/lib/obras/formulario'
-
-const ROTULOS_STATUS: Record<string, string> = {
-  aguardando_pagamento: 'Aguardando pagamento',
-  pago: 'Pago',
-  em_producao: 'Em produção',
-  enviado: 'Enviado',
-  entregue: 'Entregue',
-  cancelado: 'Cancelado',
-}
-
-type EnderecoEntrega = {
-  cep: string
-  logradouro: string
-  numero: string
-  complemento: string | null
-  bairro: string
-  cidade: string
-  estado: string
-}
+import type { EnderecoEntrega } from '@/lib/pedidos/formulario'
+import { ROTULOS_STATUS_PEDIDO, type StatusPedido } from '@/lib/pedidos/status'
 
 export default async function DetalhePedido({
   params,
@@ -46,7 +29,7 @@ export default async function DetalhePedido({
   return (
     <div className="mx-auto max-w-[800px] px-6 py-16 md:px-12 md:py-20 lg:px-24">
       <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ouro">
-        {ROTULOS_STATUS[pedido.status] ?? pedido.status}
+        {ROTULOS_STATUS_PEDIDO[pedido.status as StatusPedido] ?? pedido.status}
       </div>
       <h1 className="mb-3 font-serif text-4xl text-tinta md:text-5xl">Pedido recebido.</h1>
       <p className="mb-12 max-w-md text-base leading-relaxed text-fumaca">

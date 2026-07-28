@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { createClient } from '@/lib/supabase/client'
+import { formatarData } from '@/lib/formatarData'
 
 type StatusEncomenda = 'nova' | 'em_conversa' | 'concluida' | 'arquivada'
 
@@ -28,14 +29,6 @@ const ROTULOS_TIPO_PROJETO: Record<string, string> = {
   corporativo: 'Corporativo',
   hospitalidade: 'Hospitalidade',
   nao_sei_ainda: 'Não sei ainda',
-}
-
-function formatarData(iso: string) {
-  return new Date(iso).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
 }
 
 // A escrita de status vai direto pro Supabase (client de sessão, não uma

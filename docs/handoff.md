@@ -247,24 +247,37 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   que antes viviam só em `admin/page.tsx`; toda rota nova em `/admin/*` já
   nasce protegida sem repetir o código (isso não vale pra rota de API — cada
   uma continua se defendendo sozinha, layout não roda pra route handler).
+- **`/admin/pedidos`:** lista todos os pedidos (não só os do próprio
+  cliente — precisou de policy de SELECT nova, `pedidos_select_admin` /
+  `pedido_itens_select_admin`, via `eh_admin()`; a de UPDATE de status já
+  existia antes desta tela). Linha expansível (um pedido tem vários
+  `pedido_itens`, diferente de Encomendas que é flat): "Ver detalhes" abre
+  itens, endereço e observações. `<select>` de status escreve direto no
+  Supabase pelo client do navegador, mesmo padrão de `ListaEncomendas.tsx`,
+  gravando `atualizado_em` junto. `ROTULOS_STATUS_PEDIDO`/`STATUS_PEDIDO`
+  saíram de dentro de `/pedidos/[id]/page.tsx` pra `src/lib/pedidos/status.ts`
+  (primeiro segundo uso de verdade); `formatarData` saiu de
+  `ListaEncomendas.tsx` pra `src/lib/formatarData.ts` pelo mesmo motivo. O
+  "seletor de status que escreve no Supabase" em si **não** virou
+  componente compartilhado — comparado com `ListaEncomendas.tsx`, a
+  duplicação real é só a chamada `.update().eq()`, pouco pra justificar
+  abstração.
 
 ### A construir
 
 Ordem acordada com a artista (site completo antes do lançamento):
 
-1. **Admin → Pedidos** ← prioridade (gerenciar status de `pedidos`; mesmo
-   molde da listagem de Encomendas — comparar as duas antes de extrair
-   qualquer coisa em comum, não abstrair antes da hora)
-2. Admin → listagem/edição de obras (hoje só cadastra; falta editar/despublicar)
-3. Frete por região
-4. Pagamento (Mercado Pago — Pix + cartão)
-5. Minha Conta (dashboard, meus pedidos, endereços, perfil, favoritos —
+1. **Admin → listagem/edição de obras** ← prioridade (hoje só cadastra;
+   falta editar/despublicar)
+2. Frete por região
+3. Pagamento (Mercado Pago — Pix + cartão)
+4. Minha Conta (dashboard, meus pedidos, endereços, perfil, favoritos —
    nenhuma dessas sub-telas existe hoje; protótipo é `Minha Conta.dc.html`)
-6. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir
+5. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir
    — o texto do handoff §3 é resumo, diverge do protótipo em pontos reais)
-7. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
+6. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
    restante)
-8. Deploy (Vercel)
+7. Deploy (Vercel)
 
 ---
 
