@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 
 const NAVEGACAO = [
   { href: '/admin', rotulo: 'Cadastrar obra' },
+  { href: '/admin/obras', rotulo: 'Obras' },
   { href: '/admin/pedidos', rotulo: 'Pedidos' },
   { href: '/admin/encomendas', rotulo: 'Encomendas' },
 ]

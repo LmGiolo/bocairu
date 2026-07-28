@@ -3,15 +3,17 @@
 import { useRef, useState } from 'react'
 
 import { precoParaCentavos, formatarCentavos } from '@/lib/obras/formulario'
+import { STATUS_OBRA, ROTULOS_STATUS_OBRA, type StatusObra } from '@/lib/obras/status'
 
 // Uma linha da lista de tamanhos, do jeito que ela existe na tela.
 //
-// O `id` não vem do banco nem vai pra ele: serve só como chave do React.
-// Usar o índice do array como key daria bug — ao remover a linha do meio,
-// o React reaproveitaria o estado da linha errada e o texto "pularia" de
-// campo. O id é fixo desde que a linha nasce, então isso não acontece.
+// `id` não vem do banco nem vai pra ele: serve só como key do React (ver
+// comentário de `linhaNova`). `tamanhoId` é o outro id, o de verdade — vem
+// preenchido quando a linha já existe em `tamanhos` (modo edição) e fica
+// `null` numa linha nova, que o servidor ainda vai inserir.
 type LinhaTamanho = {
   id: number
+  tamanhoId: string | null
   rotulo: string
   preco: string
   disponivel: boolean
@@ -42,22 +44,50 @@ const FICHA_VAZIA: Ficha = {
 
 function linhaNova(id: number): LinhaTamanho {
   // Nasce disponível: é o caso comum, e espelha o default da coluna.
-  return { id, rotulo: '', preco: '', disponivel: true, prazo_dias: '' }
+  return { id, tamanhoId: null, rotulo: '', preco: '', disponivel: true, prazo_dias: '' }
 }
 
-export default function FormularioObra() {
-  const [titulo, setTitulo] = useState('')
-  const [descricao, setDescricao] = useState('')
-  const [ano, setAno] = useState('')
-  const [ficha, setFicha] = useState<Ficha>(FICHA_VAZIA)
+// Dados de uma obra já existente, no formato que a tela usa (preço como
+// texto editável, não centavos — mesma conversão que o cadastro já faz).
+// Passar `obra` liga o formulário no modo edição: PATCH em vez de POST,
+// sem exigir arquivo, com o seletor de status visível.
+export type ObraParaEdicao = {
+  id: string
+  titulo: string
+  descricao: string
+  ano: string
+  ficha: Ficha
+  status: StatusObra
+  imagemWebUrl: string
+  tamanhos: Array<{
+    tamanhoId: string
+    rotulo: string
+    preco: string
+    disponivel: boolean
+    prazo_dias: string
+  }>
+}
+
+export default function FormularioObra({ obra }: { obra?: ObraParaEdicao }) {
+  const modoEdicao = obra !== undefined
+
+  const [titulo, setTitulo] = useState(obra?.titulo ?? '')
+  const [descricao, setDescricao] = useState(obra?.descricao ?? '')
+  const [ano, setAno] = useState(obra?.ano ?? '')
+  const [ficha, setFicha] = useState<Ficha>(obra?.ficha ?? FICHA_VAZIA)
+  const [status, setStatus] = useState<StatusObra>(obra?.status ?? 'publicada')
   const [arquivo, setArquivo] = useState<File | null>(null)
-  const [linhas, setLinhas] = useState<LinhaTamanho[]>([linhaNova(0)])
-  const [status, setStatus] = useState('')
+  const [linhas, setLinhas] = useState<LinhaTamanho[]>(() =>
+    obra && obra.tamanhos.length > 0
+      ? obra.tamanhos.map((tamanho, indice) => ({ id: indice, ...tamanho }))
+      : [linhaNova(0)]
+  )
+  const [mensagem, setMensagem] = useState('')
   const [enviando, setEnviando] = useState(false)
 
   // Contador de ids. Fica num ref porque mudar ele não deve redesenhar a
   // tela — ele não é informação que aparece em lugar nenhum.
-  const proximoId = useRef(1)
+  const proximoId = useRef(linhas.length)
 
   function alterarFicha(campo: keyof Ficha, valor: string) {
     setFicha((atual) => ({ ...atual, [campo]: valor }))
@@ -82,22 +112,24 @@ export default function FormularioObra() {
   }
 
   async function enviar() {
-    if (!arquivo) {
-      setStatus('Escolha uma imagem primeiro.')
+    if (!modoEdicao && !arquivo) {
+      setMensagem('Escolha uma imagem primeiro.')
       return
     }
 
     setEnviando(true)
-    setStatus('Enviando... (o servidor ainda vai processar a imagem)')
+    setMensagem(modoEdicao ? 'Salvando...' : 'Enviando... (o servidor ainda vai processar a imagem)')
 
     // FormData é como se manda arquivo por HTTP. Não dá pra usar JSON aqui:
     // JSON só carrega texto, e a imagem é binária. Os tamanhos, que são
-    // estruturados, viajam como um campo de texto em JSON.
+    // estruturados, viajam como um campo de texto em JSON. No modo edição
+    // não há arquivo nenhum — o campo simplesmente não é anexado.
     const dados = new FormData()
-    dados.append('arquivo', arquivo)
+    if (arquivo) dados.append('arquivo', arquivo)
     dados.append('titulo', titulo)
     dados.append('descricao', descricao)
     dados.append('ano', ano)
+    if (modoEdicao) dados.append('status', status)
 
     // A ficha inteira: a chave do estado bate o nome do campo que o servidor
     // espera, então um laço só resolve os sete.
@@ -108,7 +140,8 @@ export default function FormularioObra() {
     dados.append(
       'tamanhos',
       JSON.stringify(
-        linhas.map(({ rotulo, preco, disponivel, prazo_dias }) => ({
+        linhas.map(({ tamanhoId, rotulo, preco, disponivel, prazo_dias }) => ({
+          id: tamanhoId,
           rotulo,
           preco,
           disponivel,
@@ -118,8 +151,8 @@ export default function FormularioObra() {
     )
 
     try {
-      const resposta = await fetch('/api/obras', {
-        method: 'POST',
+      const resposta = await fetch(modoEdicao ? `/api/obras/${obra.id}` : '/api/obras', {
+        method: modoEdicao ? 'PATCH' : 'POST',
         body: dados,
         // Nada de header 'Content-Type' aqui: o navegador precisa montar ele
         // sozinho pra incluir o "boundary" que separa os campos do FormData.
@@ -128,21 +161,38 @@ export default function FormularioObra() {
       const corpo = await resposta.json()
 
       if (!resposta.ok) {
-        setStatus('Erro: ' + (corpo.erro ?? resposta.status))
+        setMensagem('Erro: ' + (corpo.erro ?? resposta.status))
         return
       }
 
-      setStatus(
-        `Pronto! "${corpo.obra.titulo}" criada com ${corpo.tamanhos.length} tamanho(s).`
-      )
-      setTitulo('')
-      setDescricao('')
-      setAno('')
-      setFicha(FICHA_VAZIA)
-      setArquivo(null)
-      setLinhas([linhaNova(proximoId.current++)])
+      if (modoEdicao) {
+        setMensagem(`Salvo! "${corpo.obra.titulo}" atualizada.`)
+
+        // Tamanhos novos (sem tamanhoId) voltam do servidor com um id de
+        // verdade. Casa cada um pela `ordem` — a mesma posição que a linha
+        // tinha no array enviado — pra não depender da ordem em que o
+        // Postgres devolve o INSERT.
+        const inseridos: Array<{ id: string; ordem: number }> = corpo.tamanhosInseridos ?? []
+        const porOrdem = new Map(inseridos.map((tamanho) => [tamanho.ordem, tamanho]))
+
+        setLinhas((atuais) =>
+          atuais.map((linha, indice) => {
+            if (linha.tamanhoId) return linha
+            const inserido = porOrdem.get(indice)
+            return inserido ? { ...linha, tamanhoId: inserido.id } : linha
+          })
+        )
+      } else {
+        setMensagem(`Pronto! "${corpo.obra.titulo}" criada com ${corpo.tamanhos.length} tamanho(s).`)
+        setTitulo('')
+        setDescricao('')
+        setAno('')
+        setFicha(FICHA_VAZIA)
+        setArquivo(null)
+        setLinhas([linhaNova(proximoId.current++)])
+      }
     } catch {
-      setStatus('Não consegui falar com o servidor.')
+      setMensagem('Não consegui falar com o servidor.')
     } finally {
       setEnviando(false)
     }
@@ -150,7 +200,24 @@ export default function FormularioObra() {
 
   return (
     <div style={{ marginTop: 24, padding: 16, border: '1px solid #ccc', maxWidth: 560 }}>
-      <h2>Nova obra</h2>
+      <h2>{modoEdicao ? 'Editar obra' : 'Nova obra'}</h2>
+
+      {modoEdicao && (
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Status</label>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as StatusObra)}
+            style={{ padding: 6 }}
+          >
+            {STATUS_OBRA.map((valor) => (
+              <option key={valor} value={valor}>
+                {ROTULOS_STATUS_OBRA[valor]}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div style={{ marginBottom: 8 }}>
         <input
@@ -340,19 +407,29 @@ export default function FormularioObra() {
         </button>
       </fieldset>
 
-      <div style={{ marginBottom: 12 }}>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
-        />
-      </div>
+      {modoEdicao ? (
+        <div style={{ marginBottom: 12, display: 'flex', gap: 12, alignItems: 'center' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- admin ainda sem next/image, ver docs/handoff.md §7 */}
+          <img src={obra.imagemWebUrl} alt={obra.titulo} style={{ width: 64, height: 64, objectFit: 'cover' }} />
+          <span style={{ fontSize: 13, color: '#666' }}>
+            Trocar a imagem ainda não é suportado por aqui.
+          </span>
+        </div>
+      ) : (
+        <div style={{ marginBottom: 12 }}>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
+          />
+        </div>
+      )}
 
       <button onClick={enviar} disabled={enviando} style={{ padding: 8 }}>
-        {enviando ? 'Enviando...' : 'Salvar obra'}
+        {enviando ? 'Enviando...' : modoEdicao ? 'Salvar alterações' : 'Salvar obra'}
       </button>
 
-      {status && <p>{status}</p>}
+      {mensagem && <p>{mensagem}</p>}
     </div>
   )
 }

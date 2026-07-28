@@ -262,22 +262,48 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   componente compartilhado — comparado com `ListaEncomendas.tsx`, a
   duplicação real é só a chamada `.update().eq()`, pouco pra justificar
   abstração.
+- **`/admin/obras` + `/admin/obras/[id]/editar`:** listagem de todas as
+  obras (miniatura, série, "a partir de" calculado do menor
+  `preco_centavos` entre os tamanhos, status) com troca de status por
+  `<select>` (mesmo padrão `.update().eq()` de `ListaPedidos.tsx` — precisa
+  de policy de UPDATE nova, `obras_update_admin`, via `eh_admin()`) e link
+  "Editar" pra tela de edição completa. A listagem e a tela de edição leem
+  a obra com o client de sessão e **sem filtro de status**, então dependem
+  de uma policy de SELECT nova, `obras_select_admin` (mesmo motivo de
+  `pedidos_select_admin`): sem ela, só as obras `publicada` aparecem — o
+  mesmo que o público já vê.
+  `FormularioObra.tsx` virou os dois formulários (cadastro e edição) num
+  só: uma prop opcional `obra` liga o "modo edição" (PATCH em vez de POST,
+  sem exigir arquivo, com o `<select>` de status visível) — a ficha técnica
+  e a lista de tamanhos são idênticas nos dois casos, então duplicar o
+  arquivo inteiro criaria duas fontes de verdade pra manter em sincronia.
+  `PATCH /api/obras/[id]` (`src/app/api/obras/[id]/route.ts`) reaproveita
+  `validarFormularioObra` sem tocar nela — o validador já ignora campos
+  extras (`status`) e não olha pra `arquivada`; a rota só valida `status`
+  à parte contra `STATUS_OBRA`. **Não troca imagem** (fora do escopo
+  combinado); cada tamanho enviado carrega o `id` de verdade quando já
+  existe no banco (`null` quando é linha nova), e a rota reconcilia:
+  apaga os que sumiram da lista, faz update dos que têm id, insere os que
+  não têm — confere também que nenhum id enviado pertence a *outra* obra
+  antes de tocar nele. Diferente do POST, isto **não** é atômico (mesmo
+  limite honesto documentado abaixo): não tem pilha de desfazer porque não
+  há upload de arquivo envolvido, e cada update só toca a própria linha —
+  o pior cenário de uma falha no meio é um tamanho pendente de
+  apagar/inserir, nunca um preço errado num tamanho existente.
 
 ### A construir
 
 Ordem acordada com a artista (site completo antes do lançamento):
 
-1. **Admin → listagem/edição de obras** ← prioridade (hoje só cadastra;
-   falta editar/despublicar)
-2. Frete por região
-3. Pagamento (Mercado Pago — Pix + cartão)
-4. Minha Conta (dashboard, meus pedidos, endereços, perfil, favoritos —
+1. Frete por região
+2. Pagamento (Mercado Pago — Pix + cartão)
+3. Minha Conta (dashboard, meus pedidos, endereços, perfil, favoritos —
    nenhuma dessas sub-telas existe hoje; protótipo é `Minha Conta.dc.html`)
-5. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir
+4. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir
    — o texto do handoff §3 é resumo, diverge do protótipo em pontos reais)
-6. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
+5. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
    restante)
-7. Deploy (Vercel)
+6. Deploy (Vercel)
 
 ---
 
@@ -387,6 +413,16 @@ Ordem acordada com a artista (site completo antes do lançamento):
   antes de existir venda. RLS: INSERT público (`with check (status =
   'nova')`, ninguém nasce com outro status), SELECT e UPDATE só admin via
   `eh_admin()`.
+- **`obras.status` é o enum `obra_status`, com três valores fixos:
+  `rascunho`, `publicada`, `arquivada`** — não é texto livre, e não dá pra
+  inventar um quarto valor sem `ALTER TYPE` no banco. A policy pública
+  ("obras: público vê publicadas") já filtra por `status = 'publicada'`,
+  então `rascunho` e `arquivada` somem da vitrine automaticamente, sem
+  filtro nenhum no código. "Despublicar" (§7, Admin → Obras) move pra
+  `rascunho`; `arquivada` existe pro caso de tirar uma obra de circulação
+  de vez, preservando o histórico (pedidos antigos não referenciam
+  `obras` por FK — `pedido_itens` guarda `obra_titulo` copiado —, então
+  arquivar ou mesmo apagar uma obra nunca quebra pedido já feito).
 - **Login sem `?next=` manda admin pra `/admin`, e todo mundo mais pra `/`.**
   O ícone de conta do Cabeçalho não sabe se quem vai clicar é a artista ou
   uma cliente — não manda `next` nenhum. Sem essa checagem em `/entrar`
@@ -404,7 +440,8 @@ Ordem acordada com a artista (site completo antes do lançamento):
 
 **`obras`:** `id`, `titulo`, `descricao`, `ano`, `imagem_web` (URL pública),
 `imagem_alta` (caminho no bucket privado), `largura_px`, `altura_px`
-(dimensões da imagem web, nullable — obras antigas ainda não têm), `status`,
+(dimensões da imagem web, nullable — obras antigas ainda não têm), `status`
+(enum `obra_status`: `rascunho` | `publicada` | `arquivada`),
 `ordem`, `serie`, `historia`, `historia_titulo`, `tecnica`, `material`,
 `impressao`, `papel`, `criado_em`, `atualizado_em`
 
