@@ -83,7 +83,7 @@ export default async function PaginaObra({
           {obra.serie && (
             <>
               {' / '}
-              <Link href={`/galeria?serie=${encodeURIComponent(obra.serie)}`} className="text-fumaca">
+              <Link href={`/colecoes/${encodeURIComponent(obra.serie)}`} className="text-fumaca">
                 {obra.serie}
               </Link>
             </>
@@ -137,7 +137,12 @@ export default async function PaginaObra({
             impressao={obra.impressao}
             papel={obra.papel}
           />
-          <PrecoEAcao serie={obra.serie} />
+          <PrecoEAcao
+            obraId={obra.id}
+            titulo={obra.titulo}
+            imagemUrl={obra.imagem_web}
+            serie={obra.serie}
+          />
         </div>
       </section>
 

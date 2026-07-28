@@ -1,10 +1,16 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 import Botao from '@/components/ui/Botao'
 import { formatarCentavos } from '@/lib/obras/formulario'
+import { useCarrinho } from '@/components/carrinho/ContextoCarrinho'
 import { useTamanho } from './ContextoTamanho'
 
 type Props = {
+  obraId: string
+  titulo: string
+  imagemUrl: string
   /** Série da obra, pra montar o link de "ver obras semelhantes". */
   serie: string | null
 }
@@ -13,10 +19,27 @@ type Props = {
 // específico pode ficar indisponível. Por isso são só 2 estados aqui (não
 // os 3 do protótipo original, que previa "vendida"/"sob consulta": nenhum
 // dos dois existe no schema, ver docs/handoff.md e o plano desta tela).
-export default function PrecoEAcao({ serie }: Props) {
+export default function PrecoEAcao({ obraId, titulo, imagemUrl, serie }: Props) {
   const { selecionado } = useTamanho()
+  const { adicionar } = useCarrinho()
+  const router = useRouter()
 
-  const hrefSemelhantes = serie ? `/galeria?serie=${encodeURIComponent(serie)}` : '/galeria'
+  const hrefSemelhantes = serie ? `/colecoes/${encodeURIComponent(serie)}` : '/galeria'
+
+  // O preço guardado aqui é só cache de exibição no carrinho — quem decide
+  // o total cobrado de verdade é a rota /api/pedidos, relendo o preço atual
+  // de `tamanhos` no momento da confirmação (ver docs/handoff.md).
+  function adquirir() {
+    adicionar({
+      tamanhoId: selecionado.id,
+      obraId,
+      titulo,
+      rotulo: selecionado.rotulo,
+      precoCentavos: selecionado.preco_centavos,
+      imagemUrl,
+    })
+    router.push('/carrinho')
+  }
 
   return (
     <div className="mb-6">
@@ -38,7 +61,7 @@ export default function PrecoEAcao({ serie }: Props) {
           <div className="font-serif text-2xl text-tinta">
             {formatarCentavos(selecionado.preco_centavos)}
           </div>
-          <Botao variante="bordo" href="/entrar">
+          <Botao variante="bordo" onClick={adquirir}>
             Adquirir esta obra
           </Botao>
         </div>

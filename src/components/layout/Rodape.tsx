@@ -35,6 +35,13 @@ export default function Rodape() {
             <Link href="/encomendas" className="text-pedra">
               Encomendas &amp; Consultoria
             </Link>
+            {/* Único caminho clicável até o admin — sem ele, só digitando
+                a URL na mão. Visível pra qualquer visitante (como no
+                protótipo): quem não é admin só esbarra no redirect de
+                admin/layout.tsx, sem risco nenhum. */}
+            <Link href="/admin" className="mt-1.5 text-xs text-fumaca hover:text-pedra">
+              Painel administrativo
+            </Link>
           </div>
         </div>
       </div>

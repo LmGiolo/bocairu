@@ -203,16 +203,68 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   filtros de coleção/tamanho/orientação/faixa de preço montados
   dinamicamente a partir do que existe no catálogo (nada hardcoded), busca
   por título. `src/components/galeria/`.
+- **`/` (Home):** hero de tela cheia com a primeira obra por `ordem` + nome
+  da artista e frase de posicionamento, faixa de destaque com as 3 obras
+  seguintes, navegação por série (uma obra representante por `serie`,
+  linkando pra `/colecoes/[serie]`), bloco "sobre a artista" e prova de
+  confiança (certificado, processo de produção, depoimento). Sem tabela
+  própria pra nada disso — curadoria e copy vêm de `obras`/`ordem` e de
+  texto fixo no componente (ver §8).
+- **`/colecoes`:** índice de séries — mesma lógica de representante-por-série
+  da Home, em página cheia. `/colecoes/[serie]`: reaproveita
+  `GaleriaInterativa` (a mesma grade e filtros da `/galeria`) com a série já
+  pré-selecionada via `serieInicial`, mais breadcrumb de volta. `serie`
+  não bate com nenhuma obra do catálogo → `notFound()`. `CartaoSerie`
+  (`src/components/colecoes/`) é compartilhado entre a Home e o índice.
+- **`/a-artista`:** página estática (sem consulta ao banco) — abertura com
+  retrato-placeholder + nome, biografia editorial, processo criativo em 4
+  passos, CTA pra `/colecoes` e `/encomendas`. Todo o texto é copy fixo no
+  componente, sem fonte de dados própria (mesma lógica da Home, ver §8).
+- **Carrinho / `/finalizar-pedido` / `/pedidos/[id]`:** carrinho é só
+  client-side (`useCarrinho`, `src/components/carrinho/ContextoCarrinho.tsx`
+  — estado num módulo singleton sincronizado com `localStorage` via
+  `useSyncExternalStore`, não Context; `useState`+`useEffect` pra hidratar
+  do `localStorage` dispara "cascading render" no lint novo do React, daí a
+  troca). `/entrar` ganhou modo cadastro (alimenta o trigger
+  `handle_novo_usuario()` com `options.data.nome`) e `?next=` de retorno.
+  `/finalizar-pedido` exige sessão (redireciona pra
+  `/entrar?next=/finalizar-pedido` senão) e envia o carrinho pra `POST
+  /api/pedidos`, que **relê preço e disponibilidade de `tamanhos` com o
+  client de sessão** (nunca confia no preço em cache do carrinho) antes de
+  gravar com `criarClientAdmin()` — não existe policy de INSERT em
+  `pedidos`/`pedido_itens` de propósito, ver §8. `/pedidos/[id]` mostra a
+  confirmação (status `aguardando_pagamento`, sem pagamento real ainda).
+- **`/encomendas` + admin/encomendas:** formulário de lead (hero + form,
+  conforme `docs/prototipo/Encomendas e Consultoria.dc.html`, lido na
+  íntegra — não o resumo do §3) grava em `solicitacoes_encomenda` via
+  `POST /api/encomendas`, com o **client de sessão** (não
+  `criarClientAdmin()` — não há preço nem nada sensível pra recalcular
+  aqui, a policy de INSERT já é pública por desenho). `/admin/encomendas`
+  lista as solicitações e deixa mudar o `status` por um `<select>` que
+  escreve direto no Supabase pelo client do navegador, apoiado na policy de
+  UPDATE (`eh_admin()`) — sem rota de API pra isso. `src/app/admin/layout.tsx`
+  (novo) passou a concentrar os dois portões do admin (sessão + `perfis.papel`),
+  que antes viviam só em `admin/page.tsx`; toda rota nova em `/admin/*` já
+  nasce protegida sem repetir o código (isso não vale pra rota de API — cada
+  uma continua se defendendo sozinha, layout não roda pra route handler).
 
 ### A construir
 
-1. **Home** ← prioridade
-2. Página de Série/Coleção
-3. A Artista
-4. Carrinho / checkout (total sempre recalculado no servidor)
-5. Pagamento (Mercado Pago — Pix + cartão)
-6. Refinar Admin (estilos + lista de obras pra editar/despublicar)
-7. Deploy (Vercel)
+Ordem acordada com a artista (site completo antes do lançamento):
+
+1. **Admin → Pedidos** ← prioridade (gerenciar status de `pedidos`; mesmo
+   molde da listagem de Encomendas — comparar as duas antes de extrair
+   qualquer coisa em comum, não abstrair antes da hora)
+2. Admin → listagem/edição de obras (hoje só cadastra; falta editar/despublicar)
+3. Frete por região
+4. Pagamento (Mercado Pago — Pix + cartão)
+5. Minha Conta (dashboard, meus pedidos, endereços, perfil, favoritos —
+   nenhuma dessas sub-telas existe hoje; protótipo é `Minha Conta.dc.html`)
+6. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir
+   — o texto do handoff §3 é resumo, diverge do protótipo em pontos reais)
+7. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
+   restante)
+8. Deploy (Vercel)
 
 ---
 
@@ -244,11 +296,94 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   "esgota" (sob encomenda, sem tiragem — ver acima); não introduzir estado
   de "vendida" nem "sob consulta" pra obra inteira, só disponível/
   indisponível por tamanho.
-- **CTA "Adquirir esta obra" aponta pra `/entrar`** como placeholder até o
-  Checkout/Reserva (item da seção 7) existir de verdade.
+- **CTA "Adquirir esta obra" adiciona ao carrinho de verdade** (não é mais
+  placeholder pra `/entrar`) — ver entrada de Carrinho/Checkout em §7.
 - **Filtros da Galeria seguem o protótipo, não o texto desta seção 3**
   (que diverge do que foi de fato construído): Coleção, Tamanho, Orientação
   e faixa de preço. Sem filtro de técnica nem de disponibilidade.
+- **A Home curadoria via `ordem`, não via uma coluna `destaque`.** Hero =
+  primeira obra; faixa de destaque = as 3 seguintes. Não criar coluna nova
+  só pra "obra em destaque" — reordenar em `ordem` já resolve, e é o mesmo
+  campo que a Galeria usa.
+- **Retrato da artista e depoimentos na Home são placeholder.** Não há foto
+  da artista nem tabela de depoimentos no schema; o bloco "sobre a artista"
+  usa um selo tipográfico no lugar da foto, e a prova de confiança tem um
+  depoimento de exemplo, comentado no código como texto a trocar. Trocar
+  pelo conteúdo real não é mudança de schema, só de copy/asset.
+- **`/colecoes/[serie]` é a URL canônica de uma série**, não
+  `/galeria?serie=...`. A Home, o breadcrumb da Página da Obra e o CTA "ver
+  obras semelhantes" linkam todos pra `/colecoes/[serie]`. `/galeria?serie=`
+  continua funcionando (é assim que `GaleriaInterativa` lê o filtro inicial),
+  mas não é mais o link que o resto do site gera.
+- **Preço do pedido nunca vem do navegador.** O carrinho (client-side) só
+  guarda um preço em cache pra exibição. `POST /api/pedidos` relê
+  `tamanhos.preco_centavos`/`disponivel` no momento da confirmação, com o
+  client de sessão (mesma policy pública que `/galeria` já usa pra mostrar
+  preço — não precisa de service role pra ler). `total_centavos` é sempre
+  a soma desse valor recém-lido, nunca do que o cliente mandou.
+- **Não existem policies de RLS de INSERT em `pedidos`/`pedido_itens`**, de
+  propósito — só SELECT ("cliente vê os seus") e UPDATE (admin muda
+  status). A gravação do pedido passa só pela rota, com
+  `criarClientAdmin()`, depois que preço/disponibilidade já foram
+  conferidos contra o banco. Não escrever policy de INSERT pra "resolver"
+  isso — seria abrir a porta pro cliente inserir preço arbitrário.
+- **Cadastro de cliente usa o trigger já existente no banco**
+  (`handle_novo_usuario()`, disparado por `on_auth_user_created`): insere em
+  `perfis` a partir de `raw_user_meta_data->>'nome'`, com `papel` default
+  `'cliente'`. O front só precisa mandar `options.data.nome` no `signUp()` —
+  nada no código da aplicação toca em `perfis` diretamente.
+- **Login só é exigido em `/finalizar-pedido`**, nunca pra montar o
+  carrinho. Rota sem sessão redireciona pra `/entrar?next=/finalizar-pedido`
+  e volta sozinha depois do login/cadastro.
+- **Forma do `endereco_entrega` (jsonb):** `{ cep, logradouro, numero,
+  complemento, bairro, cidade, estado }` — `complemento` é o único opcional.
+- **Carrinho é um módulo singleton com `useSyncExternalStore`, não Context.**
+  `src/components/carrinho/ContextoCarrinho.tsx` guarda o estado fora do
+  React (só faz sentido um carrinho por navegador) e sincroniza com
+  `localStorage`. Tentativa anterior com `useState` + `useEffect` pra
+  hidratar do `localStorage` dispara o lint novo do React
+  (`react-hooks/set-state-in-effect`, "cascading renders"); `getServerSnapshot`
+  **precisa** devolver sempre a mesma referência (`ARRAY_VAZIO` do módulo),
+  senão o React entra em loop.
+- **`/api/obras` e `/api/pedidos` precisam de `SUPABASE_SERVICE_ROLE_KEY`
+  no `.env.local`** (as duas rotas que usam `criarClientAdmin()`) — sem ela,
+  lançam em dev local. Fluxo de carrinho → cadastro → pedido → confirmação
+  testado ponta a ponta contra o banco de verdade depois de a chave ser
+  adicionada.
+- **Princípio novo, vale pra todo o projeto daqui pra frente: conteúdo
+  institucional deve ser editável pela artista no admin, não hardcoded no
+  `.tsx`.** Ela opera o site sozinha — não pode depender de mim pra trocar
+  um texto ou uma foto. Não é tudo-ou-nada: decide-se caso a caso, com o
+  critério "o que ela mexe com frequência justifica o esforço agora; o que
+  ela quase nunca mexe pode ficar hardcoded e esperar". Aplicado até aqui:
+  as solicitações de encomenda viram linha no banco (é o propósito da
+  tela); a copy estrutural de `/encomendas` (headline, bullets, textos de
+  seção) fica hardcoded por ora; a foto do hero fica placeholder até a
+  tarefa "gaps de Home e A Artista" resolver as imagens editáveis das três
+  telas de uma vez, em vez de construir um mecanismo por imagem.
+- **Nem toda escrita de admin precisa de `criarClientAdmin()`.** O
+  `<select>` de status em `/admin/encomendas` escreve direto do navegador
+  (client de sessão) porque a policy de UPDATE (`eh_admin()`) já é a
+  fronteira de segurança suficiente ali — é uma ação de admin autenticado
+  sobre um dado que não tem preço nem nada equivalente pra proteger.
+  Service role continua reservado pra quando a RLS sozinha não resolve
+  (ex.: gravar `pedidos`, que não tem policy de INSERT de propósito).
+- **`solicitacoes_encomenda` é tabela própria, não reaproveita `pedidos`.**
+  "Encomenda" já é termo usado no site pra impressão feita sob encomenda
+  (qualquer obra); esta tabela é sobre pedidos de **orçamento/consultoria**
+  antes de existir venda. RLS: INSERT público (`with check (status =
+  'nova')`, ninguém nasce com outro status), SELECT e UPDATE só admin via
+  `eh_admin()`.
+- **Login sem `?next=` manda admin pra `/admin`, e todo mundo mais pra `/`.**
+  O ícone de conta do Cabeçalho não sabe se quem vai clicar é a artista ou
+  uma cliente — não manda `next` nenhum. Sem essa checagem em `/entrar`
+  (`redirecionarAposEntrar` em `src/app/entrar/page.tsx`), logar como admin
+  por ali caía sempre na Home, sem indicação nenhuma de que o login
+  funcionou (não existe estado "logada" visível no Cabeçalho — decisão já
+  registrada). `?next=` explícito (ex.: `/finalizar-pedido`) sempre vence
+  essa checagem. Rodapé ganhou um link discreto "Painel administrativo" →
+  `/admin` (igual ao protótipo), pra existir *algum* caminho clicável até
+  lá — antes só dava digitando a URL.
 
 ---
 
