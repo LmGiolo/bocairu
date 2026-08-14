@@ -145,6 +145,7 @@ export async function PATCH(
         preco_centavos: tamanho.preco_centavos,
         disponivel: tamanho.disponivel,
         prazo_dias: tamanho.prazo_dias,
+        porte: tamanho.porte,
         ordem: tamanho.ordem,
       })
       .eq('id', tamanho.id as string)
@@ -167,6 +168,7 @@ export async function PATCH(
           preco_centavos: tamanho.preco_centavos,
           disponivel: tamanho.disponivel,
           prazo_dias: tamanho.prazo_dias,
+          porte: tamanho.porte,
           ordem: tamanho.ordem,
           obra_id: id,
         }))

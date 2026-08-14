@@ -17,10 +17,17 @@ export default async function FinalizarPedido() {
     redirect('/entrar?next=/finalizar-pedido')
   }
 
+  // Tabela de frete é dado público de vitrine (mesma policy que deixa
+  // qualquer um ler tamanhos.preco_centavos) — dá pra ler com o client de
+  // sessão, sem service role. Usada só pra estimativa em tela: o valor
+  // cobrado de verdade é recalculado em POST /api/pedidos.
+  const { data: fretes } = await supabase.from('fretes').select('regiao, porte, valor_centavos')
+
   return (
     <FormularioFinalizarPedido
       emailInicial={user.email ?? ''}
       nomeInicial={typeof user.user_metadata?.nome === 'string' ? user.user_metadata.nome : ''}
+      tabelaFrete={fretes ?? []}
     />
   )
 }

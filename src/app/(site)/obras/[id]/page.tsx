@@ -36,6 +36,7 @@ export default async function PaginaObra({
       preco_centavos: tamanho.preco_centavos,
       disponivel: tamanho.disponivel,
       prazo_dias: tamanho.prazo_dias,
+      porte: tamanho.porte,
     }))
 
   // Obra sem nenhum tamanho é dado inconsistente (a rota de cadastro nunca

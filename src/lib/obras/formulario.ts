@@ -5,11 +5,14 @@
 // texto vindo do navegador em dados confiáveis. Nada aqui toca em rede,
 // banco ou disco — é só entrada e saída.
 
+import { PORTES, type Porte } from './porte'
+
 export type TamanhoValidado = {
   rotulo: string
   preco_centavos: number
   disponivel: boolean
   prazo_dias: string | null
+  porte: Porte
   ordem: number
 }
 
@@ -160,7 +163,7 @@ export function validarTamanhos(bruto: unknown): Resultado<TamanhoValidado[]> {
       return { ok: false, erro: `Tamanho ${posicao} está malformado.` }
     }
 
-    const { rotulo, preco, disponivel, prazo_dias } = item as Record<string, unknown>
+    const { rotulo, preco, disponivel, prazo_dias, porte } = item as Record<string, unknown>
 
     if (typeof rotulo !== 'string' || !rotulo.trim()) {
       return { ok: false, erro: `Tamanho ${posicao}: falta o rótulo.` }
@@ -210,12 +213,20 @@ export function validarTamanhos(bruto: unknown): Resultado<TamanhoValidado[]> {
       return { ok: false, erro: `Tamanho ${posicao}: prazo passa de ${MAX_CARACTERES_PRAZO} caracteres.` }
     }
 
+    // Ausente = 'M': mesmo espírito do default de `disponivel` — o caso
+    // comum não deveria exigir escolha. Presente, tem que ser um dos três
+    // valores de verdade (é a chave da tabela de frete, region×porte).
+    if (porte !== undefined && (typeof porte !== 'string' || !PORTES.includes(porte as Porte))) {
+      return { ok: false, erro: `Tamanho ${posicao}: porte inválido.` }
+    }
+
     tamanhos.push({
       rotulo: rotuloLimpo,
       preco_centavos: centavos,
       // Ausente = disponível: o default da coluna é true e é o caso comum.
       disponivel: disponivel ?? true,
       prazo_dias: prazoLimpo || null,
+      porte: (porte as Porte | undefined) ?? 'M',
       // Guarda a ordem em que a artista montou a lista, senão o banco
       // devolve os tamanhos em ordem arbitrária depois.
       ordem: indice,

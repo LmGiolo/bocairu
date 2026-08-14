@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 
 import { precoParaCentavos, formatarCentavos } from '@/lib/obras/formulario'
 import { STATUS_OBRA, ROTULOS_STATUS_OBRA, type StatusObra } from '@/lib/obras/status'
+import { PORTES, ROTULOS_PORTE, type Porte } from '@/lib/obras/porte'
 
 // Uma linha da lista de tamanhos, do jeito que ela existe na tela.
 //
@@ -18,6 +19,7 @@ type LinhaTamanho = {
   preco: string
   disponivel: boolean
   prazo_dias: string
+  porte: Porte
 }
 
 // A ficha técnica da obra: sete campos de texto, todos opcionais. Ficam
@@ -43,8 +45,8 @@ const FICHA_VAZIA: Ficha = {
 }
 
 function linhaNova(id: number): LinhaTamanho {
-  // Nasce disponível: é o caso comum, e espelha o default da coluna.
-  return { id, tamanhoId: null, rotulo: '', preco: '', disponivel: true, prazo_dias: '' }
+  // Nasce disponível e porte M: espelha o default das colunas.
+  return { id, tamanhoId: null, rotulo: '', preco: '', disponivel: true, prazo_dias: '', porte: 'M' }
 }
 
 // Dados de uma obra já existente, no formato que a tela usa (preço como
@@ -65,6 +67,7 @@ export type ObraParaEdicao = {
     preco: string
     disponivel: boolean
     prazo_dias: string
+    porte: Porte
   }>
 }
 
@@ -140,12 +143,13 @@ export default function FormularioObra({ obra }: { obra?: ObraParaEdicao }) {
     dados.append(
       'tamanhos',
       JSON.stringify(
-        linhas.map(({ tamanhoId, rotulo, preco, disponivel, prazo_dias }) => ({
+        linhas.map(({ tamanhoId, rotulo, preco, disponivel, prazo_dias, porte }) => ({
           id: tamanhoId,
           rotulo,
           preco,
           disponivel,
           prazo_dias,
+          porte,
         }))
       )
     )
@@ -388,6 +392,20 @@ export default function FormularioObra({ obra }: { obra?: ObraParaEdicao }) {
                   onChange={(e) => alterarLinha(linha.id, 'prazo_dias', e.target.value)}
                   style={{ padding: 6, flex: 1 }}
                 />
+
+                <label style={{ fontSize: 13, display: 'flex', gap: 4, alignItems: 'center' }}>
+                  Porte (frete)
+                  <select
+                    value={linha.porte}
+                    onChange={(e) => alterarLinha(linha.id, 'porte', e.target.value as Porte)}
+                  >
+                    {PORTES.map((porte) => (
+                      <option key={porte} value={porte}>
+                        {ROTULOS_PORTE[porte]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
 
                 <label style={{ fontSize: 13, display: 'flex', gap: 4, alignItems: 'center' }}>
                   <input

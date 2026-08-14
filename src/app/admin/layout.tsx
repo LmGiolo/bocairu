@@ -8,6 +8,7 @@ const NAVEGACAO = [
   { href: '/admin/obras', rotulo: 'Obras' },
   { href: '/admin/pedidos', rotulo: 'Pedidos' },
   { href: '/admin/encomendas', rotulo: 'Encomendas' },
+  { href: '/admin/frete', rotulo: 'Frete' },
 ]
 
 // Portão de UX pra todo /admin/*, não só a página inicial — a partir de

@@ -2,12 +2,15 @@
 
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
 
+import type { Porte } from '@/lib/obras/porte'
+
 export type Tamanho = {
   id: string
   rotulo: string
   preco_centavos: number
   disponivel: boolean
   prazo_dias: string | null
+  porte: Porte
 }
 
 type ContextoTamanhoValor = {

@@ -3,6 +3,8 @@ import type { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { criarClientAdmin } from '@/lib/supabase/admin'
 import { validarFormularioPedido } from '@/lib/pedidos/formulario'
+import { regiaoDaUf, ROTULOS_REGIAO } from '@/lib/frete/regiao'
+import { ROTULOS_PORTE, type Porte } from '@/lib/obras/porte'
 
 export async function POST(request: NextRequest) {
   // ─────────────────────────────────────────────────────────────
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
 
   const { data: tamanhosEncontrados, error: erroTamanhos } = await supabase
     .from('tamanhos')
-    .select('id, rotulo, preco_centavos, disponivel, obra_id, obras!inner(id, titulo)')
+    .select('id, rotulo, preco_centavos, disponivel, porte, obra_id, obras!inner(id, titulo)')
     .in('id', idsTamanhos)
 
   if (erroTamanhos) {
@@ -74,6 +76,28 @@ export async function POST(request: NextRequest) {
     return obras as { id: string; titulo: string } | undefined
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // Frete: mesmo princípio do preço — nunca vem do carrinho (client-side),
+  // só a estimativa em tela usa isso. Aqui relemos `fretes` de novo, com o
+  // client de sessão (é dado público de vitrine, mesma policy de
+  // `tamanhos.preco_centavos`), e cobramos o valor de porte×região que
+  // está no banco agora, não o que o navegador mandou (ele nem manda).
+  // ─────────────────────────────────────────────────────────────
+  const regiao = regiaoDaUf(dados.valor.enderecoEntrega.estado)
+
+  const { data: fretesRegiao, error: erroFretes } = await supabase
+    .from('fretes')
+    .select('porte, valor_centavos')
+    .eq('regiao', regiao)
+
+  if (erroFretes) {
+    return Response.json({ erro: 'Falha ao calcular o frete: ' + erroFretes.message }, { status: 500 })
+  }
+
+  const valorFretePorPorte = new Map(
+    (fretesRegiao ?? []).map((linha) => [linha.porte as Porte, linha.valor_centavos])
+  )
+
   const itensParaGravar: Array<{
     obra_id: string
     tamanho_id: string
@@ -82,6 +106,7 @@ export async function POST(request: NextRequest) {
     preco_centavos: number
     quantidade: number
   }> = []
+  let freteCentavos = 0
 
   for (const item of dados.valor.itens) {
     const tamanho = porId.get(item.tamanhoId)
@@ -103,6 +128,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const porte = tamanho.porte as Porte
+    const valorFrete = valorFretePorPorte.get(porte)
+
+    if (valorFrete === undefined) {
+      return Response.json(
+        {
+          erro: `Frete não configurado pro porte ${ROTULOS_PORTE[porte]} na região ${ROTULOS_REGIAO[regiao]}. Peça pra artista cadastrar em /admin/frete.`,
+        },
+        { status: 400 }
+      )
+    }
+
+    freteCentavos += valorFrete * item.quantidade
+
     itensParaGravar.push({
       obra_id: tamanho.obra_id,
       tamanho_id: tamanho.id,
@@ -113,10 +152,11 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  const totalCentavos = itensParaGravar.reduce(
+  const subtotalCentavos = itensParaGravar.reduce(
     (soma, item) => soma + item.preco_centavos * item.quantidade,
     0
   )
+  const totalCentavos = subtotalCentavos + freteCentavos
 
   // ─────────────────────────────────────────────────────────────
   // 3) GRAVA — pilha de desfazer, mesmo padrão de /api/obras
@@ -151,6 +191,7 @@ export async function POST(request: NextRequest) {
       endereco_entrega: dados.valor.enderecoEntrega,
       status: 'aguardando_pagamento',
       total_centavos: totalCentavos,
+      frete_centavos: freteCentavos,
       observacoes: dados.valor.observacoes,
     })
     .select()

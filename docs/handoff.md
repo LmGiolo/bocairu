@@ -290,20 +290,43 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   há upload de arquivo envolvido, e cada update só toca a própria linha —
   o pior cenário de uma falha no meio é um tamanho pendente de
   apagar/inserir, nunca um preço errado num tamanho existente.
+- **Frete por região:** cada tamanho de impressão ganhou um `porte`
+  (`P`/`M`/`G`, coluna nova em `tamanhos`, seletor em `FormularioObra.tsx`,
+  default `M`) — é a chave física que permite uma tabela de frete *global*
+  (`fretes`: `regiao` × `porte` → `valor_centavos`), já que o rótulo do
+  tamanho ("30x40 cm") é texto livre por obra, não dá pra cruzar direto.
+  `regiao` é uma das 5 macro-regiões do Brasil, mas é coluna `text`, não
+  enum — subir pra frete por UF no futuro é inserir linhas novas (uma por
+  estado), não migração de schema; `src/lib/frete/regiao.ts` é o único
+  lugar que sabe converter UF → região (mapa fixo, 27 UFs, dado geográfico
+  estático). Frete é público de vitrine (mesma policy de
+  `tamanhos.preco_centavos`) — `/admin/frete` (`FormularioFrete.tsx`) deixa
+  a artista editar os 15 valores (grade região × porte, upsert), e a grade
+  sempre renderiza as 15 combinações mesmo com a tabela vazia, pra não
+  depender de seed manual no banco. **Cada item do carrinho paga o valor
+  do próprio porte × quantidade** (cada impressão viaja como peça própria,
+  não uma taxa única por pedido) — decisão tomada aqui, não no design doc.
+  `/finalizar-pedido` mostra uma estimativa (lê `fretes` com o client de
+  sessão, recalcula a cada UF digitada via `calcularFreteCentavos`,
+  mostra "a calcular" em vez de 0 quando falta UF ou falta linha na
+  tabela); `POST /api/pedidos` recalcula de novo no servidor — mesmo
+  princípio de "preço nunca vem do navegador" aplicado ao frete — e grava
+  em `pedidos.frete_centavos` (`total_centavos` passou a ser subtotal +
+  frete). Se faltar `regiao`/`porte` na tabela, a rota recusa o pedido com
+  erro claro em vez de cobrar frete 0 por acidente.
 
 ### A construir
 
 Ordem acordada com a artista (site completo antes do lançamento):
 
-1. Frete por região
-2. Pagamento (Mercado Pago — Pix + cartão)
-3. Minha Conta (dashboard, meus pedidos, endereços, perfil, favoritos —
+1. Pagamento (Mercado Pago — Pix + cartão)
+2. Minha Conta (dashboard, meus pedidos, endereços, perfil, favoritos —
    nenhuma dessas sub-telas existe hoje; protótipo é `Minha Conta.dc.html`)
-4. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir
+3. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir
    — o texto do handoff §3 é resumo, diverge do protótipo em pontos reais)
-5. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
+4. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
    restante)
-6. Deploy (Vercel)
+5. Deploy (Vercel)
 
 ---
 
@@ -423,6 +446,22 @@ Ordem acordada com a artista (site completo antes do lançamento):
   de vez, preservando o histórico (pedidos antigos não referenciam
   `obras` por FK — `pedido_itens` guarda `obra_titulo` copiado —, então
   arquivar ou mesmo apagar uma obra nunca quebra pedido já feito).
+- **Frete: porte é escolha manual (P/M/G) da artista, não calculado de
+  `largura_cm`/`altura_cm`.** Essas colunas existem em `tamanhos` desde o
+  schema original mas nenhuma tela nunca as preencheu — exigir isso agora
+  pra derivar porte seria abrir uma frente nova (coletar cm em todo
+  cadastro/edição) só pra evitar um seletor de 3 opções. Não reabrir sem
+  motivo forte.
+- **Frete é somado por item do carrinho (porte × quantidade), não uma
+  taxa única por pedido.** Cada impressão é uma peça própria, com
+  embalagem e seguro individuais — um pedido com 3 obras de portes
+  diferentes paga o frete dos 3, não o do maior.
+- **`fretes.regiao` é as 5 macro-regiões, não as 27 UFs — de propósito,
+  não é limitação técnica.** A coluna é `text` livre justamente pra caber
+  UF no futuro sem `ALTER TABLE`, mas a granularidade de hoje é a
+  combinada com a artista: distância de despacho já é capturada por
+  região, 27 linhas pra manter seria trabalho sem ganho de precisão real
+  por ora.
 - **Login sem `?next=` manda admin pra `/admin`, e todo mundo mais pra `/`.**
   O ícone de conta do Cabeçalho não sabe se quem vai clicar é a artista ou
   uma cliente — não manda `next` nenhum. Sem essa checagem em `/entrar`
@@ -447,10 +486,19 @@ Ordem acordada com a artista (site completo antes do lançamento):
 
 **`tamanhos`:** `id`, `obra_id` (FK → obras), `rotulo`, `largura_cm`,
 `altura_cm`, `preco_centavos`, `ativo`, `ordem`, `disponivel`, `prazo_dias`,
-`criado_em`
+`porte` (enum `tamanho_porte`: `P` | `M` | `G`, default `M` — chave da
+tabela de frete), `criado_em`
 
 Relacionamento **um-para-muitos**: uma obra tem vários tamanhos.
 Leitura com join: `.select('*, tamanhos(*)')`
+
+**`fretes`:** `id`, `regiao` (text — uma das 5 macro-regiões, ver
+`src/lib/frete/regiao.ts`), `porte` (enum `tamanho_porte`), `valor_centavos`,
+`atualizado_em`. `unique (regiao, porte)`. RLS: SELECT público (dado de
+vitrine), INSERT/UPDATE só admin via `eh_admin()`.
+
+`pedidos` ganhou `frete_centavos` (integer, default `0`) — `total_centavos`
+é subtotal das obras + `frete_centavos`.
 
 ---
 

@@ -64,7 +64,17 @@ export default async function DetalhePedido({
         )}
       </div>
 
-      <div className="mt-6 flex items-baseline justify-between">
+      <div className="mt-6 flex flex-col gap-2 text-sm text-fumaca">
+        <div className="flex items-baseline justify-between">
+          <span>Obra</span>
+          <span>{formatarCentavos(pedido.total_centavos - pedido.frete_centavos)}</span>
+        </div>
+        <div className="flex items-baseline justify-between">
+          <span>Frete e seguro</span>
+          <span>{formatarCentavos(pedido.frete_centavos)}</span>
+        </div>
+      </div>
+      <div className="mt-3 flex items-baseline justify-between border-t border-linho pt-4">
         <span className="text-sm text-fumaca">Total</span>
         <span className="font-serif text-3xl text-tinta">
           {formatarCentavos(pedido.total_centavos)}

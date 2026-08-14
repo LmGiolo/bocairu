@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useCarrinho } from '@/components/carrinho/ContextoCarrinho'
 import Botao from '@/components/ui/Botao'
 import { formatarCentavos } from '@/lib/obras/formulario'
+import { calcularFreteCentavos, type LinhaFrete } from '@/lib/frete/calcular'
 
 const CLASSE_INPUT =
   'w-full border-b border-linho bg-transparent py-2.5 text-base text-tinta outline-none transition-colors duration-200 focus:border-tinta'
@@ -15,9 +16,10 @@ const CLASSE_LABEL = 'mb-1.5 block text-xs uppercase tracking-widest text-fumaca
 type Props = {
   emailInicial: string
   nomeInicial: string
+  tabelaFrete: LinhaFrete[]
 }
 
-export default function FormularioFinalizarPedido({ emailInicial, nomeInicial }: Props) {
+export default function FormularioFinalizarPedido({ emailInicial, nomeInicial, tabelaFrete }: Props) {
   const { itens, limpar } = useCarrinho()
   const router = useRouter()
 
@@ -37,6 +39,14 @@ export default function FormularioFinalizarPedido({ emailInicial, nomeInicial }:
   const [erro, setErro] = useState('')
 
   const subtotal = itens.reduce((soma, item) => soma + item.precoCentavos * item.quantidade, 0)
+
+  // `null` até a UF ser válida (2 letras de verdade) ou enquanto faltar
+  // alguma linha porte×região na tabela — nesse caso a tela mostra "a
+  // calcular", nunca 0: frete grátis por falta de dado seria bug de preço.
+  // O valor cobrado de verdade é recalculado no servidor, em /api/pedidos.
+  const freteEstimado =
+    estado.length === 2 ? calcularFreteCentavos(itens, estado, tabelaFrete) : null
+  const totalEstimado = subtotal + (freteEstimado ?? 0)
 
   if (itens.length === 0) {
     return (
@@ -300,12 +310,24 @@ export default function FormularioFinalizarPedido({ emailInicial, nomeInicial }:
             ))}
           </div>
 
-          <div className="mt-6 flex items-baseline justify-between border-t border-linho pt-5">
+          <div className="mt-6 flex flex-col gap-2 border-t border-linho pt-5 text-sm">
+            <div className="flex items-baseline justify-between text-fumaca">
+              <span>Obra</span>
+              <span>{formatarCentavos(subtotal)}</span>
+            </div>
+            <div className="flex items-baseline justify-between text-fumaca">
+              <span>Frete e seguro</span>
+              <span>{freteEstimado !== null ? formatarCentavos(freteEstimado) : 'a calcular'}</span>
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline justify-between border-t border-linho pt-4">
             <span className="text-sm text-fumaca">Total estimado</span>
-            <span className="font-serif text-2xl text-tinta">{formatarCentavos(subtotal)}</span>
+            <span className="font-serif text-2xl text-tinta">{formatarCentavos(totalEstimado)}</span>
           </div>
           <p className="mt-3 text-xs text-fumaca">
-            O valor final é conferido no servidor ao confirmar — pode variar se algum preço mudou.
+            {freteEstimado === null
+              ? 'Preencha a UF do endereço de entrega pra estimar o frete.'
+              : 'O valor final é conferido no servidor ao confirmar — pode variar se algum preço mudou.'}
           </p>
         </div>
       </div>

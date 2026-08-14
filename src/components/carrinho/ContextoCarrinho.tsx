@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from 'react'
 
+import type { Porte } from '@/lib/obras/porte'
+
 export type ItemCarrinho = {
   tamanhoId: string
   obraId: string
@@ -10,6 +12,7 @@ export type ItemCarrinho = {
   precoCentavos: number
   imagemUrl: string
   quantidade: number
+  porte: Porte
 }
 
 const CHAVE_LOCALSTORAGE = 'bocairu:carrinho'

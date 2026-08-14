@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import FormularioObra, { type ObraParaEdicao } from '@/components/admin/FormularioObra'
 import type { StatusObra } from '@/lib/obras/status'
+import type { Porte } from '@/lib/obras/porte'
 
 // Mesma conversão inversa de precoParaCentavos, mas sem o símbolo de moeda:
 // o campo de preço do formulário espera um texto que ele próprio consiga
@@ -54,6 +55,7 @@ export default async function EditarObra({
         preco: precoInicial(tamanho.preco_centavos),
         disponivel: tamanho.disponivel,
         prazo_dias: tamanho.prazo_dias ?? '',
+        porte: tamanho.porte as Porte,
       })),
   }
 

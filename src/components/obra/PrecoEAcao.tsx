@@ -37,6 +37,7 @@ export default function PrecoEAcao({ obraId, titulo, imagemUrl, serie }: Props) 
       rotulo: selecionado.rotulo,
       precoCentavos: selecionado.preco_centavos,
       imagemUrl,
+      porte: selecionado.porte,
     })
     router.push('/carrinho')
   }
