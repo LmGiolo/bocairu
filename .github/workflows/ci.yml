@@ -1,0 +1,42 @@
+# CI do projeto: roda em todo push/PR pra main e barra lint quebrado ou erro
+# de tipo antes de chegar no branch principal — hoje isso só era pego na hora
+# de rodar `npm run build` na mão (é o próprio `next build` que roda o tsc
+# com noEmit, ver CLAUDE.md).
+#
+# Este workflow só valida o código (CI). Deploy (CD) fica por conta da
+# integração nativa da Vercel com o GitHub — conectar o repositório lá faz
+# preview de PR e deploy de produção automáticos, sem precisar duplicar isso
+# aqui com token da Vercel. Ver Fase 1 do roteiro de lançamento.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-e-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixa o código
+        uses: actions/checkout@v4
+
+      - name: Configura Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instala dependências
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build de produção (tsc roda aqui dentro, com noEmit)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
