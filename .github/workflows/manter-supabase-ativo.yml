@@ -1,0 +1,36 @@
+# Supabase Free pausa o projeto depois de 7 dias sem atividade no banco (ver
+# docs/handoff.md e a conversa do roteiro de lançamento). Uma leitura leve por
+# dia já basta pra evitar isso, então este workflow só faz um SELECT de 1
+# linha via API REST — não escreve nada, não custa nada (bem dentro da cota
+# grátis de minutos do GitHub), e nem depende do site estar no ar.
+name: Manter Supabase ativo
+
+on:
+  schedule:
+    # Todo dia, meio-dia UTC (09h em Brasília, sem horário de verão).
+    - cron: '0 12 * * *'
+  # Permite rodar na mão pela aba Actions, pra testar sem esperar o cron.
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Leitura leve pro banco não pausar
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/obras?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY")
+          echo "status da resposta: $status"
+          # 2xx é sucesso; qualquer outra coisa falha o job pra virar um aviso
+          # visível na aba Actions (e-mail do GitHub em caso de falha).
+          if [ "${status:0:1}" != "2" ]; then
+            echo "Resposta inesperada do Supabase — confira os secrets NEXT_PUBLIC_SUPABASE_URL/NEXT_PUBLIC_SUPABASE_ANON_KEY."
+            exit 1
+          fi
+        env:
+          # Mesmos nomes de secret do ci.yml — mesma chave anon, um só lugar
+          # pra cadastrar (ela já é pública por natureza, vai pro bundle do
+          # navegador; a segurança real é o RLS do Supabase).
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
