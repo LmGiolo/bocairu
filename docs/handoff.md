@@ -336,14 +336,41 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   falta configurar `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` e
   `SITE_URL` (fase de lançamento) e ativar Pix na conta Stripe.
 
+- **Minha Conta (`/minha-conta/*`):** cinco abas conforme
+  `Minha Conta.dc.html` — Painel (obras adquiridas, pedidos em andamento,
+  favoritos, linha do tempo do último pedido), Meus Pedidos (lista com
+  `<details>` nativo, sem JS), Endereços, Perfil e Favoritos. O layout
+  (`src/app/(site)/minha-conta/layout.tsx`) só desenha a barra lateral; o
+  portão de sessão (`exigirUsuario`, `src/lib/conta/sessao.ts`) roda em
+  **cada página**, porque layout não re-renderiza na navegação (guia de
+  auth do Next 16). Pedidos são lidos com `.eq('cliente_id', user.id)`
+  explícito — sem isso a artista veria os pedidos de todo mundo na conta
+  dela, por causa de `pedidos_select_admin`. Endereços, favoritos e perfil
+  escrevem direto do navegador, protegidos por RLS; trocar o endereço
+  padrão é a RPC `definir_endereco_padrao` (dois updates numa transação).
+  Perfil só pode mudar `nome`/`telefone` — `revoke update` na tabela +
+  `grant update (nome, telefone)`, senão um cliente poderia se dar
+  `papel = 'admin'`. Troca de senha confere a senha atual com
+  `signInWithPassword` antes de `updateUser`. O coração de favoritar fica
+  na Página da Obra (`BotaoFavoritar`). `/finalizar-pedido` agora vem
+  pré-preenchido com nome/telefone do perfil e o endereço padrão.
+  **Schema em `docs/sql/2026-10-13-minha-conta.sql` — precisa ser rodado
+  no SQL Editor do Supabase** (depois do de frete, abaixo).
+- **⚠ Schema de frete nunca tinha sido aplicado no banco.** Conferido em
+  2026-10-13: `tamanhos.porte`, a tabela `fretes` e `pedidos.frete_centavos`
+  não existiam, embora o código acima já dependa deles (finalizar pedido
+  quebraria). O SQL está em `docs/sql/2026-10-13-frete.sql` — rodar
+  primeiro. A partir daqui, toda mudança de schema vira um arquivo em
+  `docs/sql/` (idempotente), pra o repositório guardar o que o banco
+  deveria ter.
+
 ### A construir
 
 Ordem acordada com a artista (site completo antes do lançamento):
 
 1. ~~Pagamento~~ — feito com Stripe (ver acima); falta só a configuração
    da conta, junto com o deploy
-2. Minha Conta (dashboard, meus pedidos, endereços, perfil, favoritos —
-   nenhuma dessas sub-telas existe hoje; protótipo é `Minha Conta.dc.html`)
+2. ~~Minha Conta~~ — feito (ver acima); falta rodar os SQL de `docs/sql/`
 3. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir
    — o texto do handoff §3 é resumo, diverge do protótipo em pontos reais)
 4. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
@@ -484,7 +511,10 @@ Ordem acordada com a artista (site completo antes do lançamento):
   combinada com a artista: distância de despacho já é capturada por
   região, 27 linhas pra manter seria trabalho sem ganho de precisão real
   por ora.
-- **Login sem `?next=` manda admin pra `/admin`, e todo mundo mais pra `/`.**
+- **Login sem `?next=` manda admin pra `/admin`, e todo mundo mais pra
+  `/minha-conta`** (era `/` antes de Minha Conta existir; o ícone de conta
+  do Cabeçalho agora aponta pra `/minha-conta`, que sem sessão cai em
+  `/entrar` sem `next`).
   O ícone de conta do Cabeçalho não sabe se quem vai clicar é a artista ou
   uma cliente — não manda `next` nenhum. Sem essa checagem em `/entrar`
   (`redirecionarAposEntrar` em `src/app/entrar/page.tsx`), logar como admin

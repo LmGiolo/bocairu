@@ -8,6 +8,7 @@ import { useCarrinho } from '@/components/carrinho/ContextoCarrinho'
 import Botao from '@/components/ui/Botao'
 import { formatarCentavos } from '@/lib/obras/formulario'
 import { calcularFreteCentavos, type LinhaFrete } from '@/lib/frete/calcular'
+import type { EnderecoEntrega } from '@/lib/pedidos/formulario'
 
 const CLASSE_INPUT =
   'w-full border-b border-linho bg-transparent py-2.5 text-base text-tinta outline-none transition-colors duration-200 focus:border-tinta'
@@ -16,23 +17,32 @@ const CLASSE_LABEL = 'mb-1.5 block text-xs uppercase tracking-widest text-fumaca
 type Props = {
   emailInicial: string
   nomeInicial: string
+  telefoneInicial: string
+  /** Endereço padrão salvo em Minha Conta → Endereços, se houver. */
+  enderecoInicial: EnderecoEntrega | null
   tabelaFrete: LinhaFrete[]
 }
 
-export default function FormularioFinalizarPedido({ emailInicial, nomeInicial, tabelaFrete }: Props) {
+export default function FormularioFinalizarPedido({
+  emailInicial,
+  nomeInicial,
+  telefoneInicial,
+  enderecoInicial,
+  tabelaFrete,
+}: Props) {
   const { itens, limpar } = useCarrinho()
   const router = useRouter()
 
   const [clienteNome, setClienteNome] = useState(nomeInicial)
   const [clienteEmail, setClienteEmail] = useState(emailInicial)
-  const [clienteTelefone, setClienteTelefone] = useState('')
-  const [cep, setCep] = useState('')
-  const [logradouro, setLogradouro] = useState('')
-  const [numero, setNumero] = useState('')
-  const [complemento, setComplemento] = useState('')
-  const [bairro, setBairro] = useState('')
-  const [cidade, setCidade] = useState('')
-  const [estado, setEstado] = useState('')
+  const [clienteTelefone, setClienteTelefone] = useState(telefoneInicial)
+  const [cep, setCep] = useState(enderecoInicial?.cep ?? '')
+  const [logradouro, setLogradouro] = useState(enderecoInicial?.logradouro ?? '')
+  const [numero, setNumero] = useState(enderecoInicial?.numero ?? '')
+  const [complemento, setComplemento] = useState(enderecoInicial?.complemento ?? '')
+  const [bairro, setBairro] = useState(enderecoInicial?.bairro ?? '')
+  const [cidade, setCidade] = useState(enderecoInicial?.cidade ?? '')
+  const [estado, setEstado] = useState(enderecoInicial?.estado ?? '')
   const [observacoes, setObservacoes] = useState('')
 
   const [enviando, setEnviando] = useState(false)

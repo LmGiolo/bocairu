@@ -69,7 +69,7 @@ export default function Cabecalho() {
         </Link>
 
         <Link
-          href="/entrar"
+          href="/minha-conta"
           aria-label="Minha conta"
           title="Minha conta"
           className="flex items-center text-tinta/85 transition-opacity duration-200 hover:opacity-100"

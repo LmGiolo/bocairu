@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
 import FormularioFinalizarPedido from '@/components/checkout/FormularioFinalizarPedido'
+import type { EnderecoEntrega } from '@/lib/pedidos/formulario'
 
 export default async function FinalizarPedido() {
   const supabase = await createClient()
@@ -21,12 +22,26 @@ export default async function FinalizarPedido() {
   // qualquer um ler tamanhos.preco_centavos) — dá pra ler com o client de
   // sessão, sem service role. Usada só pra estimativa em tela: o valor
   // cobrado de verdade é recalculado em POST /api/pedidos.
-  const { data: fretes } = await supabase.from('fretes').select('regiao, porte, valor_centavos')
+  // Pré-preenchimento: nome/telefone do Perfil e o endereço padrão salvo
+  // em Minha Conta. É só conveniência — tudo continua editável no
+  // formulário e é revalidado em POST /api/pedidos.
+  const [{ data: fretes }, { data: perfil }, { data: enderecoPadrao }] = await Promise.all([
+    supabase.from('fretes').select('regiao, porte, valor_centavos'),
+    supabase.from('perfis').select('nome, telefone').eq('id', user.id).single(),
+    supabase
+      .from('enderecos')
+      .select('cep, logradouro, numero, complemento, bairro, cidade, estado')
+      .eq('cliente_id', user.id)
+      .eq('padrao', true)
+      .maybeSingle(),
+  ])
 
   return (
     <FormularioFinalizarPedido
       emailInicial={user.email ?? ''}
-      nomeInicial={typeof user.user_metadata?.nome === 'string' ? user.user_metadata.nome : ''}
+      nomeInicial={perfil?.nome ?? ''}
+      telefoneInicial={perfil?.telefone ?? ''}
+      enderecoInicial={enderecoPadrao as EnderecoEntrega | null}
       tabelaFrete={fretes ?? []}
     />
   )

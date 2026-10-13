@@ -9,6 +9,7 @@ import SeletorTamanho from '@/components/obra/SeletorTamanho'
 import FichaTecnica from '@/components/obra/FichaTecnica'
 import PrecoEAcao from '@/components/obra/PrecoEAcao'
 import Certificado from '@/components/obra/Certificado'
+import BotaoFavoritar from '@/components/obra/BotaoFavoritar'
 
 export default async function PaginaObra({
   params,
@@ -62,6 +63,23 @@ export default async function PaginaObra({
       .limit(4)
 
     relacionadas = data ?? []
+  }
+
+  // Coração de favorito: só pergunta ao banco se houver alguém logado. O
+  // RLS de `favoritos` já limita a busca às linhas de quem está logado.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  let favorita = false
+  if (user) {
+    const { data: favorito } = await supabase
+      .from('favoritos')
+      .select('obra_id')
+      .eq('obra_id', obra.id)
+      .eq('cliente_id', user.id)
+      .maybeSingle()
+    favorita = favorito !== null
   }
 
   const proporcaoImagem =
@@ -121,8 +139,9 @@ export default async function PaginaObra({
           <h1 className="mb-2.5 font-serif text-4xl leading-tight text-tinta md:text-5xl">
             {obra.titulo}
           </h1>
-          <div className="mb-10 text-sm text-fumaca">
-            Bocairú{obra.ano ? `, ${obra.ano}` : ''}
+          <div className="mb-10 flex items-center justify-between gap-4 text-sm text-fumaca">
+            <span>Bocairú{obra.ano ? `, ${obra.ano}` : ''}</span>
+            <BotaoFavoritar obraId={obra.id} favoritoInicial={favorita} logado={user !== null} />
           </div>
 
           {obra.descricao && (

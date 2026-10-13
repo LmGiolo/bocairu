@@ -24,13 +24,14 @@ function ConteudoEntrar() {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const proximaRota = searchParams.get('next') || '/'
+  const proximaRota = searchParams.get('next') || '/minha-conta'
   const supabase = createClient()
 
   // Sem `?next=` (não veio de um fluxo específico, como o checkout, que
-  // sempre manda um destino) e a pessoa é admin → vai direto pro painel.
-  // É o caminho mais comum de login hoje (a artista clicando no ícone de
-  // conta do Cabeçalho, que não sabe nada sobre pra onde ela deveria ir).
+  // sempre manda um destino): admin → painel administrativo, cliente →
+  // Minha Conta. É o caminho do ícone de conta do Cabeçalho, que leva pra
+  // /minha-conta e, sem sessão, cai aqui sem `next` — ele não sabe se quem
+  // clicou é a artista ou uma cliente.
   async function redirecionarAposEntrar(userId: string) {
     if (searchParams.get('next')) {
       router.push(proximaRota)
@@ -40,7 +41,7 @@ function ConteudoEntrar() {
 
     const { data: perfil } = await supabase.from('perfis').select('papel').eq('id', userId).single()
 
-    router.push(perfil?.papel === 'admin' ? '/admin' : '/')
+    router.push(perfil?.papel === 'admin' ? '/admin' : '/minha-conta')
     router.refresh()
   }
 
