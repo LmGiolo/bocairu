@@ -62,7 +62,7 @@ function textoObrigatorio(
   return { ok: true, valor: limpo }
 }
 
-function validarEndereco(bruto: unknown): Resultado<EnderecoEntrega> {
+export function validarEndereco(bruto: unknown): Resultado<EnderecoEntrega> {
   if (typeof bruto !== 'object' || bruto === null) {
     return { ok: false, erro: 'Endereço de entrega malformado.' }
   }

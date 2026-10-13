@@ -8,6 +8,7 @@ import { useCarrinho } from '@/components/carrinho/ContextoCarrinho'
 import Botao from '@/components/ui/Botao'
 import { formatarCentavos } from '@/lib/obras/formulario'
 import { calcularFreteCentavos, type LinhaFrete } from '@/lib/frete/calcular'
+import type { EnderecoEntrega } from '@/lib/pedidos/formulario'
 
 const CLASSE_INPUT =
   'w-full border-b border-linho bg-transparent py-2.5 text-base text-tinta outline-none transition-colors duration-200 focus:border-tinta'
@@ -16,23 +17,32 @@ const CLASSE_LABEL = 'mb-1.5 block text-xs uppercase tracking-widest text-fumaca
 type Props = {
   emailInicial: string
   nomeInicial: string
+  telefoneInicial: string
+  /** Endereço padrão salvo em Minha Conta → Endereços, se houver. */
+  enderecoInicial: EnderecoEntrega | null
   tabelaFrete: LinhaFrete[]
 }
 
-export default function FormularioFinalizarPedido({ emailInicial, nomeInicial, tabelaFrete }: Props) {
+export default function FormularioFinalizarPedido({
+  emailInicial,
+  nomeInicial,
+  telefoneInicial,
+  enderecoInicial,
+  tabelaFrete,
+}: Props) {
   const { itens, limpar } = useCarrinho()
   const router = useRouter()
 
   const [clienteNome, setClienteNome] = useState(nomeInicial)
   const [clienteEmail, setClienteEmail] = useState(emailInicial)
-  const [clienteTelefone, setClienteTelefone] = useState('')
-  const [cep, setCep] = useState('')
-  const [logradouro, setLogradouro] = useState('')
-  const [numero, setNumero] = useState('')
-  const [complemento, setComplemento] = useState('')
-  const [bairro, setBairro] = useState('')
-  const [cidade, setCidade] = useState('')
-  const [estado, setEstado] = useState('')
+  const [clienteTelefone, setClienteTelefone] = useState(telefoneInicial)
+  const [cep, setCep] = useState(enderecoInicial?.cep ?? '')
+  const [logradouro, setLogradouro] = useState(enderecoInicial?.logradouro ?? '')
+  const [numero, setNumero] = useState(enderecoInicial?.numero ?? '')
+  const [complemento, setComplemento] = useState(enderecoInicial?.complemento ?? '')
+  const [bairro, setBairro] = useState(enderecoInicial?.bairro ?? '')
+  const [cidade, setCidade] = useState(enderecoInicial?.cidade ?? '')
+  const [estado, setEstado] = useState(enderecoInicial?.estado ?? '')
   const [observacoes, setObservacoes] = useState('')
 
   const [enviando, setEnviando] = useState(false)
@@ -89,7 +99,7 @@ export default function FormularioFinalizarPedido({ emailInicial, nomeInicial, t
     // erro genérica do Next, se a rota lançar uma exceção não tratada) não
     // é "falha de conexão" — a requisição chegou lá, só que algo quebrou
     // no servidor. As duas mensagens são propositalmente diferentes.
-    let corpo: { erro?: string; pedido?: { id: string } }
+    let corpo: { erro?: string; pedido?: { id: string }; checkoutUrl?: string | null }
     try {
       corpo = await resposta.json()
     } catch {
@@ -105,7 +115,18 @@ export default function FormularioFinalizarPedido({ emailInicial, nomeInicial, t
     }
 
     limpar()
-    router.push(`/pedidos/${corpo.pedido.id}`)
+
+    // Caminho normal: pedido criado e a Stripe devolveu um link de
+    // pagamento — manda o navegador pra lá (página hospedada pela Stripe,
+    // volta sozinha pra /pedidos/[id] no fim). Se a sessão de pagamento não
+    // veio (falha pontual na Stripe, ver POST /api/pedidos), o pedido já
+    // existe mesmo assim — cai na página do pedido, que oferece "Pagar
+    // agora" pra tentar de novo.
+    if (corpo.checkoutUrl) {
+      window.location.href = corpo.checkoutUrl
+    } else {
+      router.push(`/pedidos/${corpo.pedido.id}`)
+    }
   }
 
   return (

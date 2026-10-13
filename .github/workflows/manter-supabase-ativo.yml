@@ -14,14 +14,46 @@ on:
 
 jobs:
   ping:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Leitura leve pro banco não pausar
         run: |
-          status=$(curl -s -o /dev/null -w "%{http_code}" \
-            "$SUPABASE_URL/rest/v1/obras?select=id&limit=1" \
-            -H "apikey: $SUPABASE_ANON_KEY")
+          # Limpa o que costuma vir grudado quando o secret é colado à mão:
+          # espaço, quebra de linha, aspas e a barra final da URL. Um único
+          # caractere sobrando no domínio já faz o curl falhar com código 6
+          # ("não consegui resolver o host") — foi exatamente o erro que
+          # aparecia todo dia antes desta limpeza.
+          url=$(printf '%s' "$SUPABASE_URL" | tr -d " \r\n\"'")
+          chave=$(printf '%s' "$SUPABASE_ANON_KEY" | tr -d " \r\n\"'")
+          # Outro deslize comum: colar a linha inteira do .env.local
+          # ("NOME=valor") em vez de só o valor. Corta tudo até o "=" do nome.
+          url=${url#NEXT_PUBLIC_SUPABASE_URL=}
+          chave=${chave#NEXT_PUBLIC_SUPABASE_ANON_KEY=}
+          url=${url%/}
+
+          # Diagnóstico do FORMATO do valor, sem mostrar o valor em si (o
+          # GitHub esconde secrets no log, e o id do projeto não aparece aqui).
+          case "$url" in
+            https://*.supabase.co) echo "formato da URL: ok" ;;
+            *) echo "formato da URL: ERRADO — começa com '${url:0:8}', termina com '${url: -12}', ${#url} caracteres. Esperado: https://<id>.supabase.co" ;;
+          esac
+          case "$chave" in
+            eyJ*) echo "formato da chave: ok (${#chave} caracteres)" ;;
+            *) echo "formato da chave: ERRADO — deveria começar com eyJ (${#chave} caracteres)" ;;
+          esac
+
+          # `|| status=000`: o shell do Actions roda com `-e`, então sem isto
+          # uma falha de rede do curl matava o script antes de qualquer echo,
+          # e o log ficava mudo. --retry cobre instabilidade momentânea.
+          status=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 10 \
+            --max-time 30 \
+            "$url/rest/v1/obras?select=id&limit=1" \
+            -H "apikey: $chave") || status=000
           echo "status da resposta: $status"
+          if [ "$status" = "000" ]; then
+            echo "Nem chegou no Supabase (DNS/rede). Confira se o secret NEXT_PUBLIC_SUPABASE_URL é exatamente https://<id>.supabase.co"
+            exit 1
+          fi
           # 2xx é sucesso; qualquer outra coisa falha o job pra virar um aviso
           # visível na aba Actions (e-mail do GitHub em caso de falha).
           if [ "${status:0:1}" != "2" ]; then
