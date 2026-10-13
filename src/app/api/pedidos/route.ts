@@ -5,6 +5,7 @@ import { criarClientAdmin } from '@/lib/supabase/admin'
 import { validarFormularioPedido } from '@/lib/pedidos/formulario'
 import { regiaoDaUf, ROTULOS_REGIAO } from '@/lib/frete/regiao'
 import { ROTULOS_PORTE, type Porte } from '@/lib/obras/porte'
+import { criarSessaoCheckout } from '@/lib/stripe/checkoutPedido'
 
 export async function POST(request: NextRequest) {
   // ─────────────────────────────────────────────────────────────
@@ -216,5 +217,28 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  return Response.json({ pedido }, { status: 201 })
+  // ─────────────────────────────────────────────────────────────
+  // 4) ABRE O PAGAMENTO NA STRIPE
+  //
+  // O pedido já existe no banco nesse ponto (status aguardando_pagamento).
+  // Se a Stripe falhar aqui, não desfaz o pedido — diferente das falhas
+  // acima, esta não é uma falha de gravação, é só o passo seguinte. O
+  // pedido fica recuperável pelo botão "Pagar agora" em /pedidos/[id]
+  // (POST /api/pedidos/[id]/pagamento reaproveita o mesmo helper), então o
+  // cliente não perde o pedido, só o link direto de pagamento desta vez.
+  // ─────────────────────────────────────────────────────────────
+  let checkoutUrl: string | null = null
+  try {
+    const sessao = await criarSessaoCheckout({
+      pedidoId: pedido.id,
+      clienteEmail: dados.valor.clienteEmail,
+      itens: itensParaGravar,
+      freteCentavos,
+    })
+    checkoutUrl = sessao.url
+  } catch (erroStripe) {
+    console.error('Falha ao criar a sessão de pagamento na Stripe:', erroStripe)
+  }
+
+  return Response.json({ pedido, checkoutUrl }, { status: 201 })
 }

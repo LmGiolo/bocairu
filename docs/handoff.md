@@ -233,7 +233,7 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   client de sessão** (nunca confia no preço em cache do carrinho) antes de
   gravar com `criarClientAdmin()` — não existe policy de INSERT em
   `pedidos`/`pedido_itens` de propósito, ver §8. `/pedidos/[id]` mostra a
-  confirmação (status `aguardando_pagamento`, sem pagamento real ainda).
+  confirmação e o status do pagamento (ver item "Pagamento" abaixo).
 - **`/encomendas` + admin/encomendas:** formulário de lead (hero + form,
   conforme `docs/prototipo/Encomendas e Consultoria.dc.html`, lido na
   íntegra — não o resumo do §3) grava em `solicitacoes_encomenda` via
@@ -315,11 +315,33 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   frete). Se faltar `regiao`/`porte` na tabela, a rota recusa o pedido com
   erro claro em vez de cobrar frete 0 por acidente.
 
+- **Pagamento (Stripe Checkout — cartão + Pix):** a escolha mudou de
+  Mercado Pago pra Stripe. `POST /api/pedidos` grava o pedido e em seguida
+  abre uma Checkout Session (`src/lib/stripe/checkoutPedido.ts`) montada a
+  partir do pedido **já gravado** — preço nunca é recalculado nem vem do
+  navegador nesse passo; frete vira uma linha própria. O navegador vai pra
+  página hospedada da Stripe e volta pra `/pedidos/[id]?pagamento=sucesso|cancelado`.
+  Se a Stripe falhar na hora de abrir a sessão, o pedido **não** é
+  desfeito: `/pedidos/[id]` mostra "Pagar agora"
+  (`src/components/pedido/BotaoPagarAgora.tsx` → `POST /api/pedidos/[id]/pagamento`),
+  que abre uma sessão nova a cada clique (sessões expiram). Quem muda o
+  status é só o webhook `POST /api/webhooks/stripe` (assinatura conferida
+  com `STRIPE_WEBHOOK_SECRET`, grava com service role): cartão confirma em
+  `checkout.session.completed` com `payment_status: 'paid'`, Pix confirma
+  depois em `async_payment_succeeded` (ou cancela em `async_payment_failed`).
+  O update só pega pedido ainda `aguardando_pagamento` (idempotente contra
+  evento repetido/fora de ordem) e, se falhar, responde 500 pra Stripe
+  reenviar. O `?pagamento=` da URL só muda a mensagem da tela, nunca o
+  status. **Código pronto, ainda não testado contra a Stripe de verdade** —
+  falta configurar `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` e
+  `SITE_URL` (fase de lançamento) e ativar Pix na conta Stripe.
+
 ### A construir
 
 Ordem acordada com a artista (site completo antes do lançamento):
 
-1. Pagamento (Mercado Pago — Pix + cartão)
+1. ~~Pagamento~~ — feito com Stripe (ver acima); falta só a configuração
+   da conta, junto com o deploy
 2. Minha Conta (dashboard, meus pedidos, endereços, perfil, favoritos —
    nenhuma dessas sub-telas existe hoje; protótipo é `Minha Conta.dc.html`)
 3. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir

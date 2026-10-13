@@ -89,7 +89,7 @@ export default function FormularioFinalizarPedido({ emailInicial, nomeInicial, t
     // erro genérica do Next, se a rota lançar uma exceção não tratada) não
     // é "falha de conexão" — a requisição chegou lá, só que algo quebrou
     // no servidor. As duas mensagens são propositalmente diferentes.
-    let corpo: { erro?: string; pedido?: { id: string } }
+    let corpo: { erro?: string; pedido?: { id: string }; checkoutUrl?: string | null }
     try {
       corpo = await resposta.json()
     } catch {
@@ -105,7 +105,18 @@ export default function FormularioFinalizarPedido({ emailInicial, nomeInicial, t
     }
 
     limpar()
-    router.push(`/pedidos/${corpo.pedido.id}`)
+
+    // Caminho normal: pedido criado e a Stripe devolveu um link de
+    // pagamento — manda o navegador pra lá (página hospedada pela Stripe,
+    // volta sozinha pra /pedidos/[id] no fim). Se a sessão de pagamento não
+    // veio (falha pontual na Stripe, ver POST /api/pedidos), o pedido já
+    // existe mesmo assim — cai na página do pedido, que oferece "Pagar
+    // agora" pra tentar de novo.
+    if (corpo.checkoutUrl) {
+      window.location.href = corpo.checkoutUrl
+    } else {
+      router.push(`/pedidos/${corpo.pedido.id}`)
+    }
   }
 
   return (
