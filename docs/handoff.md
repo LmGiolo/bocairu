@@ -4,6 +4,88 @@
 > Fonte: Design Doc v1.0 (Jul 2026) + estado atual do código.
 > **Leia antes de construir qualquer tela da vitrine.**
 
+> ⚠ **Desde 2026-11-22 o site é um PORTFÓLIO, não uma loja.** Leia a seção
+> "Vendas em standby" logo abaixo antes de tudo. As seções §7 e §8 descrevem
+> também a loja que existiu (hoje guardada na tag git `loja-v1`).
+
+---
+
+## Vendas em standby (desde 2026-11-22)
+
+### O que mudou e por quê
+
+A artista pediu para pausar as vendas por um imprevisto. O site passou a
+ser **portfólio**: o visitante vê as fotos e, se gostar, fala com ela pelo
+**WhatsApp** ou **Instagram** para agendar uma **sessão de fotos**. O site
+não vende nada.
+
+A decisão foi **apagar o código da loja e guardá-lo numa tag do git**, em
+vez de escondê-lo atrás de um interruptor (feature flag). Motivos:
+
+- o site nunca tinha ido ao ar, e o código da Stripe nunca foi testado
+  contra a Stripe real;
+- os tamanhos de impressão e o certificado saíram de vez do modelo — religar
+  um interruptor não traria a loja de volta de qualquer jeito;
+- código sem uso, sem testes, no ar, é superfície de ataque e apodrece a
+  cada atualização de dependência.
+
+(Decisão tomada depois de um "LLM council" com cinco perspectivas; o
+interruptor foi a recomendação inicial e perdeu.)
+
+### O que saiu
+
+- Vitrine: carrinho, `/finalizar-pedido`, `/pedidos/[id]`, `/minha-conta/*`
+  (painel, pedidos, endereços, perfil, favoritos), `/encomendas` (formulário
+  de lead). Preço, "A partir de R$", filtros de preço e de tamanho, seletor
+  de tamanho, botão comprar, certificado de autenticidade e a seção
+  "Confiança" da Home.
+- Admin: Pedidos, Encomendas e Frete. Lista de tamanhos/preço/porte no
+  formulário de obra; campos "Impressão" e "Papel" (as colunas continuam no
+  banco).
+- API: `POST /api/pedidos`, `POST /api/pedidos/[id]/pagamento`,
+  `POST /api/webhooks/stripe`, `POST /api/encomendas`. Dependência `stripe`.
+- Contas de visitante: o modo "Criar conta" de `/entrar` e o signup no
+  painel do Supabase (Authentication → Sign In / Providers → "Allow new
+  users to sign up" **desligado**). Só a conta admin da artista existe.
+
+### O que entrou
+
+- `/contato` com dois botões: WhatsApp e Instagram. Número, @ e textos das
+  mensagens prontas moram só em `src/lib/contato.ts`.
+- Na Página da Obra, "Gostou desta foto?" + botão de WhatsApp cuja mensagem
+  já cita o título e o link daquela foto.
+- `/admin/ordem`: a artista numera as fotos publicadas (1 = capa da Home,
+  2–4 = destaques, Galeria na mesma sequência), vê uma **prévia** e só então
+  salva. Foto nova entra no fim da ordem.
+- `docs/sql/2026-11-22-portfolio.sql`: tira o INSERT público de
+  `solicitacoes_encomenda` (sem o formulário, só serviria para spam).
+
+### O que ficou no banco (de propósito)
+
+As tabelas `tamanhos`, `fretes`, `pedidos`, `pedido_itens`, `enderecos`,
+`favoritos` e `solicitacoes_encomenda` continuam lá, com as linhas antigas.
+Nenhuma delas aceita INSERT de visitante anônimo e as leituras são só do
+dono ou do admin, então não há porta aberta. Não apague: é o que a loja vai
+reusar.
+
+### Como retomar as vendas
+
+1. `git show loja-v1 --stat` mostra o estado da loja. Para ver um arquivo:
+   `git show loja-v1:src/app/api/pedidos/route.ts`. Para trazer de volta um
+   pedaço: `git checkout loja-v1 -- <caminho>`.
+2. **Não faça merge cego da tag** — o portfólio mudou arquivos que a loja
+   também usava (Página da Obra, Galeria, Home, FormularioObra, rotas
+   `/api/obras`). Traga as peças da loja uma a uma e reencaixe.
+3. Decida com a artista se o modelo volta a ter **tamanhos** (a loja inteira
+   dependia deles: preço, frete por porte, carrinho).
+4. Religue o signup no Supabase (se houver contas de cliente) e reveja o
+   `revoke insert` de `docs/sql/2026-11-22-portfolio.sql` se o formulário de
+   encomendas voltar.
+5. Stripe: criar conta, ativar Pix, configurar `STRIPE_SECRET_KEY`,
+   `STRIPE_WEBHOOK_SECRET` e `SITE_URL`, registrar o webhook e **testar de
+   ponta a ponta em modo de teste** antes de abrir — isso nunca foi feito.
+6. Cadastrar os 15 valores de frete em `/admin/frete`.
+
 ---
 
 ## 1. O que é este projeto
@@ -172,6 +254,10 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
 ---
 
 ## 7. Estado atual do código
+
+> Os itens de loja abaixo (carrinho, pagamento, Minha Conta, encomendas,
+> frete, tamanhos/preço) descrevem a tag `loja-v1` — **não existem mais no
+> código atual**. Ver "Vendas em standby" no topo.
 
 ### Pronto e testado
 
@@ -366,16 +452,19 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
 
 ### A construir
 
-Ordem acordada com a artista (site completo antes do lançamento):
+Portfólio (atualizado em 2026-11-22):
 
-1. ~~Pagamento~~ — feito com Stripe (ver acima); falta só a configuração
-   da conta, junto com o deploy
-2. ~~Minha Conta~~ — feito (ver acima); falta rodar os SQL de `docs/sql/`
-3. Gaps de Home e A Artista (ler os `.dc.html` na íntegra antes de construir
-   — o texto do handoff §3 é resumo, diverge do protótipo em pontos reais)
-4. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
+1. **Textos da artista** — a copy de A Artista e da Home foi escrita como
+   placeholder para uma artista de fine art que *vende impressões*; parte
+   dela contradiz o novo foco em sessões (ex.: A Artista diz "não há ensaio
+   nem direção"). Precisa do texto dela. Idem a história de cada foto: hoje
+   quase nenhuma obra tem `historia`, e sem ela a Página da Obra fica rasa.
+2. **Open Graph por foto** (pré-visualização do link no WhatsApp/Instagram)
+   — o que a artista provavelmente quis dizer com "Meta Ads". Meta Pixel só
+   se houver anúncio pago (exige banner LGPD).
+3. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
    restante)
-5. Deploy (Vercel)
+4. Deploy (Vercel)
 
 ---
 

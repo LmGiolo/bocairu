@@ -15,7 +15,7 @@ const sans = Work_Sans({
 
 export const metadata: Metadata = {
   title: "Bocairú",
-  description: "Fotografia fine art — impressões sob encomenda",
+  description: "Fotografia autoral de Bocairú — portfólio e sessões de foto sob agendamento.",
 };
 
 export default function RootLayout({

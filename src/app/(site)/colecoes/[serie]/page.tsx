@@ -18,10 +18,9 @@ export default async function Colecao({
   // de busca diferentes pra mesma coisa.
   const { data: obras, error } = await supabase
     .from('obras')
-    .select(
-      'id, titulo, ano, tecnica, serie, imagem_web, largura_px, altura_px, tamanhos(rotulo, preco_centavos, disponivel)'
-    )
+    .select('id, titulo, ano, tecnica, serie, imagem_web, largura_px, altura_px')
     .order('ordem', { ascending: true })
+    .order('criado_em', { ascending: true })
 
   if (error) {
     return <p style={{ color: 'crimson', padding: 40 }}>Erro: {error.message}</p>

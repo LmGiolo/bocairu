@@ -4,12 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import Botao from '@/components/ui/Botao'
 import CartaoObra from '@/components/ui/CartaoObra'
 import CartaoSerie from '@/components/colecoes/CartaoSerie'
-import { formatarCentavos } from '@/lib/obras/formulario'
-
-type TamanhoObra = {
-  preco_centavos: number
-  disponivel: boolean
-}
+import { BotaoInstagram, BotaoWhatsApp } from '@/components/contato/BotoesContato'
 
 type ObraHome = {
   id: string
@@ -20,7 +15,6 @@ type ObraHome = {
   imagem_web: string
   largura_px: number | null
   altura_px: number | null
-  tamanhos: TamanhoObra[]
 }
 
 type Serie = {
@@ -31,25 +25,6 @@ type Serie = {
   contagem: number
 }
 
-// Mesma derivação de "menor preço disponível" que a Galeria usa — preço
-// mínimo entre os tamanhos disponíveis; se nenhum tamanho está disponível,
-// cai no menor preço geral só pra não deixar o card sem número nenhum.
-function derivarObra(obra: ObraHome) {
-  const precosDisponiveis = obra.tamanhos.filter((t) => t.disponivel).map((t) => t.preco_centavos)
-  const precos = obra.tamanhos.map((t) => t.preco_centavos)
-  const precoMinimo = precosDisponiveis.length
-    ? Math.min(...precosDisponiveis)
-    : precos.length
-      ? Math.min(...precos)
-      : null
-
-  return {
-    subtitulo: [obra.tecnica, obra.ano].filter(Boolean).join(' · '),
-    disponivel: obra.tamanhos.some((t) => t.disponivel),
-    precoLabel: precoMinimo !== null ? `A partir de ${formatarCentavos(precoMinimo)}` : undefined,
-  }
-}
-
 export default async function Home() {
   const supabase = await createClient()
 
@@ -58,13 +33,16 @@ export default async function Home() {
   // §8). Busca tudo de uma vez, catálogo é curado e pequeno.
   const { data: obras, error } = await supabase
     .from('obras')
-    .select('id, titulo, ano, tecnica, serie, imagem_web, largura_px, altura_px, tamanhos(preco_centavos, disponivel)')
+    .select('id, titulo, ano, tecnica, serie, imagem_web, largura_px, altura_px')
     .order('ordem', { ascending: true })
+    .order('criado_em', { ascending: true })
 
   if (error) {
     return <p style={{ color: 'crimson', padding: 40 }}>Erro: {error.message}</p>
   }
 
+  // A posição de cada foto vem da tela Admin → Ordem: a 1ª vira o hero, da
+  // 2ª à 4ª, a faixa de destaque; a Galeria segue a mesma ordem.
   const catalogo: ObraHome[] = obras ?? []
   const hero = catalogo[0] ?? null
   const destaque = catalogo.slice(1, 4)
@@ -104,7 +82,7 @@ export default async function Home() {
           <div className="mx-auto max-w-[1440px]">
             <h1 className="font-serif text-6xl italic text-areia md:text-7xl">Bocairú</h1>
             <p className="mt-4 max-w-md text-base leading-relaxed text-areia/90 md:text-lg">
-              Fotografia fine art impressa sob encomenda — peça única para cada espaço.
+              Fotografia autoral. Sessões de foto sob agendamento.
             </p>
             <div className="mt-9">
               <Botao variante="primario" href="/galeria">
@@ -123,7 +101,7 @@ export default async function Home() {
               <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ouro">
                 Seleção atual
               </div>
-              <h2 className="font-serif text-3xl text-tinta md:text-4xl">Três obras, uma curadoria.</h2>
+              <h2 className="font-serif text-3xl text-tinta md:text-4xl">Três fotos, uma curadoria.</h2>
             </div>
             <Botao variante="terciario" href="/galeria">
               Ver toda a galeria →
@@ -131,22 +109,17 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 md:gap-8">
-            {destaque.map((obra) => {
-              const derivada = derivarObra(obra)
-              return (
-                <CartaoObra
-                  key={obra.id}
-                  href={`/obras/${obra.id}`}
-                  imagemUrl={obra.imagem_web}
-                  titulo={obra.titulo}
-                  subtitulo={derivada.subtitulo}
-                  status={derivada.disponivel ? 'Disponível' : 'Indisponível'}
-                  precoLabel={derivada.precoLabel}
-                  larguraPx={obra.largura_px}
-                  alturaPx={obra.altura_px}
-                />
-              )
-            })}
+            {destaque.map((obra) => (
+              <CartaoObra
+                key={obra.id}
+                href={`/obras/${obra.id}`}
+                imagemUrl={obra.imagem_web}
+                titulo={obra.titulo}
+                subtitulo={[obra.tecnica, obra.ano].filter(Boolean).join(' · ')}
+                larguraPx={obra.largura_px}
+                alturaPx={obra.altura_px}
+              />
+            ))}
           </div>
         </section>
       )}
@@ -186,9 +159,8 @@ export default async function Home() {
       {/* Sobre a artista */}
       <section className="mx-auto max-w-[1360px] px-6 py-20 md:px-12 md:py-28 lg:px-24">
         <div className="grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr] md:gap-20">
-          {/* Sem foto de retrato no schema/ativos ainda — placeholder no mesmo
-              tratamento visual do selo do Certificado, até existir uma imagem
-              de verdade pra artista. */}
+          {/* Sem foto de retrato no schema/ativos ainda — placeholder até
+              existir uma imagem de verdade da artista. */}
           <div
             className="flex w-full items-center justify-center border border-linho bg-creme"
             style={{ aspectRatio: '4 / 5' }}
@@ -201,14 +173,9 @@ export default async function Home() {
             <h2 className="mb-6 max-w-md font-serif text-3xl text-tinta md:text-4xl">
               Bocairú fotografa o que a luz revela devagar.
             </h2>
-            <p className="mb-4 max-w-md text-base leading-relaxed text-[#3A342C]">
-              Cada série nasce de um tempo longo de observação — paisagem, matéria e silêncio antes
-              da câmera. O resultado é uma fotografia fine art que se comporta como peça única, não
-              como produto em série.
-            </p>
             <p className="mb-8 max-w-md text-base leading-relaxed text-[#3A342C]">
-              Toda impressão é feita sob encomenda, em processo de padrão museológico, e chega
-              assinada à mão.
+              Cada série nasce de um tempo longo de observação — paisagem, matéria e silêncio antes
+              da câmera.
             </p>
             <Botao variante="secundario" href="/a-artista">
               Conhecer a artista
@@ -217,76 +184,16 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Prova de confiança — certificado, processo, depoimentos */}
-      <section className="bg-tinta px-6 py-20 text-areia md:px-12 md:py-28 lg:px-24">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="mb-14 max-w-xl">
-            <div className="mb-4 text-xs uppercase tracking-widest text-ouro">Confiança</div>
-            <h2 className="font-serif text-3xl md:text-4xl">Cada obra chega pronta pra durar.</h2>
-          </div>
-
-          <div className="grid gap-12 md:grid-cols-3 md:gap-10">
-            <div>
-              <div className="mb-5 flex h-9 w-9 items-center justify-center rounded-full border border-ouro font-serif text-sm italic text-ouro">
-                B
-              </div>
-              <h3 className="mb-3 text-base font-medium">Certificado de autenticidade</h3>
-              <p className="text-sm leading-relaxed text-pedra">
-                Toda obra chega assinada à mão, com certificado impresso e registro no arquivo da
-                artista.
-              </p>
-            </div>
-
-            <div>
-              <div className="mb-5 flex h-9 w-9 items-center justify-center rounded-full border border-ouro font-serif text-sm italic text-ouro">
-                P
-              </div>
-              <h3 className="mb-3 text-base font-medium">Processo de produção</h3>
-              <ol className="flex flex-col gap-1.5 text-sm leading-relaxed text-pedra">
-                <li>01 · Curadoria de papel e acabamento</li>
-                <li>02 · Impressão de padrão museológico</li>
-                <li>03 · Assinatura e certificado</li>
-                <li>04 · Envio cuidadoso, com rastreio</li>
-              </ol>
-            </div>
-
-            <div>
-              <div className="mb-5 flex h-9 w-9 items-center justify-center rounded-full border border-ouro font-serif text-sm italic text-ouro">
-                “
-              </div>
-              <h3 className="mb-3 text-base font-medium">O que dizem</h3>
-              {/* Depoimentos-placeholder — trocar pelos primeiros relatos
-                  reais de clientes assim que existirem. */}
-              <div className="flex flex-col gap-5 text-sm leading-relaxed text-pedra">
-                <p className="italic">
-                  “A impressão chegou com uma qualidade que eu não esperava — parece ter mais
-                  profundidade do que a foto na tela.”
-                  <span className="mt-1 block not-italic text-xs text-pedra/70">
-                    — Colecionadora particular, São Paulo
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA final — encomenda sob medida */}
-      <section className="px-6 py-24 text-center md:px-12 lg:px-24">
+      {/* CTA final — o objetivo do portfólio: virar conversa no WhatsApp */}
+      <section className="bg-creme px-6 py-24 text-center md:px-12 lg:px-24">
         <div className="mx-auto max-w-2xl">
-          <h2 className="mb-5 font-serif text-3xl text-tinta md:text-4xl">
-            Uma peça pensada para o seu espaço.
-          </h2>
+          <h2 className="mb-5 font-serif text-3xl text-tinta md:text-4xl">Vamos fotografar juntos?</h2>
           <p className="mb-9 text-base text-fumaca">
-            Encomendas sob medida, em conversa direta com a artista.
+            Sessões de foto sob agendamento, combinadas direto com a artista.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-5">
-            <Botao variante="bordo" href="/encomendas">
-              Encomendar uma peça
-            </Botao>
-            <Botao variante="terciario" href="mailto:contato@bocairu.com">
-              Ou escreva para a artista →
-            </Botao>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <BotaoWhatsApp />
+            <BotaoInstagram />
           </div>
         </div>
       </section>

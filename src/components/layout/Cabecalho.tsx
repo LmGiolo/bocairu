@@ -1,24 +1,23 @@
-'use client'
-
 import Link from 'next/link'
 
-import { useCarrinho } from '@/components/carrinho/ContextoCarrinho'
+import { IconeInstagram, IconeWhatsApp } from '@/components/contato/BotoesContato'
+import { INSTAGRAM_URL, WHATSAPP_URL_GERAL } from '@/lib/contato'
 
-// Navegação do site público. Alguns destinos (Coleções, A Artista, Encomendas)
-// ainda não têm página própria — chegam nos próximos passos do caminho de
-// construção. O link fica pronto desde já pra não termos que reconstruir o
-// Cabeçalho depois.
+// Navegação do site público. Desde que o site virou portfólio (vendas em
+// standby, ver docs/handoff.md), o Cabeçalho não tem mais carrinho nem
+// ícone de conta: visitante não faz login. A artista chega no admin pelo
+// link discreto do Rodapé.
 const NAVEGACAO = [
   { href: '/', rotulo: 'Home' },
   { href: '/galeria', rotulo: 'Galeria' },
   { href: '/colecoes', rotulo: 'Coleções' },
   { href: '/a-artista', rotulo: 'A Artista' },
-  { href: '/encomendas', rotulo: 'Encomendas' },
+  { href: '/contato', rotulo: 'Contato' },
 ]
 
-export default function Cabecalho() {
-  const { quantidadeTotal } = useCarrinho()
+const CLASSE_ICONE = 'flex items-center text-tinta/85 transition-opacity duration-200 hover:opacity-100'
 
+export default function Cabecalho() {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between gap-6 border-b border-linho bg-areia/95 px-6 py-5 backdrop-blur md:px-12 lg:px-24">
       <Link
@@ -44,48 +43,14 @@ export default function Cabecalho() {
           ))}
         </nav>
 
-        <Link
-          href="/carrinho"
-          aria-label={`Carrinho${quantidadeTotal > 0 ? `, ${quantidadeTotal} item${quantidadeTotal === 1 ? '' : 's'}` : ''}`}
-          title="Carrinho"
-          className="relative flex items-center text-tinta/85 transition-opacity duration-200 hover:opacity-100"
-        >
-          <svg
-            width="19"
-            height="19"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-          >
-            <path d="M5 7h14l-1.4 10.1a2 2 0 0 1-2 1.7H8.4a2 2 0 0 1-2-1.7L5 7Z" />
-            <path d="M8.5 7V6a3.5 3.5 0 0 1 7 0v1" />
-          </svg>
-          {quantidadeTotal > 0 && (
-            <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-vinho px-1 text-[10px] font-semibold text-areia">
-              {quantidadeTotal}
-            </span>
-          )}
-        </Link>
-
-        <Link
-          href="/minha-conta"
-          aria-label="Minha conta"
-          title="Minha conta"
-          className="flex items-center text-tinta/85 transition-opacity duration-200 hover:opacity-100"
-        >
-          <svg
-            width="19"
-            height="19"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-          >
-            <circle cx="12" cy="8" r="3.5" />
-            <path d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5" />
-          </svg>
-        </Link>
+        <div className="flex items-center gap-5">
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram" className={CLASSE_ICONE}>
+            <IconeInstagram />
+          </a>
+          <a href={WHATSAPP_URL_GERAL} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp" className={CLASSE_ICONE}>
+            <IconeWhatsApp />
+          </a>
+        </div>
       </div>
     </header>
   )

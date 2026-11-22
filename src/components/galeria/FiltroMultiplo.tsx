@@ -14,9 +14,8 @@ type Props = {
   onFechar: () => void
 }
 
-// Dropdown de checkboxes genérico — reaproveitado pra Coleção, Tamanho e
-// Orientação em vez de repetir o mesmo bloco três vezes (o protótipo
-// repete). Quem controla exclusividade (só um menu aberto por vez) é quem
+// Dropdown de checkboxes genérico — reaproveitado pra Coleção e Orientação
+// em vez de repetir o mesmo bloco (o protótipo repete). Quem controla exclusividade (só um menu aberto por vez) é quem
 // usa este componente, via `aberto`/`onToggle`.
 export default function FiltroMultiplo({
   rotulo,

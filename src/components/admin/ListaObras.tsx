@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { createClient } from '@/lib/supabase/client'
-import { formatarCentavos } from '@/lib/obras/formulario'
 import { STATUS_OBRA, ROTULOS_STATUS_OBRA, type StatusObra } from '@/lib/obras/status'
 
 export type ObraListada = {
@@ -14,14 +13,13 @@ export type ObraListada = {
   serie: string | null
   status: StatusObra
   imagem_web: string
-  tamanhos: Array<{ preco_centavos: number }>
 }
 
-// A troca de status escreve direto no Supabase (client de sessão), mesmo
-// padrão de ListaPedidos.tsx/ListaEncomendas.tsx: a policy de UPDATE
-// (`obras_update_admin`, via eh_admin()) já é a fronteira de segurança
-// suficiente pra essa ação. Edição de verdade (ficha técnica, tamanhos)
-// é coisa demais pra um <select> otimista — fica na tela de edição,
+// A troca de status escreve direto no Supabase (client de sessão): a policy
+// de UPDATE (`obras_update_admin`, via eh_admin()) já é a fronteira de
+// segurança suficiente pra essa ação. "Publicada" põe a foto no site;
+// "Rascunho" ou "Arquivada" tira, sem apagar nada. Edição de verdade
+// (ficha técnica) é coisa demais pra um <select> otimista — fica na tela de edição,
 // que passa pela rota com service role (ver src/app/api/obras/[id]/route.ts).
 export default function ListaObras({ obras }: { obras: ObraListada[] }) {
   const [linhas, setLinhas] = useState(obras)
@@ -55,16 +53,12 @@ export default function ListaObras({ obras }: { obras: ObraListada[] }) {
         <tr style={{ textAlign: 'left', borderBottom: '1px solid #ccc' }}>
           <th style={{ padding: 8 }}>Obra</th>
           <th style={{ padding: 8 }}>Série</th>
-          <th style={{ padding: 8 }}>A partir de</th>
           <th style={{ padding: 8 }}>Status</th>
           <th style={{ padding: 8 }}></th>
         </tr>
       </thead>
       <tbody>
         {linhas.map((obra) => {
-          const precos = obra.tamanhos.map((tamanho) => tamanho.preco_centavos)
-          const menorPreco = precos.length > 0 ? Math.min(...precos) : null
-
           return (
             <tr key={obra.id} style={{ borderBottom: '1px solid #eee', verticalAlign: 'top' }}>
               <td style={{ padding: 8 }}>
@@ -82,7 +76,6 @@ export default function ListaObras({ obras }: { obras: ObraListada[] }) {
                 </div>
               </td>
               <td style={{ padding: 8, color: '#666' }}>{obra.serie ?? '—'}</td>
-              <td style={{ padding: 8 }}>{menorPreco !== null ? formatarCentavos(menorPreco) : '—'}</td>
               <td style={{ padding: 8 }}>
                 <select
                   value={obra.status}

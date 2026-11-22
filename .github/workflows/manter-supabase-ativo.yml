@@ -37,9 +37,11 @@ jobs:
             https://*.supabase.co) echo "formato da URL: ok" ;;
             *) echo "formato da URL: ERRADO — começa com '${url:0:8}', termina com '${url: -12}', ${#url} caracteres. Esperado: https://<id>.supabase.co" ;;
           esac
+          # Dois formatos válidos: a chave anon antiga (JWT, começa com eyJ)
+          # e a "publishable key" nova do Supabase (começa com sb_publishable_).
           case "$chave" in
-            eyJ*) echo "formato da chave: ok (${#chave} caracteres)" ;;
-            *) echo "formato da chave: ERRADO — deveria começar com eyJ (${#chave} caracteres)" ;;
+            eyJ*|sb_publishable_*) echo "formato da chave: ok (${#chave} caracteres)" ;;
+            *) echo "formato da chave: ERRADO — deveria começar com eyJ ou sb_publishable_ (${#chave} caracteres)" ;;
           esac
 
           # `|| status=000`: o shell do Actions roda com `-e`, então sem isto

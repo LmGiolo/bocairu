@@ -67,11 +67,6 @@ export default function AArtista() {
               a mesma — o que a luz revela quando a gente para de interferir. Não há ensaio nem
               direção, só a espera de um instante que já estava ali.
             </p>
-            <p>
-              Essa mesma paciência guia a impressão: cada obra é produzida sob encomenda, em
-              processo de padrão museológico, pra que o papel carregue a mesma densidade da cena
-              original.
-            </p>
           </div>
         </div>
       </section>
@@ -107,8 +102,8 @@ export default function AArtista() {
             <Botao variante="bordo" href="/colecoes">
               Ver coleções
             </Botao>
-            <Botao variante="terciario" href="/encomendas">
-              Encomendar uma peça →
+            <Botao variante="terciario" href="/contato">
+              Agendar uma sessão →
             </Botao>
           </div>
         </div>
