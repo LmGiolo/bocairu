@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -81,8 +82,16 @@ export default function EditorRetrato({
         {/* Mesma moldura 4:5 do site. */}
         <div className="flex aspect-[4/5] w-32 shrink-0 items-center justify-center overflow-hidden border border-linho bg-creme">
           {retrato ? (
-            // eslint-disable-next-line @next/next/no-img-element -- admin sem next/image, ver docs/handoff.md §7
-            <img src={retrato} alt="Retrato atual desta página" className="h-full w-full object-cover" />
+            // Moldura fixa de 128×160px: largura fixa, como na Miniatura
+            // (ver Miniatura.tsx) — o retrato é a mesma imagem de 1200px
+            // que o site usa, e aqui só precisa de uma cópia pequena.
+            <Image
+              src={retrato}
+              alt="Retrato atual desta página"
+              width={128}
+              height={160}
+              className="h-full w-full object-cover"
+            />
           ) : (
             <span aria-hidden="true" className="font-serif text-5xl italic text-ouro">
               B

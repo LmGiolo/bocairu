@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { atualizarSitePublico } from '@/app/admin/acoes'
+import Miniatura from '@/components/admin/Miniatura'
 import { createClient } from '@/lib/supabase/client'
 import { STATUS_OBRA, ROTULOS_STATUS_OBRA, type StatusObra } from '@/lib/obras/status'
 import { CLASSE_BOTAO_TEXTO, CLASSE_CARTAO } from '@/components/admin/estilos'
@@ -208,8 +209,7 @@ export default function ListaObras({
               >
                 {/* Obra: miniatura 40×40 + título e ano (e, no celular, a série). */}
                 <div className="flex min-w-0 basis-full items-center gap-3 md:basis-auto">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- admin sem next/image, ver docs/handoff.md §7 */}
-                  <img src={obra.imagem_web} alt="" className="h-10 w-10 shrink-0 bg-linho object-cover" />
+                  <Miniatura src={obra.imagem_web} className="bg-linho" />
                   <div className="min-w-0">
                     <div className="truncate">{obra.titulo}</div>
                     <div className="text-xs text-fumaca">

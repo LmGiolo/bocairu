@@ -3,7 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+import Image from 'next/image'
+
 import { atualizarSitePublico } from '@/app/admin/acoes'
+import Miniatura from '@/components/admin/Miniatura'
 import { createClient } from '@/lib/supabase/client'
 import type { StatusObra } from '@/lib/obras/status'
 import Aviso from '@/components/admin/Aviso'
@@ -173,8 +176,7 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
                     }}
                     className="w-16 shrink-0 rounded-sm border border-linho bg-areia px-2 py-2 text-center text-base transition-colors duration-200 focus:border-tinta"
                   />
-                  {/* eslint-disable-next-line @next/next/no-img-element -- admin ainda sem next/image, ver docs/handoff.md §7 */}
-                  <img src={obra.imagem_web} alt="" className="h-10 w-10 shrink-0 bg-linho object-cover" />
+                  <Miniatura src={obra.imagem_web} className="bg-linho" />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm">{obra.titulo}</div>
                     <div className="text-xs text-fumaca">
@@ -217,8 +219,7 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
                 <ul className={`${CLASSE_CARTAO} opacity-60`}>
                   {foraDoSite.map((obra) => (
                     <li key={obra.id} className="flex items-center gap-3 border-b border-creme px-3 py-2.5 last:border-b-0 md:px-4">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- admin ainda sem next/image */}
-                      <img src={obra.imagem_web} alt="" className="h-10 w-10 shrink-0 object-cover" />
+                      <Miniatura src={obra.imagem_web} />
                       <span className="truncate text-sm">{obra.titulo}</span>
                     </li>
                   ))}
@@ -234,8 +235,18 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
               <div className="mb-1.5 text-[11px] uppercase tracking-[0.06em] text-fumaca">Home — capa (1)</div>
               {capa && (
                 <div className="relative mb-5 aspect-[16/9] overflow-hidden bg-tinta">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- prévia do admin */}
-                  <img src={capa.imagem_web} alt="" className="h-full w-full object-cover" />
+                  {/* As imagens da prévia também passam pelo next/image (ver
+                      Miniatura.tsx). `sizes` diz ao navegador a largura real
+                      na tela: a prévia é metade da área do admin a partir de
+                      1024px (~560px no máximo) e a largura toda abaixo
+                      disso. */}
+                  <Image
+                    src={capa.imagem_web}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 560px, 100vw"
+                    className="object-cover"
+                  />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-tinta/80 to-transparent p-3">
                     <span className="font-serif text-xl italic text-areia">Bocairú</span>
                   </div>
@@ -250,8 +261,16 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
                   <div className="mb-5 grid grid-cols-3 gap-2">
                     {destaques.map((obra) => (
                       <div key={obra.id}>
-                        {/* eslint-disable-next-line @next/next/no-img-element -- prévia do admin */}
-                        <img src={obra.imagem_web} alt="" className="aspect-[4/5] w-full object-cover" />
+                        {/* Um terço da prévia. width/height só dão a proporção
+                            (4:5); o tamanho na tela vem das classes. */}
+                        <Image
+                          src={obra.imagem_web}
+                          alt=""
+                          width={400}
+                          height={500}
+                          sizes="(min-width: 1024px) 180px, 33vw"
+                          className="aspect-[4/5] w-full object-cover"
+                        />
                         <div className="mt-1 truncate text-[11px]">{obra.titulo}</div>
                       </div>
                     ))}
@@ -263,8 +282,15 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
               <div className="grid grid-cols-4 gap-1.5">
                 {ordem.map((obra, indice) => (
                   <div key={obra.id} className="relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element -- prévia do admin */}
-                    <img src={obra.imagem_web} alt="" className="aspect-square w-full object-cover" />
+                    {/* Um quarto da prévia, quadrada. */}
+                    <Image
+                      src={obra.imagem_web}
+                      alt=""
+                      width={300}
+                      height={300}
+                      sizes="(min-width: 1024px) 140px, 25vw"
+                      className="aspect-square w-full object-cover"
+                    />
                     <span className="absolute left-1 top-1 bg-tinta/80 px-1.5 text-[10px] text-areia">{indice + 1}</span>
                   </div>
                 ))}

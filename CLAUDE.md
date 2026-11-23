@@ -91,6 +91,8 @@ Esses redirects são só UX. Ao criar qualquer superfície nova de admin, ajuste
 2. a versão web vai para o bucket público `obras-web`, o original para o bucket privado `obras-alta`;
 3. a obra guarda a URL pública em `imagem_web` e o **caminho** (não URL) em `imagem_alta`.
 
+**Versão do `sharp`:** a do `package.json` tem de ser a mesma que o `next` pede (hoje `^0.34.5`; confira com `npm ls sharp`, que deve mostrar `deduped`). Com duas versões instaladas, o otimizador do `next/image` e o nosso código carregam libvips diferentes no mesmo processo; a segunda quebra e o Next passa a servir a foto original sem reduzir, sem erro nenhum na tela. Ao atualizar o Next, alinhe o `sharp` junto.
+
 ### Consistência: a pilha de desfazer
 
 A rota grava em **dois sistemas** (Storage e Postgres) e o Supabase não oferece transação que abrace os dois. O padrão adotado é compensação: cada gravação bem-sucedida empilha em `desfazer` a ação que a reverte, e qualquer falha posterior chama `reverterTudo()`, que executa a pilha de trás para frente. Falhou o insert da obra → as duas imagens somem dos buckets.
@@ -137,3 +139,5 @@ O domínio inteiro é em português do Brasil: rotas (`/entrar`, `/galeria`, `/a
 Os comentários do repositório têm registro explicativo, quase didático (o autor está aprendendo a stack). Mantenha esse tom.
 
 Site público e admin usam Tailwind com os tokens do `@theme` (sem `style={{}}` inline). No admin, telas novas usam `CabecalhoPagina`, `Aviso` e as classes de `src/components/admin/estilos.ts`, e entram no menu pela lista `ITENS` de `BarraLateral.tsx`.
+
+Foto vinda do bucket passa sempre por `next/image`, também no admin (miniatura 40×40: `src/components/admin/Miniatura.tsx`). Um `<img>` direto baixa a versão de 2000px inteira. A única exceção é a prévia local (`blob:`) do upload.
