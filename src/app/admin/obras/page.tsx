@@ -12,8 +12,9 @@ export default async function AdminObras() {
   // docs/handoff.md.
   const { data: obras, error } = await supabase
     .from('obras')
-    .select('id, titulo, ano, serie, status, imagem_web, tamanhos(preco_centavos)')
+    .select('id, titulo, ano, serie, status, imagem_web')
     .order('ordem', { ascending: true })
+    .order('criado_em', { ascending: true })
 
   if (error) {
     return <p style={{ color: 'crimson' }}>Erro ao carregar obras: {error.message}</p>

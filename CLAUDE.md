@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 @AGENTS.md
 
-Site de galeria de fotografia de uma artista. Next.js 16 (App Router) + Supabase (Postgres, Auth, Storage).
+Site-portfólio de fotografia de uma artista. Next.js 16 (App Router) + Supabase (Postgres, Auth, Storage).
+
+**Vendas em standby (desde 2026-11-22):** o site é só portfólio — o visitante vê as fotos e fala com a artista pelo WhatsApp/Instagram (`src/lib/contato.ts`) para agendar sessões ou negociar a compra de uma foto (a negociação é fora do site). Não há carrinho, checkout, tamanhos, preços nem contas de visitante; só a artista faz login (admin). Todo o código da loja está na tag git `loja-v1`; como retomar está em docs/handoff.md ("Vendas em standby").
 
 A especificação de design e o estado do projeto estão em docs/handoff.md; consulte antes de construir telas.
 
@@ -43,19 +45,19 @@ Nos dois primeiros a chave é a anon e **a fronteira de segurança real é o RLS
 
 Não existe `middleware.ts`: a sessão não é renovada a cada navegação e não há proteção de rota centralizada. Cada página protegida se defende sozinha.
 
-`src/app/admin/page.tsx` é o padrão a seguir — dois portões dentro do Server Component:
+`src/app/admin/layout.tsx` concentra dois portões para todo `/admin/*` (rota de API não passa por layout — cada uma refaz os portões):
 
 1. `supabase.auth.getUser()` → `redirect('/entrar')` se não houver usuário;
 2. `perfis.papel !== 'admin'` → `redirect('/entrar')`.
 
 Esses redirects são só UX. Ao criar qualquer superfície nova de admin, ajuste as policies de RLS junto.
 
-`/entrar` faz `signInWithPassword` e empurra para `/admin`.
+`/entrar` faz `signInWithPassword` e empurra para `/admin`; conta que não é admin é deslogada na hora. Não existe cadastro: o modo "Criar conta" foi removido e o signup está **desligado no painel do Supabase** (sem isso, `signUp()` continuaria chamável pela API com a chave anon pública).
 
 ## Modelo de dados (vive no Supabase, não neste repositório)
 
-- `obras` — `id`, `titulo`, `ano`, `descricao`, `status` (a galeria espera `'publicada'`), `ordem` (chave de ordenação), `imagem_web` (URL pública), `imagem_alta` (caminho no bucket privado).
-- `tamanhos` — um-para-muitos com `obras`: `id`, `obra_id` (FK com `on delete cascade`), `rotulo` (ex: `'30x40 cm'`), `preco_centavos` (**integer**), `ordem`.
+- `obras` — `id`, `titulo`, `ano`, `descricao`, `status` (a galeria espera `'publicada'`), `ordem` (posição no site: 1 = capa da Home, 2–4 = destaques, a Galeria segue a mesma sequência; editada em `/admin/ordem`; desempate por `criado_em`), `imagem_web` (URL pública), `imagem_alta` (caminho no bucket privado).
+- `tamanhos`, `fretes`, `pedidos`, `pedido_itens`, `enderecos`, `favoritos`, `solicitacoes_encomenda` — tabelas da loja, **sem uso enquanto as vendas estão em standby**. Continuam no banco, protegidas por RLS (schema em `docs/sql/`).
 - `perfis` — uma linha por usuário do auth: `id` (= `auth.users.id`), `papel` (`'admin'`).
 - Bucket `obras-web` (público) — arquivos são nomeados `${Date.now()}-${arquivo.name}` e lidos de volta com `getPublicUrl`.
 
@@ -71,14 +73,13 @@ Esses redirects são só UX. Ao criar qualquer superfície nova de admin, ajuste
 
 ### Consistência: a pilha de desfazer
 
-A rota grava em **dois sistemas** (Storage e Postgres) e o Supabase não oferece transação que abrace os dois. O padrão adotado é compensação: cada gravação bem-sucedida empilha em `desfazer` a ação que a reverte, e qualquer falha posterior chama `reverterTudo()`, que executa a pilha de trás para frente. Falhou o insert de `tamanhos` → a obra é apagada e as duas imagens somem dos buckets.
+A rota grava em **dois sistemas** (Storage e Postgres) e o Supabase não oferece transação que abrace os dois. O padrão adotado é compensação: cada gravação bem-sucedida empilha em `desfazer` a ação que a reverte, e qualquer falha posterior chama `reverterTudo()`, que executa a pilha de trás para frente. Falhou o insert da obra → as duas imagens somem dos buckets.
 
-Duas propriedades que sustentam isso:
+**Validação antes de efeito colateral.** Título, ano e ficha são validados no topo da rota, antes de `sharp` e antes de qualquer upload. Campo malformado nunca chega a sujar bucket.
 
-- **Validação antes de efeito colateral.** Título, ano e todos os preços são validados no topo da rota, antes de `sharp` e antes de qualquer upload. Preço malformado nunca chega a sujar bucket.
-- **Os tamanhos entram num único `insert`** com o array inteiro. Um comando SQL é atômico no Postgres, então não existe estado de "metade dos tamanhos salvos".
+**O limite honesto:** isto não é uma transação. Se o processo morrer entre um upload e o insert da obra, a compensação não roda e sobra um arquivo órfão no bucket (lixo, não dado errado).
 
-**O limite honesto:** isto não é uma transação. Se o processo morrer entre o insert da obra e o dos tamanhos, a compensação não roda e sobra uma obra sem tamanhos. Fechar essa janela exige mover as duas escritas para uma função `plpgsql` chamada via RPC — aí o Postgres cuida da atomicidade de verdade.
+Foto nova entra no **fim** da ordem do site (`ordem` = maior + 1).
 
 `obras-alta` é privado: **nunca** use `getPublicUrl` nele — o link não abre. O acesso é por signed URL gerada na hora ou só pelo servidor.
 
@@ -97,11 +98,13 @@ Por isso a rota tem dois portões antes de tocar no arquivo, e a ordem importa:
 
 A checagem de `perfis.papel` da página `/admin` não protege rota de API nenhuma — cada rota nova refaz esses dois portões.
 
-## Dinheiro
+## Contato
 
-Preços são **sempre inteiros em centavos** (`preco_centavos`), nunca reais com decimal. `precoParaCentavos()` em `src/lib/obras/formulario.ts` é a única conversão: ela soma inteiros (`"19" * 100 + "99"`) em vez de multiplicar float, porque `parseFloat('19.99') * 100` dá `1998.9999999999998` em JavaScript.
+`src/lib/contato.ts` é o único lugar com o número do WhatsApp, o Instagram e o texto das mensagens prontas (geral, sobre sessão de fotos; e "sobre esta foto", interesse em comprar, com título + link). Trocar número ou mensagem é mexer só ali.
 
-`src/lib/obras/formulario.ts` não tem import de servidor de propósito — é puro. O formulário importa `precoParaCentavos` para mostrar o valor formatado enquanto a artista digita, então cliente e servidor interpretam o preço com o mesmo código e não têm como divergir. O servidor revalida tudo assim mesmo; a validação no cliente é conveniência, nunca garantia.
+## Dinheiro (quando as vendas voltarem)
+
+Preços são **sempre inteiros em centavos** (`preco_centavos`), nunca reais com decimal. A conversão `precoParaCentavos()` (na tag `loja-v1`, em `src/lib/obras/formulario.ts`) soma inteiros (`"19" * 100 + "99"`) em vez de multiplicar float, porque `parseFloat('19.99') * 100` dá `1998.9999999999998` em JavaScript.
 
 ## Idioma
 
@@ -109,4 +112,4 @@ O domínio inteiro é em português do Brasil: rotas (`/entrar`, `/galeria`, `/a
 
 Os comentários do repositório têm registro explicativo, quase didático (o autor está aprendendo a stack). Mantenha esse tom.
 
-Páginas ainda usam `style={{}}` inline; o Tailwind está configurado no `layout.tsx` mas não foi adotado na marcação.
+O site público usa Tailwind com os tokens do `@theme`; parte do admin (formulário de obra, listagem) ainda usa `style={{}}` inline.

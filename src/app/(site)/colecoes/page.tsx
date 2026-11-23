@@ -25,6 +25,7 @@ export default async function Colecoes() {
     .from('obras')
     .select('serie, imagem_web, largura_px, altura_px')
     .order('ordem', { ascending: true })
+    .order('criado_em', { ascending: true })
 
   if (error) {
     return <p style={{ color: 'crimson', padding: 40 }}>Erro: {error.message}</p>

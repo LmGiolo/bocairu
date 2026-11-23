@@ -8,8 +8,6 @@ type Props = {
   subtitulo: string
   /** Texto alternativo descritivo (técnica + composição). Sem isso, cai no título. */
   alt?: string
-  status?: string
-  precoLabel?: string
   /**
    * Dimensões em pixels da imagem web (colunas `largura_px`/`altura_px` de
    * `obras`, gravadas no upload a partir do que o sharp devolve depois de
@@ -27,8 +25,6 @@ export default function CartaoObra({
   titulo,
   subtitulo,
   alt,
-  status,
-  precoLabel,
   larguraPx,
   alturaPx,
 }: Props) {
@@ -56,13 +52,6 @@ export default function CartaoObra({
           {titulo}
         </Link>
         <div className="mt-0.5 text-xs text-fumaca">{subtitulo}</div>
-
-        {(status || precoLabel) && (
-          <div className="mt-1 flex items-center justify-between text-xs text-fumaca">
-            {status && <span>{status}</span>}
-            {precoLabel && <span className="text-tinta">{precoLabel}</span>}
-          </div>
-        )}
       </div>
     </div>
   )

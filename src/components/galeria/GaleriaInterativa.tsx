@@ -4,15 +4,7 @@ import { useMemo, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
 import CartaoObra from '@/components/ui/CartaoObra'
-import { formatarCentavos } from '@/lib/obras/formulario'
 import FiltroMultiplo, { type OpcaoFiltro } from './FiltroMultiplo'
-import FiltroPreco from './FiltroPreco'
-
-type TamanhoObra = {
-  rotulo: string
-  preco_centavos: number
-  disponivel: boolean
-}
 
 export type ObraGaleria = {
   id: string
@@ -23,7 +15,6 @@ export type ObraGaleria = {
   imagem_web: string
   largura_px: number | null
   altura_px: number | null
-  tamanhos: TamanhoObra[]
 }
 
 type Orientacao = 'vertical' | 'horizontal' | 'quadrada'
@@ -55,41 +46,23 @@ export default function GaleriaInterativa({
   const pathname = usePathname()
 
   // Cada obra ganha, uma vez só, os campos que a UI precisa e que não vêm
-  // prontos do banco: subtítulo, menor preço, disponibilidade e orientação
-  // (esta última derivada da proporção real da imagem).
+  // prontos do banco: subtítulo e orientação (derivada da proporção real
+  // da imagem).
   const obrasDerivadas = useMemo(
     () =>
-      obras.map((obra) => {
-        const precosDisponiveis = obra.tamanhos.filter((t) => t.disponivel).map((t) => t.preco_centavos)
-        const precos = obra.tamanhos.map((t) => t.preco_centavos)
-        const precoMinimo = precosDisponiveis.length
-          ? Math.min(...precosDisponiveis)
-          : precos.length
-            ? Math.min(...precos)
-            : null
-
-        return {
-          ...obra,
-          subtitulo: [obra.tecnica, obra.ano].filter(Boolean).join(' · '),
-          disponivel: obra.tamanhos.some((t) => t.disponivel),
-          precoMinimo,
-          precoLabel: precoMinimo !== null ? `A partir de ${formatarCentavos(precoMinimo)}` : null,
-          orientacao: orientacaoDaObra(obra),
-        }
-      }),
+      obras.map((obra) => ({
+        ...obra,
+        subtitulo: [obra.tecnica, obra.ano].filter(Boolean).join(' · '),
+        orientacao: orientacaoDaObra(obra),
+      })),
     [obras]
   )
 
   // Opções de filtro nascem do que existe nos dados — nada de lista fixa
-  // com séries/tamanhos que talvez nem existam no catálogo agora.
+  // com séries que talvez nem existam no catálogo agora.
   const opcoesSerie: OpcaoFiltro[] = useMemo(() => {
     const series = new Set(obras.map((o) => o.serie).filter((s): s is string => !!s))
     return [...series].sort().map((serie) => ({ valor: serie, texto: serie }))
-  }, [obras])
-
-  const opcoesTamanho: OpcaoFiltro[] = useMemo(() => {
-    const rotulos = new Set(obras.flatMap((o) => o.tamanhos.map((t) => t.rotulo)))
-    return [...rotulos].sort().map((rotulo) => ({ valor: rotulo, texto: rotulo }))
   }, [obras])
 
   const opcoesOrientacao: OpcaoFiltro[] = useMemo(() => {
@@ -99,15 +72,8 @@ export default function GaleriaInterativa({
       .map((orientacao) => ({ valor: orientacao, texto: ROTULO_ORIENTACAO[orientacao] }))
   }, [obrasDerivadas])
 
-  const precoMaximoCatalogo = useMemo(
-    () => Math.max(0, ...obras.flatMap((o) => o.tamanhos.map((t) => t.preco_centavos))),
-    [obras]
-  )
-
   const [serieSel, setSerieSel] = useState<string[]>(serieInicial ? [serieInicial] : [])
-  const [tamanhoSel, setTamanhoSel] = useState<string[]>([])
   const [orientacaoSel, setOrientacaoSel] = useState<string[]>([])
-  const [precoMax, setPrecoMax] = useState(precoMaximoCatalogo)
   const [busca, setBusca] = useState('')
   const [menuAberto, setMenuAberto] = useState<string | null>(null)
 
@@ -116,26 +82,17 @@ export default function GaleriaInterativa({
 
     return obrasDerivadas.filter((obra) => {
       if (serieSel.length && !(obra.serie && serieSel.includes(obra.serie))) return false
-      if (tamanhoSel.length && !obra.tamanhos.some((t) => tamanhoSel.includes(t.rotulo))) return false
       if (orientacaoSel.length && !(obra.orientacao && orientacaoSel.includes(obra.orientacao))) return false
-      if (obra.precoMinimo !== null && obra.precoMinimo > precoMax) return false
       if (buscaNormalizada && !obra.titulo.toLowerCase().includes(buscaNormalizada)) return false
       return true
     })
-  }, [obrasDerivadas, serieSel, tamanhoSel, orientacaoSel, precoMax, busca])
+  }, [obrasDerivadas, serieSel, orientacaoSel, busca])
 
-  const temFiltroAtivo =
-    serieSel.length > 0 ||
-    tamanhoSel.length > 0 ||
-    orientacaoSel.length > 0 ||
-    precoMax < precoMaximoCatalogo ||
-    busca.trim() !== ''
+  const temFiltroAtivo = serieSel.length > 0 || orientacaoSel.length > 0 || busca.trim() !== ''
 
   function limparFiltros() {
     setSerieSel([])
-    setTamanhoSel([])
     setOrientacaoSel([])
-    setPrecoMax(precoMaximoCatalogo)
     setBusca('')
     setMenuAberto(null)
     router.replace(pathname)
@@ -158,7 +115,7 @@ export default function GaleriaInterativa({
             {serieUnicaAtiva ? `${serieUnicaAtiva}.` : 'Galeria completa.'}
           </h1>
           <p className="max-w-sm text-sm text-fumaca">
-            Fotografia fine art e obras exclusivas, impressas sob encomenda.
+            Uma seleção do trabalho fotográfico de Bocairú.
           </p>
         </div>
       </section>
@@ -190,31 +147,12 @@ export default function GaleriaInterativa({
               />
 
               <FiltroMultiplo
-                rotulo="Tamanho"
-                opcoes={opcoesTamanho}
-                selecionados={tamanhoSel}
-                onChange={setTamanhoSel}
-                aberto={menuAberto === 'tamanho'}
-                onToggle={() => setMenuAberto((atual) => (atual === 'tamanho' ? null : 'tamanho'))}
-                onFechar={() => setMenuAberto(null)}
-              />
-
-              <FiltroMultiplo
                 rotulo="Orientação"
                 opcoes={opcoesOrientacao}
                 selecionados={orientacaoSel}
                 onChange={setOrientacaoSel}
                 aberto={menuAberto === 'orientacao'}
                 onToggle={() => setMenuAberto((atual) => (atual === 'orientacao' ? null : 'orientacao'))}
-                onFechar={() => setMenuAberto(null)}
-              />
-
-              <FiltroPreco
-                max={precoMaximoCatalogo}
-                valor={precoMax}
-                onChange={setPrecoMax}
-                aberto={menuAberto === 'preco'}
-                onToggle={() => setMenuAberto((atual) => (atual === 'preco' ? null : 'preco'))}
                 onFechar={() => setMenuAberto(null)}
               />
             </div>
@@ -247,8 +185,6 @@ export default function GaleriaInterativa({
                   imagemUrl={obra.imagem_web}
                   titulo={obra.titulo}
                   subtitulo={obra.subtitulo}
-                  status={obra.disponivel ? 'Disponível' : 'Indisponível'}
-                  precoLabel={obra.precoLabel ?? undefined}
                   larguraPx={obra.largura_px}
                   alturaPx={obra.altura_px}
                 />

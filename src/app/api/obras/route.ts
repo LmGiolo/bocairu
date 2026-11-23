@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
   //
   // A ordem aqui é de propósito. Só depois que texto, números e imagem
   // estiverem todos aprovados é que começamos a gravar. Se validássemos
-  // aos poucos, um preço digitado errado só apareceria depois da imagem
+  // aos poucos, um campo digitado errado só apareceria depois da imagem
   // já estar no bucket — e aí sobra faxina pra fazer.
   // ─────────────────────────────────────────────────────────────
   const formulario = await request.formData()
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ erro: dados.erro }, { status: 400 })
   }
 
-  const { tamanhos, ...camposObra } = dados.valor
+  const camposObra = dados.valor
 
   const arquivo = formulario.get('arquivo')
 
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
   // ─────────────────────────────────────────────────────────────
   // 3) A PARTIR DAQUI TUDO TEM VOLTA
   //
-  // São quatro gravações em dois sistemas diferentes (Storage e Postgres),
+  // São três gravações em dois sistemas diferentes (Storage e Postgres),
   // e o Supabase não nos dá uma transação que abrace as duas coisas. Então
   // cada passo que dá certo empilha aqui como desfazer ele. Se um passo
   // seguinte falhar, a pilha é executada de trás pra frente e o mundo
@@ -198,6 +198,17 @@ export async function POST(request: NextRequest) {
   // ou direto pelo servidor.
   const { data: dadosUrl } = admin.storage.from('obras-web').getPublicUrl(caminhoWeb)
 
+  // Foto nova entra no FIM da ordem do site (maior `ordem` + 1). Assim ela
+  // nunca empurra sozinha a capa da Home pra baixo — a artista decide a
+  // posição depois, na tela Admin → Ordem.
+  const { data: ultima } = await admin
+    .from('obras')
+    .select('ordem')
+    .order('ordem', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  const proximaOrdem = (ultima?.ordem ?? 0) + 1
+
   const { data: obra, error: erroObra } = await admin
     .from('obras')
     .insert({
@@ -208,6 +219,7 @@ export async function POST(request: NextRequest) {
       // fluxo de rascunho → revisão → publicação, este é o lugar de mudar
       // (conferindo antes quais valores a coluna status aceita).
       status: 'publicada',
+      ordem: proximaOrdem,
       imagem_web: dadosUrl.publicUrl,
       imagem_alta: caminhoAlta,
       largura_px: infoWeb.width,
@@ -220,32 +232,7 @@ export async function POST(request: NextRequest) {
     await reverterTudo()
     return Response.json({ erro: 'Falha ao criar a obra: ' + erroObra.message }, { status: 500 })
   }
-  desfazer.push(() => admin.from('obras').delete().eq('id', obra.id))
-
-  // ─────────────────────────────────────────────────────────────
-  // 5) Cria os tamanhos
-  // ─────────────────────────────────────────────────────────────
-  // Um único insert com a lista inteira, não um insert por tamanho. Isso
-  // é um comando SQL só, e comando SQL é atômico no Postgres: ou entram
-  // todas as linhas, ou nenhuma. Não existe estado de "metade dos
-  // tamanhos salvos" pra limpar depois.
-  const { data: tamanhosCriados, error: erroTamanhos } = await admin
-    .from('tamanhos')
-    .insert(tamanhos.map((tamanho) => ({ ...tamanho, obra_id: obra.id })))
-    .select()
-
-  if (erroTamanhos) {
-    // Aqui está o caso que você pediu: os tamanhos falharam, então a obra
-    // que acabou de nascer é apagada junto com as duas imagens. Não fica
-    // obra órfã, nem obra publicada sem preço.
-    await reverterTudo()
-    return Response.json(
-      { erro: 'Falha ao salvar os tamanhos: ' + erroTamanhos.message },
-      { status: 500 }
-    )
-  }
-
-  return Response.json({ obra, tamanhos: tamanhosCriados }, { status: 201 })
+  return Response.json({ obra }, { status: 201 })
 }
 
 // Nome de arquivo vindo do usuário não serve como chave de storage: pode ter

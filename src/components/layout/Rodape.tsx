@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import { INSTAGRAM_EXIBICAO, INSTAGRAM_URL, WHATSAPP_EXIBICAO, WHATSAPP_URL_GERAL } from '@/lib/contato'
+
 export default function Rodape() {
   return (
     <footer className="mt-16 bg-tinta px-6 py-16 text-pedra md:px-12 lg:px-24">
@@ -9,8 +11,7 @@ export default function Rodape() {
             BOCAIRÚ
           </div>
           <p className="max-w-xs text-sm">
-            Fotografia fine art e obras exclusivas, produzidas em processos
-            de padrão museológico.
+            Fotografia autoral. Sessões de foto sob agendamento.
           </p>
         </div>
 
@@ -21,6 +22,7 @@ export default function Rodape() {
           <div className="flex flex-col gap-2.5 text-sm">
             <Link href="/" className="text-pedra">Home</Link>
             <Link href="/colecoes" className="text-pedra">Coleções</Link>
+            <Link href="/galeria" className="text-pedra">Galeria</Link>
             <Link href="/a-artista" className="text-pedra">A Artista</Link>
           </div>
         </div>
@@ -30,10 +32,14 @@ export default function Rodape() {
             Contato
           </div>
           <div className="flex flex-col gap-2.5 text-sm">
-            <a href="#" className="text-pedra">contato@bocairu.com</a>
-            <a href="#" className="text-pedra">@bocairu</a>
-            <Link href="/encomendas" className="text-pedra">
-              Encomendas &amp; Consultoria
+            <a href={WHATSAPP_URL_GERAL} target="_blank" rel="noopener noreferrer" className="text-pedra">
+              WhatsApp {WHATSAPP_EXIBICAO}
+            </a>
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="text-pedra">
+              Instagram {INSTAGRAM_EXIBICAO}
+            </a>
+            <Link href="/contato" className="text-pedra">
+              Contato
             </Link>
             {/* Único caminho clicável até o admin — sem ele, só digitando
                 a URL na mão. Visível pra qualquer visitante (como no

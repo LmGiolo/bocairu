@@ -1,7 +1,7 @@
 'use client'
 
-import { Suspense, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/client'
 import Botao from '@/components/ui/Botao'
@@ -10,125 +10,56 @@ const CLASSE_INPUT =
   'w-full border-b border-linho bg-transparent py-3 text-base text-tinta outline-none transition-colors duration-200 focus:border-tinta'
 const CLASSE_LABEL = 'mb-2 block text-xs uppercase tracking-widest text-fumaca'
 
-function ConteudoEntrar() {
-  const [modo, setModo] = useState<'entrar' | 'cadastrar'>('entrar')
-  const [nome, setNome] = useState('')
+// Login da área administrativa — e só dela. Desde que o site virou portfólio
+// (vendas em standby, ver docs/handoff.md), visitante não tem conta: o modo
+// "Criar conta" saiu desta tela E o cadastro foi desligado no painel do
+// Supabase (Authentication → Sign In / Providers → "Allow new users to sign
+// up"). As duas coisas juntas: tirar só a tela deixaria o signUp() ainda
+// chamável direto pela API, com a chave anon que é pública.
+export default function Entrar() {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
-  // Cadastro com confirmação de e-mail ligada no projeto: signUp() dá certo
-  // mas não devolve sessão. Em vez de tentar redirecionar sem sessão,
-  // avisamos e paramos aqui.
-  const [aguardandoConfirmacao, setAguardandoConfirmacao] = useState(false)
 
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const proximaRota = searchParams.get('next') || '/minha-conta'
   const supabase = createClient()
-
-  // Sem `?next=` (não veio de um fluxo específico, como o checkout, que
-  // sempre manda um destino): admin → painel administrativo, cliente →
-  // Minha Conta. É o caminho do ícone de conta do Cabeçalho, que leva pra
-  // /minha-conta e, sem sessão, cai aqui sem `next` — ele não sabe se quem
-  // clicou é a artista ou uma cliente.
-  async function redirecionarAposEntrar(userId: string) {
-    if (searchParams.get('next')) {
-      router.push(proximaRota)
-      router.refresh()
-      return
-    }
-
-    const { data: perfil } = await supabase.from('perfis').select('papel').eq('id', userId).single()
-
-    router.push(perfil?.papel === 'admin' ? '/admin' : '/minha-conta')
-    router.refresh()
-  }
 
   async function enviar(evento: React.FormEvent) {
     evento.preventDefault()
     setErro('')
     setCarregando(true)
 
-    if (modo === 'entrar') {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha })
+
+    if (error || !data.user) {
       setCarregando(false)
-
-      if (error || !data.user) {
-        setErro('E-mail ou senha incorretos.')
-        return
-      }
-
-      await redirecionarAposEntrar(data.user.id)
+      setErro('E-mail ou senha incorretos.')
       return
     }
 
-    // modo === 'cadastrar'
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: senha,
-      // O trigger handle_novo_usuario() lê raw_user_meta_data->>'nome' pra
-      // criar a linha em `perfis` (papel 'cliente' por padrão).
-      options: { data: { nome } },
-    })
-    setCarregando(false)
+    // Conta que não é admin (sobra de antes do cadastro ser desligado) não
+    // tem nada pra fazer logada: sai na hora, em vez de ficar com uma sessão
+    // sem uso. O portão de verdade continua em admin/layout.tsx e no RLS.
+    const { data: perfil } = await supabase.from('perfis').select('papel').eq('id', data.user.id).single()
 
-    if (error) {
-      setErro(
-        error.message.toLowerCase().includes('already registered')
-          ? 'Já existe uma conta com este e-mail. Tente entrar.'
-          : 'Não foi possível criar a conta. Confira os dados e tente de novo.'
-      )
+    if (perfil?.papel !== 'admin') {
+      await supabase.auth.signOut()
+      setCarregando(false)
+      setErro('Esta área é só para a administração do site.')
       return
     }
 
-    if (data.session) {
-      router.push(proximaRota)
-      router.refresh()
-      return
-    }
-
-    setAguardandoConfirmacao(true)
-  }
-
-  if (aguardandoConfirmacao) {
-    return (
-      <div className="mx-auto max-w-[400px] px-6 py-24 text-center md:px-0">
-        <div className="mb-4 font-serif text-2xl italic text-tinta">Quase lá.</div>
-        <p className="text-sm leading-relaxed text-fumaca">
-          Enviamos um link de confirmação para <strong className="text-tinta">{email}</strong>.
-          Confirme seu e-mail para poder entrar.
-        </p>
-      </div>
-    )
+    router.push('/admin')
+    router.refresh()
   }
 
   return (
     <div className="mx-auto max-w-[400px] px-6 py-24 md:px-0">
-      <div className="mb-2 text-xs uppercase tracking-widest text-ouro">
-        {modo === 'entrar' ? 'Minha conta' : 'Criar conta'}
-      </div>
-      <h1 className="mb-9 font-serif text-4xl text-tinta">
-        {modo === 'entrar' ? 'Entrar.' : 'Criar conta.'}
-      </h1>
+      <div className="mb-2 text-xs uppercase tracking-widest text-ouro">Área administrativa</div>
+      <h1 className="mb-9 font-serif text-4xl text-tinta">Entrar.</h1>
 
       <form onSubmit={enviar} className="flex flex-col gap-7">
-        {modo === 'cadastrar' && (
-          <div>
-            <label className={CLASSE_LABEL} htmlFor="nome">
-              Nome
-            </label>
-            <input
-              id="nome"
-              type="text"
-              required
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              className={CLASSE_INPUT}
-            />
-          </div>
-        )}
-
         <div>
           <label className={CLASSE_LABEL} htmlFor="email">
             E-mail
@@ -137,6 +68,7 @@ function ConteudoEntrar() {
             id="email"
             type="email"
             required
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={CLASSE_INPUT}
@@ -151,7 +83,7 @@ function ConteudoEntrar() {
             id="senha"
             type="password"
             required
-            minLength={6}
+            autoComplete="current-password"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             className={CLASSE_INPUT}
@@ -159,35 +91,16 @@ function ConteudoEntrar() {
         </div>
 
         {erro && (
-          <div className="flex items-start gap-2.5 text-sm text-[#B8492E]">
-            <span className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#B8492E]" />
+          <div role="alert" className="flex items-start gap-2.5 text-sm text-[#B8492E]">
+            <span aria-hidden="true" className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#B8492E]" />
             {erro}
           </div>
         )}
 
         <Botao variante="bordo" type="submit" disabled={carregando} className="mt-2">
-          {carregando ? 'Aguarde…' : modo === 'entrar' ? 'Entrar' : 'Criar conta'}
+          {carregando ? 'Aguarde…' : 'Entrar'}
         </Botao>
       </form>
-
-      <button
-        type="button"
-        onClick={() => {
-          setModo((atual) => (atual === 'entrar' ? 'cadastrar' : 'entrar'))
-          setErro('')
-        }}
-        className="mt-7 text-sm text-fumaca underline underline-offset-4 transition-colors duration-200 hover:text-vinho-escuro"
-      >
-        {modo === 'entrar' ? 'Não tem conta? Criar uma.' : 'Já tem conta? Entrar.'}
-      </button>
     </div>
-  )
-}
-
-export default function Entrar() {
-  return (
-    <Suspense fallback={null}>
-      <ConteudoEntrar />
-    </Suspense>
   )
 }

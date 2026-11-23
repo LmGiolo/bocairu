@@ -1,15 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
 import CartaoObra from '@/components/ui/CartaoObra'
-import { ProvedorTamanho, type Tamanho } from '@/components/obra/ContextoTamanho'
-import SeletorTamanho from '@/components/obra/SeletorTamanho'
 import FichaTecnica from '@/components/obra/FichaTecnica'
-import PrecoEAcao from '@/components/obra/PrecoEAcao'
-import Certificado from '@/components/obra/Certificado'
-import BotaoFavoritar from '@/components/obra/BotaoFavoritar'
+import { BotaoWhatsApp } from '@/components/contato/BotoesContato'
+import { whatsAppUrlSobreFoto } from '@/lib/contato'
 
 export default async function PaginaObra({
   params,
@@ -23,26 +21,11 @@ export default async function PaginaObra({
   // admin, do mesmo jeito que a /galeria já faz.
   const { data: obra } = await supabase
     .from('obras')
-    .select('*, tamanhos(*)')
+    .select('*')
     .eq('id', id)
     .single()
 
   if (!obra) notFound()
-
-  const tamanhos: Tamanho[] = [...obra.tamanhos]
-    .sort((a, b) => a.ordem - b.ordem)
-    .map((tamanho) => ({
-      id: tamanho.id,
-      rotulo: tamanho.rotulo,
-      preco_centavos: tamanho.preco_centavos,
-      disponivel: tamanho.disponivel,
-      prazo_dias: tamanho.prazo_dias,
-      porte: tamanho.porte,
-    }))
-
-  // Obra sem nenhum tamanho é dado inconsistente (a rota de cadastro nunca
-  // cria isso) — não tem preço nem ficha pra mostrar.
-  if (tamanhos.length === 0) notFound()
 
   let relacionadas: Array<{
     id: string
@@ -60,33 +43,26 @@ export default async function PaginaObra({
       .eq('serie', obra.serie)
       .neq('id', obra.id)
       .order('ordem', { ascending: true })
+      .order('criado_em', { ascending: true })
       .limit(4)
 
     relacionadas = data ?? []
   }
 
-  // Coração de favorito: só pergunta ao banco se houver alguém logado. O
-  // RLS de `favoritos` já limita a busca às linhas de quem está logado.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  let favorita = false
-  if (user) {
-    const { data: favorito } = await supabase
-      .from('favoritos')
-      .select('obra_id')
-      .eq('obra_id', obra.id)
-      .eq('cliente_id', user.id)
-      .maybeSingle()
-    favorita = favorito !== null
-  }
+  // Endereço completo desta página, pra ir dentro da mensagem do WhatsApp
+  // (a artista recebe o link e sabe na hora de qual foto se trata). Montado
+  // a partir do próprio pedido — funciona igual em localhost, em preview e
+  // no domínio final, sem variável de ambiente pra lembrar de configurar.
+  const cabecalhos = await headers()
+  const host = cabecalhos.get('host')
+  const protocolo = cabecalhos.get('x-forwarded-proto') ?? 'https'
+  const linkDaFoto = host ? `${protocolo}://${host}/obras/${obra.id}` : ''
 
   const proporcaoImagem =
     obra.largura_px && obra.altura_px ? `${obra.largura_px} / ${obra.altura_px}` : '4 / 5'
 
   return (
-    <ProvedorTamanho tamanhos={tamanhos}>
+    <>
       {/* Breadcrumb */}
       <div className="mx-auto flex max-w-[1360px] flex-col gap-5 px-6 pt-10 md:px-12 lg:px-24">
         <Link
@@ -139,9 +115,8 @@ export default async function PaginaObra({
           <h1 className="mb-2.5 font-serif text-4xl leading-tight text-tinta md:text-5xl">
             {obra.titulo}
           </h1>
-          <div className="mb-10 flex items-center justify-between gap-4 text-sm text-fumaca">
-            <span>Bocairú{obra.ano ? `, ${obra.ano}` : ''}</span>
-            <BotaoFavoritar obraId={obra.id} favoritoInicial={favorita} logado={user !== null} />
+          <div className="mb-10 text-sm text-fumaca">
+            Bocairú{obra.ano ? `, ${obra.ano}` : ''}
           </div>
 
           {obra.descricao && (
@@ -150,19 +125,19 @@ export default async function PaginaObra({
             </p>
           )}
 
-          <SeletorTamanho />
-          <FichaTecnica
-            tecnica={obra.tecnica}
-            material={obra.material}
-            impressao={obra.impressao}
-            papel={obra.papel}
-          />
-          <PrecoEAcao
-            obraId={obra.id}
-            titulo={obra.titulo}
-            imagemUrl={obra.imagem_web}
-            serie={obra.serie}
-          />
+          <FichaTecnica tecnica={obra.tecnica} material={obra.material} />
+
+          {/* O site não tem checkout: o interesse em comprar vira conversa no
+              WhatsApp. A mensagem pronta já cita o título e o link desta página. */}
+          <div className="border-t border-linho pt-8">
+            <p className="mb-5 max-w-sm text-sm leading-relaxed text-fumaca">
+              Gostou desta foto? Fale com a artista para saber como adquiri-la.
+            </p>
+            <BotaoWhatsApp
+              href={whatsAppUrlSobreFoto(obra.titulo, linkDaFoto)}
+              rotulo="Tenho interesse nesta foto"
+            />
+          </div>
         </div>
       </section>
 
@@ -185,8 +160,6 @@ export default async function PaginaObra({
         </section>
       )}
 
-      <Certificado titulo={obra.titulo} ano={obra.ano} />
-
       {relacionadas.length > 0 && (
         <section className="mx-auto max-w-[1360px] px-6 py-24 md:px-12 lg:px-24">
           <h2 className="mb-11 font-serif text-3xl text-tinta">Da mesma série.</h2>
@@ -205,6 +178,6 @@ export default async function PaginaObra({
           </div>
         </section>
       )}
-    </ProvedorTamanho>
+    </>
   )
 }

@@ -6,9 +6,9 @@ import { createClient } from '@/lib/supabase/server'
 const NAVEGACAO = [
   { href: '/admin', rotulo: 'Cadastrar obra' },
   { href: '/admin/obras', rotulo: 'Obras' },
-  { href: '/admin/pedidos', rotulo: 'Pedidos' },
-  { href: '/admin/encomendas', rotulo: 'Encomendas' },
-  { href: '/admin/frete', rotulo: 'Frete' },
+  { href: '/admin/ordem', rotulo: 'Ordem do site' },
+  // Pedidos, Encomendas e Frete saíram com as vendas — ver "Vendas em
+  // standby" em docs/handoff.md (código guardado na tag git `loja-v1`).
 ]
 
 // Portão de UX pra todo /admin/*, não só a página inicial — a partir de
