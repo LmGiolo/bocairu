@@ -226,7 +226,8 @@
  * cabeçalho deixa de ser previsível. A barra de filtros da Galeria, que
  * gruda logo abaixo dele, sobe junto. */
 .cabecalho,
-.cabecalho a {
+.cabecalho a,
+.cabecalho .botao-menu {
   transition:
     background-color 320ms ease,
     border-color 320ms ease,
@@ -269,8 +270,59 @@ html:not([data-rolou]):has(.anim-hero) .cabecalho {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
-html:not([data-rolou]):has(.anim-hero) .cabecalho a {
+/* Letras claras só nos links e no botão "Menu" do próprio cabeçalho — não
+ * nos da gaveta do celular, que mora dentro dele no HTML mas abre por cima
+ * da tela, com fundo areia (`:not(dialog *)` = "que não esteja dentro de
+ * um <dialog>"). */
+html:not([data-rolou]):has(.anim-hero) .cabecalho :is(a, .botao-menu):not(dialog *) {
   color: var(--color-areia);
+}
+
+/* ── Gavetas: menu do celular, filtros da Galeria, menu do admin ──────
+ * São <dialog> abertos com showModal(). A gaveta desliza de fora da tela
+ * (`--gaveta-fora`: direita por padrão) e o fundo escurece junto.
+ *
+ * `@starting-style` diz de onde a animação parte quando o <dialog> acaba
+ * de abrir (antes disso ele nem existia na tela, então não havia "de onde
+ * sair"). `allow-discrete` em `display`/`overlay` segura o <dialog> visível
+ * até o fim da saída — sem isso ele sumiria de uma vez ao fechar. Navegador
+ * sem suporte simplesmente abre e fecha sem deslizar. */
+.gaveta {
+  --gaveta-fora: 100% 0;
+  translate: var(--gaveta-fora);
+  transition:
+    translate 320ms var(--curva-pouso),
+    overlay 320ms allow-discrete,
+    display 320ms allow-discrete;
+}
+.gaveta-esquerda {
+  --gaveta-fora: -100% 0;
+}
+.gaveta-baixo {
+  --gaveta-fora: 0 100%;
+}
+.gaveta[open] {
+  translate: 0 0;
+}
+@starting-style {
+  .gaveta[open] {
+    translate: var(--gaveta-fora);
+  }
+}
+.gaveta::backdrop {
+  background-color: rgb(27 24 20 / 0);
+  transition:
+    background-color 320ms ease,
+    overlay 320ms allow-discrete,
+    display 320ms allow-discrete;
+}
+.gaveta[open]::backdrop {
+  background-color: rgb(27 24 20 / 0.55);
+}
+@starting-style {
+  .gaveta[open]::backdrop {
+    background-color: rgb(27 24 20 / 0);
+  }
 }
 
 /* ── Movimento reduzido (preferência do sistema): só fade ─────────────
@@ -286,6 +338,11 @@ html:not([data-rolou]):has(.anim-hero) .cabecalho a {
   }
   .group:hover .anim-foto-img {
     transform: none;
+  }
+
+  /* Gavetas: abrem no lugar, sem deslizar (o fundo ainda escurece). */
+  .gaveta {
+    transition: none;
   }
 
   /* Passagens: a foto não voa (o grupo pula direto para o destino); o

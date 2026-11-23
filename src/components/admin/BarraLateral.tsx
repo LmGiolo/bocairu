@@ -70,7 +70,8 @@ export default function BarraLateral() {
         onClick={(e) => {
           if (e.target === e.currentTarget) fecharGaveta()
         }}
-        className="m-0 h-dvh max-h-none w-72 max-w-[85vw] bg-tinta p-0 text-pedra backdrop:bg-tinta/55 open:flex lg:hidden"
+        // `gaveta gaveta-esquerda`: desliza da esquerda (globals.css).
+        className="gaveta gaveta-esquerda m-0 h-dvh max-h-none w-72 max-w-[85vw] bg-tinta p-0 text-pedra open:flex lg:hidden"
       >
         <div className="flex w-full flex-col gap-10 overflow-y-auto px-5 py-7">
           <button
