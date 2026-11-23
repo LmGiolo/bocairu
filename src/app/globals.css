@@ -46,3 +46,243 @@
     outline-offset: 2px;
   }
 }
+
+/* ═════════════════════════════════════════════════════════════════════
+ * ANIMAÇÕES — o §4 do handoff (Design Doc), mais o cabeçalho do protótipo
+ *
+ * Como funciona:
+ * - O <html> recebe `data-js` antes de a página aparecer (script em
+ *   src/lib/animacao.ts). Os estados "antes de entrar" começam por esse
+ *   atributo: sem JavaScript, nada fica invisível.
+ * - Os componentes só carregam ganchos — `data-anim="secao|foto|capa"` e
+ *   as classes `anim-*`, `cabecalho`, `barra-filtros`, `botao-*`.
+ * - O ObservadorAnimacoes marca `data-visivel` quando o elemento entra na
+ *   tela: `data-visivel=""` = entrou agora (anima); `data-visivel="ja"` =
+ *   chegou por navegação com a imagem em cache (aparece direto). E põe
+ *   `data-rolou` no <html> quando a página rolou mais de 40px.
+ *
+ * Fica FORA de @layer de propósito: regra sem layer vence as utilitárias do
+ * Tailwind (que estão em layer), e algumas daqui precisam anular classes
+ * do Tailwind, como o `hover:bg-tinta` dos botões e o `sticky` do
+ * cabeçalho na Home.
+ * ═════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* A curva do Design Doc (§4): sai rápido e pousa devagar. */
+  --curva-pouso: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Passagem de página e da foto ─────────────────────────────────────
+ * `.pagina` é a classe do <ViewTransition> em volta do <main>
+ * (src/app/(site)/layout.tsx): cross-fade de 350ms, como pede o §4.
+ * `.morph` é a foto compartilhada entre o cartão e a Página da Obra. */
+::view-transition-old(.pagina),
+::view-transition-new(.pagina) {
+  animation-duration: 350ms;
+}
+
+::view-transition-group(.morph) {
+  animation-duration: 550ms;
+  animation-timing-function: var(--curva-pouso);
+}
+
+/* O cabeçalho não participa: fica parado por cima, como ponto fixo. */
+::view-transition-group(cabecalho) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(cabecalho) {
+  display: none;
+}
+::view-transition-new(cabecalho) {
+  animation: none;
+}
+
+/* ── Entrada de seções e cartões ──────────────────────────────────────
+ * Fade + sobe 12px, 500ms. Cartões escalonados em 60ms pela posição na
+ * fileira (`--i`, que o componente preenche). */
+[data-js] [data-anim='secao'],
+[data-js] [data-anim='foto'],
+[data-js] .anim-hero-texto {
+  transition:
+    opacity 500ms var(--curva-pouso),
+    transform 500ms var(--curva-pouso);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+
+[data-js] [data-anim='secao']:not([data-visivel]),
+[data-js] [data-anim='foto']:not([data-visivel]),
+[data-js] .anim-hero:not([data-visivel]) .anim-hero-texto {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+[data-js] [data-visivel='ja'] {
+  transition: none;
+}
+
+/* ── Parallax sutil (0.9x) só na capa ─────────────────────────────────
+ * A foto desce 10% do quanto a página sobe. Usa "scroll-driven animation"
+ * (a animação anda com a rolagem, sem JavaScript); navegador sem suporte
+ * simplesmente não faz parallax. Atenção à ordem: o atalho `animation`
+ * zera `animation-timeline`, então timeline e range vêm DEPOIS dele. */
+@supports (animation-timeline: scroll()) {
+  .anim-hero-foto {
+    animation: anim-paralaxe linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 100vh;
+  }
+}
+
+@keyframes anim-paralaxe {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(10vh);
+  }
+}
+
+/* ── Hover do cartão ──────────────────────────────────────────────────
+ * Zoom de 1.03 em 600ms e a moldura escurece, sem sombra. `:hover` só em
+ * aparelho com mouse (no celular o "hover" gruda depois do toque). */
+.anim-foto-img {
+  transition: transform 600ms ease-out;
+}
+.anim-moldura {
+  transition: border-color 600ms ease-out;
+}
+.group:focus-within .anim-moldura {
+  border-color: var(--color-tinta);
+}
+
+/* ── Botões: preenchimento que entra da esquerda em 250ms ─────────────
+ * É uma imagem de fundo (um degradê de uma cor só) que cresce de 0% a 100%
+ * da largura, por cima da cor de fundo do botão. */
+.botao-primario,
+.botao-secundario,
+.botao-bordo {
+  background-image: linear-gradient(var(--cor-preenchimento), var(--cor-preenchimento));
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 0% 100%;
+  transition:
+    background-size 250ms var(--curva-pouso),
+    color 250ms var(--curva-pouso);
+}
+.botao-primario {
+  --cor-preenchimento: #3a342c;
+}
+.botao-secundario {
+  --cor-preenchimento: var(--color-tinta);
+}
+.botao-bordo {
+  --cor-preenchimento: var(--color-vinho-escuro);
+}
+.botao-primario:focus-visible,
+.botao-secundario:focus-visible,
+.botao-bordo:focus-visible {
+  background-size: 100% 100%;
+}
+
+@media (hover: hover) {
+  .group:hover .anim-foto-img {
+    transform: scale(1.03);
+  }
+  .group:hover .anim-moldura {
+    border-color: var(--color-tinta);
+  }
+
+  .botao-primario:hover,
+  .botao-secundario:hover,
+  .botao-bordo:hover {
+    background-size: 100% 100%;
+  }
+  /* Anula o hover de cor sólida do Tailwind — quem pinta agora é o
+     preenchimento. Sem isso o botão mudaria de cor de uma vez, e o
+     preenchimento chegaria atrasado sobre uma cor que já mudou. */
+  .botao-primario:hover {
+    background-color: var(--color-tinta);
+  }
+  .botao-secundario:hover {
+    background-color: transparent;
+  }
+  .botao-bordo:hover {
+    background-color: var(--color-vinho);
+  }
+}
+
+/* ── Cabeçalho ────────────────────────────────────────────────────────
+ * Em todas as páginas: encolhe ao rolar (73px → 57px). Só a partir de
+ * 1024px: abaixo disso o menu quebra em mais linhas e a altura do
+ * cabeçalho deixa de ser previsível. A barra de filtros da Galeria, que
+ * gruda logo abaixo dele, sobe junto. */
+.cabecalho,
+.cabecalho a {
+  transition:
+    background-color 320ms ease,
+    border-color 320ms ease,
+    color 320ms ease,
+    opacity 200ms ease,
+    padding 300ms var(--curva-pouso);
+}
+
+@media (min-width: 1024px) {
+  .barra-filtros {
+    transition: top 300ms var(--curva-pouso);
+  }
+  [data-rolou] .cabecalho {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+  [data-rolou] .barra-filtros {
+    top: 57px;
+  }
+}
+
+/* Na Home (a única página com `.anim-hero`), o cabeçalho fica POR CIMA da
+ * capa: transparente, sem borda, com letras claras — como no protótipo
+ * (docs/prototipo/Home.dc.html). Ao rolar, volta a ser o cabeçalho normal
+ * (fundo areia, borda, letras escuras).
+ *
+ * `:has()` pergunta "a página tem uma capa?" direto no CSS, sem o
+ * cabeçalho precisar saber em que rota está. `position: fixed` tira o
+ * cabeçalho do fluxo: a capa passa a começar no topo da tela, por baixo
+ * dele. */
+html:has(.anim-hero) .cabecalho {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+html:not([data-rolou]):has(.anim-hero) .cabecalho {
+  background-color: transparent;
+  border-bottom-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html:not([data-rolou]):has(.anim-hero) .cabecalho a {
+  color: var(--color-areia);
+}
+
+/* ── Movimento reduzido (preferência do sistema): só fade ─────────────
+ * Fica no fim para vencer as regras acima pela ordem. */
+@media (prefers-reduced-motion: reduce) {
+  [data-js] [data-anim='secao']:not([data-visivel]),
+  [data-js] [data-anim='foto']:not([data-visivel]),
+  [data-js] .anim-hero:not([data-visivel]) .anim-hero-texto {
+    transform: none;
+  }
+  .anim-hero-foto {
+    animation: none;
+  }
+  .group:hover .anim-foto-img {
+    transform: none;
+  }
+
+  /* Passagens: a foto não voa (o grupo pula direto para o destino); o
+     cross-fade continua. */
+  ::view-transition-group(*) {
+    animation-duration: 0s;
+  }
+}

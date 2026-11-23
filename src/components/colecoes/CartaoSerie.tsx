@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 
 type Props = {
   nome: string
@@ -7,22 +8,30 @@ type Props = {
   larguraPx: number | null
   alturaPx: number | null
   contagem: number
+  /** Posição na fileira — ver o mesmo campo em CartaoObra. */
+  indice?: number
 }
 
-export default function CartaoSerie({ nome, imagemUrl, larguraPx, alturaPx, contagem }: Props) {
+export default function CartaoSerie({ nome, imagemUrl, larguraPx, alturaPx, contagem, indice = 0 }: Props) {
   const aspectRatio = larguraPx && alturaPx ? `${larguraPx} / ${alturaPx}` : '4 / 5'
 
+  // Ganchos de animação (`data-anim`, `anim-*`): ver CartaoObra.
   return (
-    <Link href={`/colecoes/${encodeURIComponent(nome)}`} className="group block">
+    <Link
+      href={`/colecoes/${encodeURIComponent(nome)}`}
+      className="group block"
+      data-anim="foto"
+      style={{ '--i': indice } as CSSProperties}
+    >
       <div
-        className="relative w-full overflow-hidden border border-linho"
+        className="anim-moldura relative w-full overflow-hidden border border-linho"
         style={{ aspectRatio }}
       >
         <Image
           src={imagemUrl}
           alt={nome}
           fill
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          className="anim-foto-img object-cover"
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         />
       </div>

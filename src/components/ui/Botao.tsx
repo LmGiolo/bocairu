@@ -38,7 +38,9 @@ export default function Botao({
   type = 'button',
   ...resto
 }: Props) {
-  const classe = `${CLASSES_BASE} ${disabled ? CLASSES_DESABILITADO : CLASSES_VARIANTE[variante]} ${className}`
+  // `botao-<variante>` é gancho para a animação de hover (preenchimento
+  // que entra da esquerda, em globals.css).
+  const classe = `${CLASSES_BASE} ${disabled ? CLASSES_DESABILITADO : `botao-${variante} ${CLASSES_VARIANTE[variante]}`} ${className}`
 
   if (href && !disabled) {
     return (

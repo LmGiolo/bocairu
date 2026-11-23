@@ -58,7 +58,7 @@ export default async function Colecoes() {
 
   return (
     <div>
-      <section className="mx-auto max-w-[1440px] px-6 pb-8 pt-16 md:px-12 lg:px-24">
+      <section className="mx-auto max-w-[1440px] px-6 pb-8 pt-16 md:px-12 lg:px-24" data-anim="secao">
         <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ouro">
           {series.length} coleç{series.length === 1 ? 'ão' : 'ões'}
         </div>
@@ -72,9 +72,10 @@ export default async function Colecoes() {
       <section className="mx-auto max-w-[1440px] px-6 py-14 md:px-12 lg:px-24">
         {series.length > 0 ? (
           <div className="grid grid-cols-1 gap-9 sm:grid-cols-2 lg:grid-cols-3">
-            {series.map((serie) => (
+            {series.map((serie, indice) => (
               <CartaoSerie
                 key={serie.nome}
+                indice={indice % 3}
                 nome={serie.nome}
                 imagemUrl={serie.imagem_web}
                 larguraPx={serie.largura_px}

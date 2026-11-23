@@ -65,21 +65,34 @@ export default async function Home() {
 
   return (
     <div>
-      {/* Hero editorial — uma obra em tela cheia, sem carrossel */}
-      <section className="relative h-[85vh] w-full overflow-hidden bg-tinta md:h-[70vh] lg:h-[100vh]">
+      {/* Hero editorial — uma obra em tela cheia, sem carrossel.
+          Ganchos (globals.css): `anim-hero` é a seção — e a presença dela
+          na página é o que deixa o cabeçalho transparente por cima da foto;
+          `anim-hero-foto` é a imagem (parallax); `anim-hero-texto` o nome e
+          a frase (sobem ao entrar). `data-anim="capa"`: a entrada só
+          começa quando a foto carregou. */}
+      <section
+        className="anim-hero relative h-[85vh] w-full overflow-hidden bg-tinta md:h-[70vh] lg:h-[100vh]"
+        data-anim="capa"
+      >
         {hero && (
           <Image
             src={hero.imagem_web}
             alt={hero.titulo}
             fill
             priority
-            className="object-cover"
+            className="anim-hero-foto object-cover"
             sizes="100vw"
           />
         )}
 
+        {/* Sombra leve no topo da foto: o cabeçalho transparente usa letras
+            claras, e sem isso ele sumiria sobre uma foto de céu ou parede
+            branca. Mesmo recurso do protótipo (Home.dc.html). */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-tinta/50 to-transparent" />
+
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-tinta/85 via-tinta/25 to-transparent px-6 pb-14 pt-40 md:px-12 md:pb-16 lg:px-24">
-          <div className="mx-auto max-w-[1440px]">
+          <div className="anim-hero-texto mx-auto max-w-[1440px]">
             <h1 className="font-serif text-6xl italic text-areia md:text-7xl">Bocairú</h1>
             <p className="mt-4 max-w-md text-base leading-relaxed text-areia/90 md:text-lg">
               Fotografia autoral. Sessões de foto sob agendamento.
@@ -96,7 +109,7 @@ export default async function Home() {
       {/* Faixa de destaque — 3 obras selecionadas (as próximas na ordem de curadoria) */}
       {destaque.length > 0 && (
         <section className="mx-auto max-w-[1440px] px-6 py-20 md:px-12 md:py-28 lg:px-24">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-6 md:mb-14">
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-6 md:mb-14" data-anim="secao">
             <div>
               <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ouro">
                 Seleção atual
@@ -109,10 +122,11 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 md:gap-8">
-            {destaque.map((obra) => (
+            {destaque.map((obra, indice) => (
               <CartaoObra
                 key={obra.id}
-                href={`/obras/${obra.id}`}
+                obraId={obra.id}
+                indice={indice}
                 imagemUrl={obra.imagem_web}
                 titulo={obra.titulo}
                 subtitulo={[obra.tecnica, obra.ano].filter(Boolean).join(' · ')}
@@ -128,7 +142,7 @@ export default async function Home() {
       {series.length > 0 && (
         <section className="bg-creme px-6 py-20 md:px-12 md:py-28 lg:px-24">
           <div className="mx-auto max-w-[1440px]">
-            <div className="mb-10 flex flex-wrap items-end justify-between gap-6 md:mb-14">
+            <div className="mb-10 flex flex-wrap items-end justify-between gap-6 md:mb-14" data-anim="secao">
               <div>
                 <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ouro">
                   Séries
@@ -141,9 +155,10 @@ export default async function Home() {
             </div>
 
             <div className="grid grid-cols-1 gap-9 sm:grid-cols-2 lg:grid-cols-3">
-              {series.map((serie) => (
+              {series.map((serie, indice) => (
                 <CartaoSerie
                   key={serie.nome}
+                  indice={indice % 3}
                   nome={serie.nome}
                   imagemUrl={serie.imagem_web}
                   larguraPx={serie.largura_px}
@@ -158,7 +173,7 @@ export default async function Home() {
 
       {/* Sobre a artista */}
       <section className="mx-auto max-w-[1360px] px-6 py-20 md:px-12 md:py-28 lg:px-24">
-        <div className="grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr] md:gap-20">
+        <div className="grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr] md:gap-20" data-anim="secao">
           {/* Sem foto de retrato no schema/ativos ainda — placeholder até
               existir uma imagem de verdade da artista. */}
           <div
@@ -186,7 +201,7 @@ export default async function Home() {
 
       {/* CTA final — o objetivo do portfólio: virar conversa no WhatsApp */}
       <section className="bg-creme px-6 py-24 text-center md:px-12 lg:px-24">
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-2xl" data-anim="secao">
           <h2 className="mb-5 font-serif text-3xl text-tinta md:text-4xl">Vamos fotografar juntos?</h2>
           <p className="mb-9 text-base text-fumaca">
             Sessões de foto sob agendamento, combinadas direto com a artista.

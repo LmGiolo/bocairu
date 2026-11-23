@@ -104,7 +104,7 @@ export default function GaleriaInterativa({
   return (
     <div>
       {/* Cabeçalho de contexto */}
-      <section className="mx-auto max-w-[1440px] px-6 pb-8 pt-16 md:px-12 lg:px-24">
+      <section className="mx-auto max-w-[1440px] px-6 pb-8 pt-16 md:px-12 lg:px-24" data-anim="secao">
         <div className="mb-4.5 text-xs font-semibold uppercase tracking-widest text-ouro">
           {serieUnicaAtiva
             ? `${contagemPlural(obrasFiltradas.length)} nesta coleção`
@@ -120,8 +120,11 @@ export default function GaleriaInterativa({
         </div>
       </section>
 
-      {/* Barra de filtros */}
-      <section className="sticky top-[76px] z-30 border-b border-linho bg-areia">
+      {/* Barra de filtros. Gruda logo abaixo do cabeçalho, que tem 73px no
+          desktop (era 76px, e o conteúdo vazava por uma fresta de 3px).
+          `barra-filtros`: gancho para acompanhar o cabeçalho quando ele
+          encolhe ao rolar (globals.css). */}
+      <section className="barra-filtros sticky top-[73px] z-30 border-b border-linho bg-areia">
         <div className="mx-auto max-w-[1440px] px-6 md:px-12 lg:px-24">
           <div className="flex flex-wrap items-center justify-between gap-6 py-4.5">
             <div className="flex flex-wrap items-center gap-2.5">
@@ -178,10 +181,11 @@ export default function GaleriaInterativa({
       <section className="mx-auto max-w-[1440px] px-6 py-14 md:px-12 lg:px-24">
         {obrasFiltradas.length > 0 ? (
           <div className="columns-1 gap-7 sm:columns-2 lg:columns-3">
-            {obrasFiltradas.map((obra) => (
+            {obrasFiltradas.map((obra, indice) => (
               <div key={obra.id} className="mb-7 break-inside-avoid">
                 <CartaoObra
-                  href={`/obras/${obra.id}`}
+                  obraId={obra.id}
+                  indice={indice % 3}
                   imagemUrl={obra.imagem_web}
                   titulo={obra.titulo}
                   subtitulo={obra.subtitulo}
