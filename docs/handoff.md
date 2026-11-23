@@ -750,12 +750,27 @@ Lacunas encontradas comparando este documento com o código:
     "texto alternativo" no formulário de obra;
   - foco visível já existe (`:focus-visible` ouro em `globals.css`).
 - **Responsividade (§5):**
-  - Galeria: filtros viram **drawer/bottom sheet** no tablet/mobile (hoje
-    só quebram linha);
-  - Página da Obra no mobile: **CTA do WhatsApp sticky no rodapé**;
-  - Home no mobile: destaques em **carrossel com swipe**;
-  - Cabeçalho no mobile: 5 links + 2 ícones quebram linha — avaliar menu
-    compacto (com trap de foco + Esc, §6);
+  - ✅ **Cabeçalho abaixo de 1024px** (branch `feat/menu-celular`): antes,
+    os 5 links + 2 ícones quebravam em 3 linhas (131px grudados no topo,
+    cobrindo o conteúdo). Agora é uma linha de 65px com logo + botão
+    "Menu", que abre uma gaveta pela direita
+    (`src/components/layout/MenuCelular.tsx`, `<dialog>` com showModal —
+    foco preso, Esc fecha): links grandes em serifa, a página atual em
+    itálico com ponto ouro, e WhatsApp/Instagram no pé. Na Home, o botão
+    fica claro sobre a capa (`.botao-menu` no CSS do cabeçalho
+    transparente).
+  - ✅ **Galeria no celular (< 768px)**: a barra grudada virou uma linha
+    (busca + botão "Filtros · N"); os filtros abrem numa gaveta que sobe de
+    baixo (`src/components/galeria/FiltrosCelular.tsx`), com linhas de 48px
+    para o dedo. A barra gruda a 65px abaixo de 1024px e a 73px acima. A
+    busca ganhou `aria-label` e fonte de 16px no celular (o iPhone dá zoom
+    em campo com fonte menor). **Tablet (768–1023px) manteve os menus
+    suspensos** — cabem numa linha; o §5 fala em drawer, reavaliar se
+    incomodar.
+  - ✅ Gavetas deslizam (classe `gaveta` em `globals.css`, com
+    `@starting-style`); o menu do admin usa a mesma (`gaveta-esquerda`).
+  - Página da Obra no mobile: **CTA do WhatsApp sticky no rodapé** — falta;
+  - Home no mobile: destaques em **carrossel com swipe** — falta;
   - conferir proporções do split da Obra (60/40 desktop, 55/45 tablet).
 - **Tipografia (§2):** H1 do spec é 64px; várias páginas usam
   `text-4xl md:text-5xl` (36/48px). Revisar a escala H1/H2/H3 contra a

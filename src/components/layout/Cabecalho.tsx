@@ -1,13 +1,14 @@
 import Link from 'next/link'
 
 import { IconeInstagram, IconeWhatsApp } from '@/components/contato/BotoesContato'
+import MenuCelular, { type ItemNavegacao } from '@/components/layout/MenuCelular'
 import { INSTAGRAM_URL, WHATSAPP_URL_GERAL } from '@/lib/contato'
 
 // Navegação do site público. Desde que o site virou portfólio (vendas em
 // standby, ver docs/handoff.md), o Cabeçalho não tem mais carrinho nem
 // ícone de conta: visitante não faz login. A artista chega no admin pelo
 // link discreto do Rodapé.
-const NAVEGACAO = [
+const NAVEGACAO: ItemNavegacao[] = [
   { href: '/', rotulo: 'Home' },
   { href: '/galeria', rotulo: 'Galeria' },
   { href: '/colecoes', rotulo: 'Coleções' },
@@ -17,6 +18,10 @@ const NAVEGACAO = [
 
 const CLASSE_ICONE = 'flex items-center text-tinta/85 transition-opacity duration-200 hover:opacity-100'
 
+// Duas formas, mesma faixa:
+// - a partir de 1024px (`lg`): links e ícones em linha, como no protótipo;
+// - abaixo disso: só o logo e o botão "Menu" (MenuCelular), numa linha só
+//   de 65px — a altura em que a barra de filtros da Galeria gruda.
 export default function Cabecalho() {
   return (
     // `cabecalho`: gancho do "encolher ao rolar" e, na Home, do modo
@@ -25,7 +30,7 @@ export default function Cabecalho() {
     // de página, para o CSS mantê-lo parado enquanto o conteúdo faz o
     // cross-fade.
     <header
-      className="cabecalho sticky top-0 z-50 flex items-center justify-between gap-6 border-b border-linho bg-areia/95 px-6 py-5 backdrop-blur md:px-12 lg:px-24"
+      className="cabecalho sticky top-0 z-50 flex items-center justify-between gap-6 border-b border-linho bg-areia/95 px-5 py-3 backdrop-blur md:px-12 lg:px-24 lg:py-5"
       style={{ viewTransitionName: 'cabecalho' }}
     >
       <Link
@@ -35,10 +40,10 @@ export default function Cabecalho() {
         BOCAIRÚ
       </Link>
 
-      <div className="flex flex-wrap items-center gap-x-10 gap-y-2">
+      <div className="hidden items-center gap-x-10 lg:flex">
         <nav
           aria-label="Navegação principal"
-          className="flex flex-wrap gap-x-8 gap-y-2 text-xs uppercase tracking-widest"
+          className="flex gap-x-8 text-xs uppercase tracking-widest"
         >
           {NAVEGACAO.map((item) => (
             <Link
@@ -60,6 +65,8 @@ export default function Cabecalho() {
           </a>
         </div>
       </div>
+
+      <MenuCelular itens={NAVEGACAO} />
     </header>
   )
 }

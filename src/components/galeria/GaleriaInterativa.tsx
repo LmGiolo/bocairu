@@ -1,10 +1,11 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
 import CartaoObra from '@/components/ui/CartaoObra'
 import FiltroMultiplo, { type OpcaoFiltro } from './FiltroMultiplo'
+import FiltrosCelular from './FiltrosCelular'
 
 export type ObraGaleria = {
   id: string
@@ -76,6 +77,7 @@ export default function GaleriaInterativa({
   const [orientacaoSel, setOrientacaoSel] = useState<string[]>([])
   const [busca, setBusca] = useState('')
   const [menuAberto, setMenuAberto] = useState<string | null>(null)
+  const gavetaFiltros = useRef<HTMLDialogElement>(null)
 
   const obrasFiltradas = useMemo(() => {
     const buscaNormalizada = busca.trim().toLowerCase()
@@ -89,6 +91,9 @@ export default function GaleriaInterativa({
   }, [obrasDerivadas, serieSel, orientacaoSel, busca])
 
   const temFiltroAtivo = serieSel.length > 0 || orientacaoSel.length > 0 || busca.trim() !== ''
+  // Quantas opções estão marcadas (sem contar a busca, que tem campo
+  // próprio): aparece no botão "Filtros · 2" do celular.
+  const quantosFiltros = serieSel.length + orientacaoSel.length
 
   function limparFiltros() {
     setSerieSel([])
@@ -121,13 +126,18 @@ export default function GaleriaInterativa({
       </section>
 
       {/* Barra de filtros. Gruda logo abaixo do cabeçalho, que tem 73px no
-          desktop (era 76px, e o conteúdo vazava por uma fresta de 3px).
+          desktop (era 76px, e o conteúdo vazava por uma fresta de 3px) e
+          65px abaixo de 1024px, onde ele vira uma linha só com o botão Menu.
           `barra-filtros`: gancho para acompanhar o cabeçalho quando ele
-          encolhe ao rolar (globals.css). */}
-      <section className="barra-filtros sticky top-[73px] z-30 border-b border-linho bg-areia">
+          encolhe ao rolar (globals.css).
+
+          No celular (< 768px) a barra fica com uma linha só: a busca e o
+          botão "Filtros", que abre a gaveta de baixo (FiltrosCelular). Os
+          menus suspensos ficam do tablet pra cima. */}
+      <section className="barra-filtros sticky top-[65px] z-30 border-b border-linho bg-areia lg:top-[73px]">
         <div className="mx-auto max-w-[1440px] px-6 md:px-12 lg:px-24">
-          <div className="flex flex-wrap items-center justify-between gap-6 py-4.5">
-            <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center justify-between gap-3 py-3 md:flex-wrap md:gap-6 md:py-4.5">
+            <div className="hidden flex-wrap items-center gap-2.5 md:flex">
               <button
                 type="button"
                 onClick={limparFiltros}
@@ -161,12 +171,27 @@ export default function GaleriaInterativa({
             </div>
 
             <input
-              type="text"
+              type="search"
               value={busca}
               onChange={(evento) => setBusca(evento.target.value)}
               placeholder="Buscar por título…"
-              className="w-52 rounded-full border border-linho bg-white px-4 py-2.5 text-sm transition-colors duration-200 focus:border-tinta"
+              aria-label="Buscar por título"
+              className="min-w-0 flex-1 rounded-full border border-linho bg-white px-4 py-2.5 text-base transition-colors duration-200 focus:border-tinta md:w-52 md:flex-none md:text-sm"
             />
+
+            {/* Só no celular. `text-base` na busca acima também é por causa
+                dele: com fonte menor que 16px, o iPhone dá zoom na página
+                ao tocar no campo. */}
+            <button
+              type="button"
+              onClick={() => gavetaFiltros.current?.showModal()}
+              aria-haspopup="dialog"
+              className={`shrink-0 rounded-full border px-4.5 py-2.5 text-sm transition-colors duration-200 md:hidden ${
+                quantosFiltros > 0 ? 'border-tinta bg-tinta text-areia' : 'border-linho text-tinta'
+              }`}
+            >
+              Filtros{quantosFiltros > 0 ? ` · ${quantosFiltros}` : ''}
+            </button>
           </div>
 
           {temFiltroAtivo && (
@@ -176,6 +201,21 @@ export default function GaleriaInterativa({
           )}
         </div>
       </section>
+
+      <FiltrosCelular
+        ref={gavetaFiltros}
+        grupos={[
+          { rotulo: 'Coleção', opcoes: opcoesSerie, selecionados: serieSel, onChange: setSerieSel },
+          { rotulo: 'Orientação', opcoes: opcoesOrientacao, selecionados: orientacaoSel, onChange: setOrientacaoSel },
+        ]}
+        encontradas={obrasFiltradas.length}
+        temFiltroAtivo={quantosFiltros > 0}
+        onLimpar={() => {
+          setSerieSel([])
+          setOrientacaoSel([])
+          router.replace(pathname)
+        }}
+      />
 
       {/* Grade */}
       <section className="mx-auto max-w-[1440px] px-6 py-14 md:px-12 lg:px-24">
