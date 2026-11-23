@@ -4,6 +4,7 @@ import sharp from 'sharp'
 import { createClient } from '@/lib/supabase/server'
 import { criarClientAdmin } from '@/lib/supabase/admin'
 import { RETRATOS, ehLocalRetrato } from '@/lib/textos'
+import { revalidarSitePublico } from '@/lib/cache-site'
 
 // Os retratos da artista — um por página (Home, A Artista e Contato),
 // enviados pela tela /admin/textos. Toda chamada diz de qual página é o
@@ -166,6 +167,9 @@ export async function POST(request: NextRequest) {
     return Response.json({ erro: 'Falha ao salvar o retrato: ' + erroBanco.message }, { status: 500 })
   }
 
+  // O site já aponta para o retrato novo: renova o cache das páginas.
+  revalidarSitePublico()
+
   // ── 5) Só agora apaga o antigo ──
   await apagarArquivoAntigo(admin, urlAntiga)
 
@@ -191,6 +195,7 @@ export async function DELETE(request: NextRequest) {
   if (error) {
     return Response.json({ erro: 'Falha ao remover o retrato: ' + error.message }, { status: 500 })
   }
+  revalidarSitePublico()
 
   await apagarArquivoAntigo(admin, urlAntiga)
   return new Response(null, { status: 204 })

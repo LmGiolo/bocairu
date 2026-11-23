@@ -2,8 +2,15 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { createClient } from '@/lib/supabase/server'
+import { criarClientPublico } from '@/lib/supabase/publico'
 import GaleriaInterativa from '@/components/galeria/GaleriaInterativa'
+
+// Lista vazia = nenhuma coleção montada no build; cada uma é montada na
+// primeira visita e fica em cache (ver `revalidate` em ../../layout.tsx).
+// Sem esta função, rota com [parâmetro] seria montada de novo a cada visita.
+export async function generateStaticParams() {
+  return []
+}
 
 export async function generateMetadata({
   params,
@@ -23,7 +30,7 @@ export default async function Colecao({
   params: Promise<{ serie: string }>
 }) {
   const { serie } = await params
-  const supabase = await createClient()
+  const supabase = criarClientPublico()
 
   // Mesma busca da /galeria: sem filtro de status (RLS decide o que é
   // visível) e catálogo inteiro de uma vez — a grade já sabe filtrar por
@@ -36,7 +43,10 @@ export default async function Colecao({
     .order('criado_em', { ascending: true })
 
   if (error) {
-    return <p style={{ color: 'crimson', padding: 40 }}>Erro: {error.message}</p>
+    // Lançar o erro (em vez de desenhar uma mensagem) é o que protege o
+    // cache: se o banco falhar na hora de remontar a página, o Next mantém
+    // a versão anterior em vez de guardar uma página de erro por uma hora.
+    throw new Error('Falha ao ler as fotos: ' + error.message)
   }
 
   const catalogo = obras ?? []

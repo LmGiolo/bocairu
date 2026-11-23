@@ -1,8 +1,9 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
-import { createClient } from '@/lib/supabase/server'
+import { criarClientPublico } from '@/lib/supabase/publico'
 import Botao from '@/components/ui/Botao'
-import CartaoObra from '@/components/ui/CartaoObra'
+import CarrosselDestaques from '@/components/ui/CarrosselDestaques'
 import CartaoSerie from '@/components/colecoes/CartaoSerie'
 import { BotaoInstagram, BotaoWhatsApp } from '@/components/contato/BotoesContato'
 import Retrato from '@/components/contato/Retrato'
@@ -30,7 +31,7 @@ type Serie = {
 }
 
 export default async function Home() {
-  const supabase = await createClient()
+  const supabase = criarClientPublico()
   // Textos editáveis em /admin/textos (com o texto padrão de reserva).
   const { textos, retratos } = await lerConteudoSite()
 
@@ -44,7 +45,10 @@ export default async function Home() {
     .order('criado_em', { ascending: true })
 
   if (error) {
-    return <p style={{ color: 'crimson', padding: 40 }}>Erro: {error.message}</p>
+    // Lançar o erro (em vez de desenhar uma mensagem) é o que protege o
+    // cache: se o banco falhar na hora de remontar a página, o Next mantém
+    // a versão anterior em vez de guardar uma página de erro por uma hora.
+    throw new Error('Falha ao ler as fotos: ' + error.message)
   }
 
   // A posição de cada foto vem da tela Admin → Ordem: a 1ª vira o hero, da
@@ -70,7 +74,11 @@ export default async function Home() {
   }
 
   return (
-    <div>
+    // `-mb-16` anula o `mt-16` do rodapé só na Home: aqui a última seção
+    // (a chamada final, creme) já termina com fundo próprio, e o vão
+    // deixaria uma faixa areia entre ela e o rodapé escuro. As margens das
+    // duas "se somam" (64 − 64 = 0) porque nada as separa no HTML.
+    <div className="-mb-16">
       {/* Hero editorial — uma obra em tela cheia, sem carrossel.
           Ganchos (globals.css): `anim-hero` é a seção — e a presença dela
           na página é o que deixa o cabeçalho transparente por cima da foto;
@@ -112,36 +120,29 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Faixa de destaque — 3 obras selecionadas (as próximas na ordem de curadoria) */}
+      {/* Faixa de destaque — 3 obras selecionadas (as próximas na ordem de
+          curadoria), num anel 3D que gira: arrastar no celular, setas ou
+          clique na foto do lado no computador. */}
       {destaque.length > 0 && (
-        <section className="mx-auto max-w-[1440px] px-6 py-20 md:px-12 md:py-28 lg:px-24">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-6 md:mb-14" data-anim="secao">
+        <CarrosselDestaques
+          obras={destaque.map((obra) => ({
+            id: obra.id,
+            titulo: obra.titulo,
+            subtitulo: [obra.tecnica, obra.ano].filter(Boolean).join(' · '),
+            imagem_web: obra.imagem_web,
+          }))}
+          titulo={
             <div>
-              <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ouro">
-                Seleção atual
-              </div>
+              <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ouro">Seleção atual</div>
               <h2 className="font-serif text-3xl text-tinta md:text-4xl">Três fotos, uma curadoria.</h2>
             </div>
+          }
+          acaoExtra={
             <Botao variante="terciario" href="/galeria">
               Ver toda a galeria →
             </Botao>
-          </div>
-
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 md:gap-8">
-            {destaque.map((obra, indice) => (
-              <CartaoObra
-                key={obra.id}
-                obraId={obra.id}
-                indice={indice}
-                imagemUrl={obra.imagem_web}
-                titulo={obra.titulo}
-                subtitulo={[obra.tecnica, obra.ano].filter(Boolean).join(' · ')}
-                larguraPx={obra.largura_px}
-                alturaPx={obra.altura_px}
-              />
-            ))}
-          </div>
-        </section>
+          }
+        />
       )}
 
       {/* Séries/Coleções — navegação por narrativa visual */}
@@ -177,25 +178,36 @@ export default async function Home() {
         </section>
       )}
 
-      {/* Sobre a artista */}
-      <section className="mx-auto max-w-[1360px] px-6 py-20 md:px-12 md:py-28 lg:px-24">
-        <div className="grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr] md:gap-20" data-anim="secao">
+      {/* Sobre a artista — numa faixa ESCURA, como a faixa "Processo
+          artístico" do protótipo (docs/prototipo/Home.dc.html). É ela que
+          separa o retrato das fotos em destaque: sem a troca de fundo, as
+          duas seções (ambas foto + texto sobre areia) pareciam uma só.
+          Escura funciona com ou sem a seção Séries antes dela (que só
+          aparece quando alguma foto tem série) e contrasta com a chamada
+          final, em creme, logo depois. */}
+      <section className="bg-tinta px-6 py-20 md:px-12 md:py-28 lg:px-24">
+        <div className="mx-auto grid max-w-[1360px] items-center gap-14 md:grid-cols-[0.9fr_1.1fr] md:gap-20" data-anim="secao">
           {/* Retrato da Home, enviado em /admin/textos — sem ele, o "B". */}
           <Retrato url={retratos.home} />
 
           <div>
             <div className="mb-5 text-xs uppercase tracking-widest text-ouro">A artista</div>
-            <h2 className="mb-6 max-w-md font-serif text-3xl text-tinta md:text-4xl">
+            <h2 className="mb-6 max-w-md font-serif text-3xl text-areia md:text-4xl">
               {textos['home.artista_titulo']}
             </h2>
-            <div className="mb-8 flex max-w-md flex-col gap-4 text-base leading-relaxed text-[#3A342C]">
+            <div className="mb-8 flex max-w-md flex-col gap-4 text-base leading-relaxed text-areia/75">
               {paragrafos(textos['home.artista_texto']).map((paragrafo) => (
                 <p key={paragrafo}>{paragrafo}</p>
               ))}
             </div>
-            <Botao variante="secundario" href="/a-artista">
-              Conhecer a artista
-            </Botao>
+            {/* Link sublinhado claro (como no protótipo): os botões do
+                design system são escuros e sumiriam neste fundo. */}
+            <Link
+              href="/a-artista"
+              className="text-[15px] text-areia underline underline-offset-4 transition-opacity duration-200 hover:text-areia hover:opacity-80"
+            >
+              Conhecer a artista →
+            </Link>
           </div>
         </div>
       </section>

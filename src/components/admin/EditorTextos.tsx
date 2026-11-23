@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
 
+import { atualizarSitePublico } from '@/app/admin/acoes'
 import { createClient } from '@/lib/supabase/client'
 import {
   CATALOGO_TEXTOS,
@@ -98,12 +99,17 @@ export default function EditorTextos({
       .from('textos_site')
       .upsert(alteradas.map((chave) => ({ chave, valor: valores[chave], atualizado_em: agora })))
 
-    setSalvando(null)
-
     if (error) {
+      setSalvando(null)
       setAvisos((atuais) => ({ ...atuais, [grupo]: { tipo: 'erro', texto: 'Falha ao salvar: ' + error.message } }))
       return
     }
+
+    // O site público fica em cache: avisa que os textos mudaram, senão o
+    // visitante veria os antigos por até uma hora. Se o aviso falhar (rede),
+    // o texto já está salvo — o site só demora esse tanto para mostrar.
+    await atualizarSitePublico().catch(() => {})
+    setSalvando(null)
 
     setSalvos((atuais) => {
       const novos = { ...atuais }

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { createClient } from '@/lib/supabase/server'
+import { criarClientPublico } from '@/lib/supabase/publico'
 import CartaoSerie from '@/components/colecoes/CartaoSerie'
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ type Serie = {
 }
 
 export default async function Colecoes() {
-  const supabase = await createClient()
+  const supabase = criarClientPublico()
 
   // Sem filtro de status: o RLS decide o que é visível pra quem não é admin
   // (mesma regra que /galeria e a Home já seguem — ver docs/handoff.md §8).
@@ -35,7 +35,10 @@ export default async function Colecoes() {
     .order('criado_em', { ascending: true })
 
   if (error) {
-    return <p style={{ color: 'crimson', padding: 40 }}>Erro: {error.message}</p>
+    // Lançar o erro (em vez de desenhar uma mensagem) é o que protege o
+    // cache: se o banco falhar na hora de remontar a página, o Next mantém
+    // a versão anterior em vez de guardar uma página de erro por uma hora.
+    throw new Error('Falha ao ler as fotos: ' + error.message)
   }
 
   const catalogo: ObraColecoes[] = obras ?? []

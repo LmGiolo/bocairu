@@ -41,15 +41,25 @@ Alias de import: `@/*` → `./src/*`.
 
 Variáveis em `.env.local` (fora do git): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY` (esta última só no servidor — veja abaixo).
 
-## Os três clients do Supabase
+## Os quatro clients do Supabase
 
 Nunca são intercambiáveis:
 
-- `src/lib/supabase/server.ts` — `createClient()` é **async** (faz `await cookies()`). Use em Server Components e Route Handlers. Sempre `await createClient()`.
+- `src/lib/supabase/publico.ts` — `criarClientPublico()`, síncrono, **sem cookies**: sempre o visitante anônimo. É o client de **todo o site público** (páginas de `(site)`, `lerConteudoSite`, `opengraph-image`). Sem cookies a página pode ficar em cache (ver "Cache do site público").
+- `src/lib/supabase/server.ts` — `createClient()` é **async** (faz `await cookies()`). Use no admin, em `/entrar` e em Route Handlers/Server Actions. Sempre `await createClient()`.
 - `src/lib/supabase/client.ts` — client síncrono do navegador, para componentes `'use client'`.
 - `src/lib/supabase/admin.ts` — `criarClientAdmin()`, service role, **só no servidor**. Detalhado em "Upload em dois buckets".
 
-Nos dois primeiros a chave é a anon e **a fronteira de segurança real é o RLS do Supabase**, não o código do app. No terceiro isso se inverte.
+Nos três primeiros a chave é a anon e **a fronteira de segurança real é o RLS do Supabase**, não o código do app. No último isso se inverte.
+
+## Cache do site público
+
+As páginas de `src/app/(site)` e as `opengraph-image` são ISR: montadas uma vez e servidas prontas (`revalidate = 3600` no layout do site; rotas com `[parâmetro]` têm `generateStaticParams` vazio para entrar no cache na primeira visita). O `npm run build` mostra isso na tabela de rotas: nenhuma rota pública pode aparecer como `ƒ (Dynamic)`.
+
+- **Não use `cookies()`, `headers()` nem `searchParams` em página pública**: qualquer um deles tira a página do cache sem avisar. (Por isso a Galeria não lê `?serie=`, que virou redirect para `/colecoes/X` no `next.config.ts`, e o link da foto no WhatsApp vem de `urlDoSite()`.)
+- **Toda gravação do admin que muda o site invalida o cache**: rotas de API chamam `revalidarSitePublico()` (`src/lib/cache-site.ts`); componentes que gravam pelo client do navegador chamam a Server Action `atualizarSitePublico()` (`src/app/admin/acoes.ts`, com os dois portões) depois de salvar. Gravação nova esquecida aqui = site desatualizado por até uma hora.
+- Erro de banco em página pública é **lançado** (`throw`), não desenhado: assim o ISR mantém a versão anterior em vez de guardar uma página de erro.
+- Consequência do client anônimo: a artista logada vê no site o mesmo que o visitante (rascunho só no admin).
 
 ## Autenticação e autorização
 

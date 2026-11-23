@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { criarClientAdmin } from '@/lib/supabase/admin'
 import { validarFormularioObra } from '@/lib/obras/formulario'
 import { STATUS_OBRA, type StatusObra } from '@/lib/obras/status'
+import { revalidarSitePublico } from '@/lib/cache-site'
 
 // Edita uma obra existente: ficha técnica e status
 // (rascunho/publicada/arquivada). Não mexe em imagem — trocar a foto de
@@ -73,6 +74,8 @@ export async function PATCH(
     return Response.json({ erro: 'Falha ao salvar a obra: ' + erroObra.message }, { status: 500 })
   }
 
+  // Ficha ou status mudou: o site público precisa ser remontado.
+  revalidarSitePublico()
   return Response.json({ obra: obraAtualizada })
 }
 
@@ -196,6 +199,9 @@ export async function DELETE(
     }
     return Response.json({ erro: 'Falha ao excluir a obra: ' + erroObra.message }, { status: 500 })
   }
+
+  // A obra já saiu do banco: o site público não pode mais mostrá-la.
+  revalidarSitePublico()
 
   // ─────────────────────────────────────────────────────────────
   // 5) REMOVE OS ARQUIVOS DOS DOIS BUCKETS

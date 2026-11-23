@@ -2,7 +2,7 @@ import 'server-only'
 
 import { cache } from 'react'
 
-import { createClient } from '@/lib/supabase/server'
+import { criarClientPublico } from '@/lib/supabase/publico'
 import { resolverRetratos, resolverTextos, type Retratos, type Textos } from '@/lib/textos'
 
 export type ConteudoSite = {
@@ -17,11 +17,15 @@ export type ConteudoSite = {
 //
 // `cache()` do React: numa mesma visita, o cabeçalho, o rodapé e a página
 // pedem os textos — cada um chama lerConteudoSite() sozinho, sem precisar
-// passar props de um para o outro — e o banco é consultado UMA vez só. O
-// cache vale só para aquela requisição; a próxima visita lê de novo, então
-// o que a artista salva no admin aparece no próximo carregamento.
+// passar props de um para o outro — e o banco é consultado UMA vez só.
+//
+// Esse `cache()` vale só para uma montagem de página. O que evita consultar
+// o banco a CADA visita é outro cache, o das páginas prontas do Next
+// (`revalidate` em src/app/(site)/layout.tsx); quando a artista salva um
+// texto no admin, src/lib/cache-site.ts o invalida. Por isso o client
+// público (sem cookies): com cookies, nenhuma página poderia ficar em cache.
 export const lerConteudoSite = cache(async (): Promise<ConteudoSite> => {
-  const supabase = await createClient()
+  const supabase = criarClientPublico()
   const { data, error } = await supabase.from('textos_site').select('chave, valor')
 
   if (error) {
