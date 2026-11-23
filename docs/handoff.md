@@ -17,7 +17,8 @@
    `NEXT_PUBLIC_SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY` (fora do
    git — copiar da máquina antiga ou do painel do Supabase).
 3. `npm run dev` → http://localhost:3000. Admin em `/entrar`.
-4. O plano do que falta está em **§7 → "A construir"**. As regras do
+4. O plano do que falta está em **§7 → "A construir"** — comece pelo
+   bloco **"📍 ONDE PARAMOS"** logo no início dele. As regras do
    projeto para o Claude Code estão em `CLAUDE.md` (inclusive: commits e
    PRs **sem** atribuição de IA).
 5. Mudança de schema = arquivo novo em `docs/sql/` (idempotente), rodado à
@@ -475,6 +476,29 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
 > sessão do Claude Code) começa por aqui. Ordem combinada com o usuário:
 > **1 → 2 → 3 → 4 → 5**. Marque cada item como feito ao terminar.
 
+> **📍 ONDE PARAMOS (2026-11-23)**
+>
+> - ✅ Item 1 (Open Graph) e ✅ item 2 (excluir foto) — no `main`.
+> - ✅ Animações do item 4 (§4 do Design Doc + cabeçalho transparente da
+>   Home, como no protótipo) — no `main` (PR "Animações do Design Doc").
+> - **Próximo passo sugerido: o design do admin (item 2½ abaixo)**,
+>   adiantado de "baixa prioridade" porque o usuário perguntou por ele.
+>   Sugestão feita ao usuário: fazê-lo **antes do item 3**, porque o item 3
+>   cria uma tela nova de admin (`/admin/textos`, o "Imagens do site" do
+>   protótipo) — com o visual pronto, ela já nasce no estilo certo.
+>   **Confirmar essa ordem com o usuário ao retomar.**
+> - Ordem proposta daqui em diante: **2½ (admin) → 3 → resto do 4
+>   (acessibilidade, celular, skeleton) → 5 (deploy)**.
+> - Ferramentas: a skill `frontend-design` (anthropics/skills) está
+>   instalada globalmente nesta máquina, mas o usuário prefere seguir o
+>   Design Doc e os protótipos; propostas "diferentes" de animação foram
+>   recusadas. Na outra máquina, instalar com
+>   `npx skills add anthropics/skills@frontend-design -g -y -a claude-code`
+>   se quiser.
+> - Com o `npm run dev` do usuário aberto, **não rodar `npm run build`**
+>   (deixou páginas de obra dando 404 no dev). Para checar tipos, usar
+>   `npx tsc --noEmit`; o CI roda o build no PR.
+
 #### 1. Open Graph (pré-visualização do link) — ✅ FEITO (branch `feat/og-admin-textos`)
 
 O que a artista chamou de "Meta Ads" era, na prática, isto: quando alguém
@@ -531,6 +555,37 @@ Supabase). As duas opções convivem.
   URLs reais do banco. **Falta o teste logado como admin** (excluir uma
   foto de teste; "test1" deve responder 409 por ter pedido).
 
+#### 2½. Design do admin igual ao protótipo — próximo (a confirmar)
+
+Hoje o admin é cru: `src/app/admin/layout.tsx` é uma barra de links com
+`style={{}}` inline e fonte `sans-serif`; `ListaObras.tsx`,
+`FormularioObra.tsx` e `OrdenadorObras.tsx` também usam estilo inline.
+O alvo é `docs/prototipo/Admin.dc.html` — **ler na íntegra antes de
+começar**.
+
+- **Estrutura do protótipo:** barra lateral fixa de 240px, fundo tinta
+  `#1B1814`, logo "BOCAIRÚ" em serifa itálica + "Painel administrativo"
+  pequeno embaixo; itens de menu com fundo leve no ativo/hover; no pé, a
+  conta (círculo ouro com "B", "Bocairú · Administradora"). Conteúdo à
+  direita (padding 44/56px, máx. 1320px), título de página em Instrument
+  Serif 36px, botão primário tinta ("+ Nova obra"). Tabelas em cartão
+  branco com borda linho, cabeçalho 11px caixa alta fumaça, linhas
+  separadas por `#EDE6D8`, miniatura 40×40.
+- **O que se aplica ao portfólio:** Obras (lista + cadastro/edição; no
+  protótipo a edição é uma janela modal), Ordem (tela nossa, não existe no
+  protótipo — vestir com o mesmo estilo), "Imagens do site" (vira a tela
+  do item 3: textos + retrato). Talvez um Dashboard simples (contagem de
+  fotos publicadas/rascunho) — perguntar.
+- **O que NÃO se aplica (vendas em standby):** Pedidos, Clientes,
+  Analytics, KPIs de receita, colunas "Tamanhos"/"A partir de" da tabela
+  de Obras. Séries no protótipo é tabela própria; aqui série é só a
+  coluna `obras.serie` — não criar tabela.
+- **Celular:** a artista pode usar pelo telefone — a barra lateral precisa
+  virar menu recolhível abaixo de ~1024px (o protótipo é só desktop).
+- Trocar o `style={{}}` inline por Tailwind com os tokens do `@theme`
+  (mesma regra do site público). Lembrar: foco visível, labels nos
+  campos, erro com ícone + texto (§6).
+
 #### 3. Textos do site editáveis pelo admin — a fazer
 
 Pedido exato do usuário (aprovado): **Home, A Artista e Contato**, mais o
@@ -568,26 +623,63 @@ cada rótulo de botão/filtro — só a "voz" dela.
   nem direção" — contradiz o foco em sessões de foto. O texto padrão pode
   ficar, mas avisar a artista para reescrever pela tela nova.
 
-#### 4. Estética — auditoria do handoff (§2–§6) feita em 2026-11-23 — a fazer
+#### 4. Estética — auditoria do handoff (§2–§6) feita em 2026-11-23 — em andamento (animações ✅)
 
-Prioridade: **site público**. O visual do admin é baixa prioridade (decisão
-do usuário).
+Prioridade: **site público**. O visual do admin, que era baixa prioridade,
+virou o item 2½ acima.
 
-> **Decisão em aberto antes de começar (2026-11-23).** O usuário quer o site
-> "moderno e sem cara de IA" e instalou a skill `frontend-design`
-> (anthropics/skills, global em `~/.claude/skills/`). Ela lista os padrões
-> visuais mais típicos de página gerada por IA, e o Design Doc (§2) bate em
-> vários: fundo creme ~`#F4F1EA` (o nosso é `#F5F1EA`) com serifa de alto
-> contraste; fios hairline + raio zero; overline em caixa alta acima de
-> cada título; fade-and-slide-up em toda seção e stagger em todo grid
-> (exatamente o §4). Antes de implementar §4, decidir com o usuário: manter
-> o Design Doc como está, ou revisar paleta/tipo/movimento com a skill
-> (passo 1: plano de tokens + wireframes, revisado contra o brief). As
-> lacunas de acessibilidade e responsividade abaixo valem nos dois casos.
+> **Contexto (2026-11-23).** O usuário quer o site "moderno e sem cara de
+> IA" e instalou a skill `frontend-design` (anthropics/skills, global em
+> `~/.claude/skills/`). Ela lista os padrões visuais mais típicos de página
+> gerada por IA, e o Design Doc (§2) bate em vários: fundo creme ~`#F4F1EA`
+> (o nosso é `#F5F1EA`) com serifa de alto contraste; fios hairline + raio
+> zero; overline em caixa alta acima de cada título; fade-and-slide-up em
+> toda seção e stagger em todo grid (exatamente o §4).
+>
+> **Decisão do usuário:** paleta e tipografia **ficam** como estão.
+> Animações: **as do Design Doc (§4)**. Foram testadas duas alternativas
+> sugeridas pela skill ("Revelação": a capa se revelando como no
+> laboratório; "Passe-partout": a capa abrindo de dentro de uma moldura) —
+> o usuário **não gostou de nenhuma**. Não reabrir.
+
+**Animações — ✅ FEITO (branch `feat/animacoes`, no `main`).**
+
+- **§4 implementado:** seções e cartões sobem 12px com fade ao aparecer
+  (500ms, cartões escalonados 60ms); parallax 0.9x na capa (CSS
+  scroll-driven, sem JS); hover 1.03 + moldura escura; botões com
+  preenchimento da esquerda (250ms); cross-fade de 350ms entre páginas; a
+  foto "voa" do cartão para a Página da Obra (`<ViewTransition>` do React,
+  `experimental.viewTransition` no `next.config.ts`). Com
+  `prefers-reduced-motion`, tudo vira fade.
+- **Cabeçalho do protótipo** (`docs/prototipo/Home.dc.html`): na Home ele
+  fica fixo **por cima da capa, transparente, sem borda e com letras
+  claras**; depois de 40px de rolagem ganha fundo areia, borda e letras
+  escuras, e encolhe 73→57px (o encolher vale em todas as páginas, só a
+  partir de 1024px). Feito só com CSS (`html:has(.anim-hero)`). A capa
+  ganhou uma sombra leve no topo para as letras claras não sumirem sobre
+  foto clara.
+- **Peças:** `src/lib/animacao.ts` (script que põe `data-js` no `<html>`
+  antes da pintura — sem JS, nada fica escondido),
+  `src/components/animacao/ObservadorAnimacoes.tsx` (marca `data-visivel`
+  quando o elemento entra na tela e a imagem carregou; em navegação, foto
+  em cache aparece direto com `data-visivel="ja"`; põe `data-rolou` no
+  `<html>`) e o bloco "ANIMAÇÕES" de `src/app/globals.css`. Os
+  componentes só têm ganchos: `data-anim="secao|foto|capa"` e classes
+  `anim-*`, `cabecalho`, `barra-filtros`, `botao-*`.
+- **Verificado** (Playwright): passagem galeria → obra, volta sem
+  reanimar, cabeçalho transparente/sólido (desktop e celular), barra de
+  filtros acompanhando o cabeçalho, movimento reduzido, console limpo.
+- **Corrigido junto:** a barra de filtros da Galeria grudava a 76px com o
+  cabeçalho de 73px (fresta de 3px).
+- **Se as páginas de obra derem 404 no `npm run dev`** com o código certo
+  (aconteceu em 2026-11-23 durante estas mudanças; o build de produção
+  respondia 200): é página velha guardada pelo servidor dev. Reiniciar o
+  `npm run dev` resolve. Evitar rodar `npm run build` com o dev aberto.
 
 Lacunas encontradas comparando este documento com o código:
 
-- **Animações (§4) — nada implementado ainda:**
+- **Animações (§4) — feito acima**, exceto o **skeleton shimmer** em
+  `loading.tsx`, que ainda **não** foi feito. Lista original da auditoria:
   - entrada fade + translateY(12px)→0, 500ms, `cubic-bezier(0.16,1,0.3,1)`;
     grids com stagger de 60ms;
   - reveal-on-scroll por seção (IntersectionObserver);

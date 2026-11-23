@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function Contato() {
   return (
     <section className="mx-auto grid max-w-[1440px] items-center gap-14 px-6 py-20 md:grid-cols-2 md:gap-20 md:px-12 md:py-28 lg:px-24">
-      <div>
+      <div data-anim="secao">
         <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ouro">Contato</div>
         <h1 className="mb-6 font-serif text-4xl text-tinta md:text-5xl">Vamos fotografar juntos?</h1>
         <p className="mb-10 max-w-md text-base leading-relaxed text-[#3A342C]">

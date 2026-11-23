@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
+import { ViewTransition } from 'react'
 
 import { createClient } from '@/lib/supabase/server'
 import CartaoObra from '@/components/ui/CartaoObra'
@@ -122,22 +123,28 @@ export default async function PaginaObra({
       {/* Split-screen: imagem + ficha */}
       <section className="mx-auto grid max-w-[1360px] gap-14 px-6 pt-8 md:grid-cols-[1.15fr_1fr] md:gap-16 md:px-12 lg:gap-22 lg:px-24">
         <div className="md:sticky md:top-24 md:self-start">
-          <div
-            className="relative w-full overflow-hidden border border-linho"
-            style={{ aspectRatio: proporcaoImagem }}
-          >
-            <Image
-              src={obra.imagem_web}
-              alt={obra.titulo}
-              fill
-              priority
-              className="object-cover"
-              sizes="(min-width: 768px) 55vw, 100vw"
-            />
-          </div>
+          {/* Mesmo `name` do cartão da galeria (CartaoObra): a foto clicada
+              "voa" do cartão até aqui. De propósito, esta imagem NÃO tem
+              animação de entrada própria — a passagem já é o movimento, e
+              quem chega por link direto vê a foto na hora. */}
+          <ViewTransition name={`foto-${obra.id}`} share="morph" default="none">
+            <div
+              className="relative w-full overflow-hidden border border-linho"
+              style={{ aspectRatio: proporcaoImagem }}
+            >
+              <Image
+                src={obra.imagem_web}
+                alt={obra.titulo}
+                fill
+                priority
+                className="object-cover"
+                sizes="(min-width: 768px) 55vw, 100vw"
+              />
+            </div>
+          </ViewTransition>
         </div>
 
-        <div>
+        <div data-anim="secao">
           {obra.serie && (
             <div className="mb-5 text-xs font-semibold uppercase tracking-widest text-ouro">
               Série {obra.serie}
@@ -175,7 +182,7 @@ export default async function PaginaObra({
       {/* História da obra — só se a artista escreveu uma */}
       {obra.historia && (
         <section className="mx-auto max-w-[1360px] px-6 py-24 md:px-12 md:py-32 lg:px-24 lg:py-40">
-          <div className="max-w-2xl">
+          <div className="max-w-2xl" data-anim="secao">
             <div className="mb-5 text-xs font-semibold uppercase tracking-widest text-ouro">
               História da obra
             </div>
@@ -195,10 +202,11 @@ export default async function PaginaObra({
         <section className="mx-auto max-w-[1360px] px-6 py-24 md:px-12 lg:px-24">
           <h2 className="mb-11 font-serif text-3xl text-tinta">Da mesma série.</h2>
           <div className="grid grid-cols-2 gap-7 md:grid-cols-4">
-            {relacionadas.map((relacionada) => (
+            {relacionadas.map((relacionada, indice) => (
               <CartaoObra
                 key={relacionada.id}
-                href={`/obras/${relacionada.id}`}
+                obraId={relacionada.id}
+                indice={indice}
                 imagemUrl={relacionada.imagem_web}
                 titulo={relacionada.titulo}
                 subtitulo={relacionada.tecnica ?? ''}

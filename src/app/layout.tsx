@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Work_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { urlDoSite } from "@/lib/site";
+import { SCRIPT_ANIMACAO } from "@/lib/animacao";
 
 const serif = Instrument_Serif({
   weight: "400",
@@ -37,9 +39,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // `suppressHydrationWarning`: o script abaixo põe `data-js` no <html>
+  // antes de o React chegar, então o HTML do navegador fica diferente do que
+  // o servidor mandou — de propósito. Sem isso, o React reclamaria da
+  // diferença ao hidratar. Vale só para os atributos do próprio <html>.
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${serif.variable} ${sans.variable} antialiased`}>
+        {/* beforeInteractive: roda antes da página aparecer, para o estado
+            "antes de entrar" das animações já valer no primeiro quadro. */}
+        <Script id="animacao" strategy="beforeInteractive">
+          {SCRIPT_ANIMACAO}
+        </Script>
         {children}
       </body>
     </html>

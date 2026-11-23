@@ -35,7 +35,7 @@ export default function AArtista() {
     <div>
       {/* Abertura — retrato + nome */}
       <section className="mx-auto max-w-[1360px] px-6 py-20 md:px-12 md:py-28 lg:px-24">
-        <div className="grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr] md:gap-20">
+        <div className="grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr] md:gap-20" data-anim="secao">
           {/* Mesmo placeholder tipográfico da Home, até existir uma foto real
               da artista (ver docs/handoff.md §8). */}
           <div
@@ -58,7 +58,7 @@ export default function AArtista() {
 
       {/* Biografia */}
       <section className="bg-creme px-6 py-20 md:px-12 md:py-28 lg:px-24">
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-2xl" data-anim="secao">
           <div className="mb-5 text-xs uppercase tracking-widest text-ouro">Trajetória</div>
           <h2 className="mb-8 font-serif text-3xl text-tinta md:text-4xl">
             Um olhar que espera antes de fotografar.
@@ -80,7 +80,7 @@ export default function AArtista() {
 
       {/* Processo criativo */}
       <section className="mx-auto max-w-[1440px] px-6 py-20 md:px-12 md:py-28 lg:px-24">
-        <div className="mb-14 max-w-xl">
+        <div className="mb-14 max-w-xl" data-anim="secao">
           <div className="mb-4 text-xs uppercase tracking-widest text-ouro">Processo</div>
           <h2 className="font-serif text-3xl text-tinta md:text-4xl">Como cada série nasce.</h2>
         </div>
@@ -98,7 +98,7 @@ export default function AArtista() {
 
       {/* CTA final */}
       <section className="px-6 py-24 text-center md:px-12 lg:px-24">
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-2xl" data-anim="secao">
           <h2 className="mb-5 font-serif text-3xl text-tinta md:text-4xl">
             Conheça o trabalho completo.
           </h2>

@@ -8,7 +8,9 @@ Site-portfólio de fotografia de uma artista. Next.js 16 (App Router) + Supabase
 
 **Vendas em standby (desde 2026-11-22):** o site é só portfólio — o visitante vê as fotos e fala com a artista pelo WhatsApp/Instagram (`src/lib/contato.ts`) para agendar sessões ou negociar a compra de uma foto (a negociação é fora do site). Não há carrinho, checkout, tamanhos, preços nem contas de visitante; só a artista faz login (admin). Todo o código da loja está na tag git `loja-v1`; como retomar está em docs/handoff.md ("Vendas em standby").
 
-A especificação de design e o estado do projeto estão em docs/handoff.md; consulte antes de construir telas. **O plano do que falta fazer (com especificação) está em docs/handoff.md §7 → "A construir"** — comece por ele ao retomar o trabalho.
+A especificação de design e o estado do projeto estão em docs/handoff.md; consulte antes de construir telas. **O plano do que falta fazer (com especificação) está em docs/handoff.md §7 → "A construir"** — comece pelo bloco "📍 ONDE PARAMOS" dele ao retomar o trabalho.
+
+Em decisões visuais, o usuário prefere **seguir o Design Doc e os protótipos** (`docs/prototipo/*.dc.html`) a propostas alternativas — duas linhas de animação "diferentes" foram testadas e recusadas.
 
 Commits e PRs deste repositório **não levam atribuição de IA** (nada de `Co-Authored-By: Claude` nem "Generated with Claude Code").
 
@@ -22,6 +24,12 @@ npm run lint    # eslint (flat config: eslint-config-next core-web-vitals + type
 ```
 
 Não há setup de testes no repositório.
+
+**Não rode `npm run build` com o `npm run dev` do usuário aberto**: já deixou o dev servindo uma versão velha das páginas (404 em todas as obras). Para checar tipos nesse caso, `npx tsc --noEmit`; o CI roda lint + build em todo PR.
+
+## Animações do site público
+
+Componentes não têm lógica de animação, só ganchos: `data-anim="secao|foto|capa"` e classes `anim-*`, `cabecalho`, `barra-filtros`, `botao-*`. O `ObservadorAnimacoes` (montado no layout do site) marca `data-visivel` quando o elemento entra na tela e `data-rolou` no `<html>` ao rolar; o CSS de tudo está no bloco "ANIMAÇÕES" de `src/app/globals.css`. A passagem da foto entre cartão e Página da Obra é `<ViewTransition name="foto-<id>">` do React (`experimental.viewTransition` no `next.config.ts`); os tipos vêm de `src/types/react-canary.d.ts`.
 
 ## Stack e convenções de configuração
 

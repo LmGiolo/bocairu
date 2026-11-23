@@ -19,7 +19,15 @@ const CLASSE_ICONE = 'flex items-center text-tinta/85 transition-opacity duratio
 
 export default function Cabecalho() {
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between gap-6 border-b border-linho bg-areia/95 px-6 py-5 backdrop-blur md:px-12 lg:px-24">
+    // `cabecalho`: gancho do "encolher ao rolar" e, na Home, do modo
+    // transparente por cima da capa (globals.css).
+    // `viewTransitionName`: dá ao cabeçalho uma identidade própria na troca
+    // de página, para o CSS mantê-lo parado enquanto o conteúdo faz o
+    // cross-fade.
+    <header
+      className="cabecalho sticky top-0 z-50 flex items-center justify-between gap-6 border-b border-linho bg-areia/95 px-6 py-5 backdrop-blur md:px-12 lg:px-24"
+      style={{ viewTransitionName: 'cabecalho' }}
+    >
       <Link
         href="/"
         className="font-serif text-2xl italic tracking-wide text-tinta"

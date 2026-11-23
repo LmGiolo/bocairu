@@ -33,7 +33,7 @@ const CLASSE_BASE =
 // nova de controlar esta aqui (proteção padrão pra qualquer _blank).
 export function BotaoWhatsApp({ href = WHATSAPP_URL_GERAL, rotulo = 'Conversar no WhatsApp' }: { href?: string; rotulo?: string }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={`${CLASSE_BASE} bg-vinho text-areia hover:bg-vinho-escuro`}>
+    <a href={href} target="_blank" rel="noopener noreferrer" className={`botao-bordo ${CLASSE_BASE} bg-vinho text-areia hover:bg-vinho-escuro`}>
       <IconeWhatsApp />
       {rotulo}
     </a>
@@ -46,7 +46,7 @@ export function BotaoInstagram() {
       href={INSTAGRAM_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${CLASSE_BASE} border border-tinta text-tinta hover:bg-tinta hover:text-areia`}
+      className={`botao-secundario ${CLASSE_BASE} border border-tinta text-tinta hover:bg-tinta hover:text-areia`}
     >
       <IconeInstagram />
       Ver no Instagram
