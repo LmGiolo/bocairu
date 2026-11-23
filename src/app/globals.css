@@ -325,6 +325,87 @@ html:not([data-rolou]):has(.anim-hero) .cabecalho :is(a, .botao-menu):not(dialog
   }
 }
 
+/* ── Carrossel da Home: anel 3D ──────────────────────────────────────
+ * src/components/ui/CarrosselDestaques.tsx. O componente marca cada foto
+ * com `data-posicao`: 0 (frente), 1 (direita), -1 (esquerda) ou "fora".
+ * Aqui cada posição vira um lugar no espaço, e a `transition` leva a foto
+ * de um lugar ao outro quando a posição muda.
+ *
+ * - `perspective` no palco dá a profundidade: `translateZ` negativo
+ *   afasta a foto (ela encolhe) e `rotateY` a vira para dentro, como se
+ *   estivesse na parede de um cilindro.
+ * - `transform-style: preserve-3d` no trilho faz o navegador ordenar as
+ *   fotos pela profundidade REAL: quem está mais perto fica por cima, sem
+ *   z-index. É isso que faz a foto que "dá a volta" (da esquerda para a
+ *   direita) passar por trás da da frente.
+ * - `translateX` em % é relativo à largura da própria foto: os lados se
+ *   afastam na proporção certa em qualquer tamanho de tela. */
+:root {
+  /* Acelera e desacelera por igual: o anel "pega embalo" e para macio. */
+  --curva-girar: cubic-bezier(0.65, 0, 0.35, 1);
+}
+.anim-anel {
+  perspective: 1600px;
+}
+.anim-anel-trilho {
+  transform-style: preserve-3d;
+  /* No celular as vizinhas ficam mais perto, para aparecerem na tela. */
+  --deslocamento: 74%;
+}
+@media (min-width: 768px) {
+  .anim-anel-trilho {
+    --deslocamento: 92%;
+  }
+}
+.anim-anel-cartao {
+  transform: translateX(0) translateZ(0) rotateY(0deg);
+  transition:
+    transform 900ms var(--curva-girar),
+    filter 900ms var(--curva-girar),
+    opacity 900ms var(--curva-girar);
+}
+.anim-anel-cartao[data-posicao='1'] {
+  transform: translateX(var(--deslocamento)) translateZ(-280px) rotateY(-28deg);
+}
+.anim-anel-cartao[data-posicao='-1'] {
+  transform: translateX(calc(var(--deslocamento) * -1)) translateZ(-280px) rotateY(28deg);
+}
+/* As de trás: desfocadas e mais escuras, como fora do foco da lente. */
+.anim-anel-cartao:is([data-posicao='1'], [data-posicao='-1']) {
+  filter: blur(3px) brightness(0.82);
+  cursor: pointer;
+}
+.anim-anel-cartao[data-posicao='fora'] {
+  transform: translateX(0) translateZ(-640px) rotateY(0deg);
+  opacity: 0;
+  pointer-events: none;
+}
+/* Sombra só na da frente: ela "flutua" acima das outras. */
+.anim-anel-cartao[data-posicao='0'] .anim-moldura {
+  box-shadow: 0 40px 60px -40px rgb(27 24 20 / 0.55);
+}
+.anim-anel-cartao .anim-moldura {
+  transition:
+    border-color 600ms ease-out,
+    box-shadow 900ms var(--curva-girar);
+}
+
+/* A legenda da foto nova entra com fade + sobe. */
+.anim-legenda {
+  animation: anim-legenda-entra 600ms var(--curva-pouso) both;
+}
+@keyframes anim-legenda-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes anim-legenda-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
 /* ── Movimento reduzido (preferência do sistema): só fade ─────────────
  * Fica no fim para vencer as regras acima pela ordem. */
 @media (prefers-reduced-motion: reduce) {
@@ -338,6 +419,15 @@ html:not([data-rolou]):has(.anim-hero) .cabecalho :is(a, .botao-menu):not(dialog
   }
   .group:hover .anim-foto-img {
     transform: none;
+  }
+
+  /* Carrossel da Home: o anel não gira (e nem gira sozinho — o
+     componente desliga); as fotos trocam de lugar direto. */
+  .anim-anel-cartao {
+    transition: none;
+  }
+  .anim-legenda {
+    animation-name: anim-legenda-aparece;
   }
 
   /* Gavetas: abrem no lugar, sem deslizar (o fundo ainda escurece). */
