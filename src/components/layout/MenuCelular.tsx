@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useRef, useState } from 'react'
 
 import { IconeInstagram, IconeWhatsApp } from '@/components/contato/BotoesContato'
-import { INSTAGRAM_URL, WHATSAPP_URL_GERAL } from '@/lib/contato'
+import { INSTAGRAM_URL } from '@/lib/contato'
 
 export type ItemNavegacao = { href: string; rotulo: string }
 
@@ -22,7 +22,9 @@ export type ItemNavegacao = { href: string; rotulo: string }
 // navegador prende o foco dentro dela, fecha com Esc e deixa a página de
 // trás inerte (o §6 do handoff pede isso para menu sobreposto). O deslizar
 // é CSS (classe `gaveta` em globals.css).
-export default function MenuCelular({ itens }: { itens: ItemNavegacao[] }) {
+// `whatsappUrl` vem pronto do Cabecalho (servidor), que lê a mensagem
+// editável do banco.
+export default function MenuCelular({ itens, whatsappUrl }: { itens: ItemNavegacao[]; whatsappUrl: string }) {
   const gaveta = useRef<HTMLDialogElement>(null)
   const [aberta, setAberta] = useState(false)
   const caminho = usePathname()
@@ -112,7 +114,7 @@ export default function MenuCelular({ itens }: { itens: ItemNavegacao[] }) {
             </p>
             <div className="flex flex-col gap-3">
               <a
-                href={WHATSAPP_URL_GERAL}
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-3 rounded-sm bg-tinta px-5 py-3.5 text-sm tracking-wide text-areia"

@@ -110,7 +110,11 @@ A checagem de `perfis.papel` da página `/admin` não protege rota de API nenhum
 
 ## Contato
 
-`src/lib/contato.ts` é o único lugar com o número do WhatsApp, o Instagram e o texto das mensagens prontas (geral, sobre sessão de fotos; e "sobre esta foto", interesse em comprar, com título + link). Trocar número ou mensagem é mexer só ali.
+`src/lib/contato.ts` é o único lugar com o número do WhatsApp e o Instagram, e quem monta os links do wa.me (`whatsAppUrlGeral`, `whatsAppUrlSobreFoto`). O **texto** das mensagens prontas é editável pela artista em `/admin/textos` (chaves `whatsapp.*`).
+
+## Textos do site
+
+Os textos da Home, A Artista e Contato, as mensagens do WhatsApp e os retratos da artista (um por página: `retrato_home`, `retrato_artista`, `retrato_contato`) vêm da tabela `textos_site` (schema em `docs/sql/2026-11-23-textos-site.sql`), editada em `/admin/textos`. O catálogo das chaves, com o texto padrão de cada uma, é `src/lib/textos.ts`: chave sem linha no banco mostra o padrão, então o site nunca fica em branco. Nas páginas, leia com `lerConteudoSite()` (`src/lib/textos-servidor.ts`, embrulhado em `cache()` do React: cabeçalho, rodapé e página consultam o banco uma vez só por visita). Texto multilinha passa por `paragrafos()` (linha em branco = novo parágrafo). Rótulos de botão, filtro e menu **não** entram no catálogo: são interface, não a voz da artista. Os retratos sobem por `POST /api/textos/retrato` com `local` = `home`|`artista`|`contato` (dois portões, sharp → webp, bucket `obras-web`, pasta `site/`).
 
 ## Dinheiro (quando as vendas voltarem)
 

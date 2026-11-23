@@ -481,17 +481,22 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
 > - ✅ Item 1 (Open Graph) e ✅ item 2 (excluir foto) — no `main`.
 > - ✅ Animações do item 4 (§4 do Design Doc + cabeçalho transparente da
 >   Home, como no protótipo) — no `main` (PR "Animações do Design Doc").
-> - ✅ Item 2½ (visual do admin igual ao protótipo) — branch
->   `feat/admin-visual` (2026-11-23). Ordem confirmada pelo usuário: admin
->   antes do item 3; **sem Dashboard** (o painel abre direto em Obras).
->   **Falta o teste logado como admin** (cadastrar, editar, trocar status,
->   excluir, ordenar, sair) — o visual foi conferido com dados falsos.
-> - **Próximo passo: item 3 (textos editáveis)** — a tela `/admin/textos`
->   já nasce no estilo novo: usar `CabecalhoPagina`, `Aviso` e as classes
->   de `src/components/admin/estilos.ts`, e pôr o item no menu em
->   `BarraLateral.tsx` (lista `ITENS`).
-> - Ordem daqui em diante: **3 → resto do 4 (acessibilidade, celular,
->   skeleton) → 5 (deploy)**.
+> - ✅ Item 2½ (visual do admin igual ao protótipo) — no `main` (PR #8),
+>   testado logado pelo usuário. **Sem Dashboard** (o painel abre em Obras).
+> - ✅ Menu recolhível no celular + filtros da Galeria em gaveta — no
+>   `main` (PR #9), testado no celular pelo usuário.
+> - ✅ Item 3 (textos editáveis + um retrato por página) — no `main`. O SQL
+>   (`docs/sql/2026-11-23-textos-site.sql`) **já foi rodado** no Supabase
+>   em 2026-11-23. Numa base nova, rodar antes: sem a tabela o site
+>   funciona (textos padrão), mas `/admin/textos` avisa que não consegue ler.
+> - **Hospedagem (decisão em andamento, 2026-11-23):** a tendência é plano
+>   Hostinger de 1 ano (precisa ser o **Unlimited**/Business — o Premium
+>   não roda Node.js/Next) e o domínio **bocairu.com.br direto no
+>   registro.br**, no CPF da artista. Quem paga é ela. Item 5 (deploy) muda
+>   de Vercel para Hostinger quando a compra sair — reescrever o item 5.
+> - Ordem daqui em diante: **resto do 4 (CTA do WhatsApp fixo na obra no
+>   celular, carrossel de destaques, acessibilidade, skeleton) → 5
+>   (deploy)**.
 > - Ferramentas: a skill `frontend-design` (anthropics/skills) está
 >   instalada globalmente nesta máquina, mas o usuário prefere seguir o
 >   Design Doc e os protótipos; propostas "diferentes" de animação foram
@@ -631,7 +636,63 @@ começar**.
   (mesma regra do site público). Lembrar: foco visível, labels nos
   campos, erro com ícone + texto (§6).
 
-#### 3. Textos do site editáveis pelo admin — a fazer
+#### 3. Textos do site editáveis pelo admin — ✅ FEITO (branch `feat/textos-site`)
+
+O que foi construído (o plano original segue abaixo, como referência):
+
+- **Banco:** `docs/sql/2026-11-23-textos-site.sql` — tabela `textos_site`
+  (`chave`, `valor` ≤ 5000, `atualizado_em`), RLS: SELECT público,
+  INSERT/UPDATE `eh_admin()`, sem DELETE (o retrato é apagado pela rota,
+  com service role).
+- **Catálogo** `src/lib/textos.ts` (puro): 23 chaves com rótulo, grupo,
+  texto padrão (o texto que o site tinha), multilinha e dica.
+  `resolverTextos()` junta banco + padrão (valor em branco não substitui o
+  padrão); `paragrafos()` quebra multilinha em `<p>` por linha em branco.
+- **Leitura** `src/lib/textos-servidor.ts`: `lerConteudoSite()` com
+  `cache()` do React (uma consulta por visita, mesmo com Cabecalho, Rodape
+  e página lendo). Se a leitura falha (ex.: tabela não criada), loga e
+  devolve os padrões — o site não quebra. Isso deixou Cabecalho e Rodape
+  `async` e A Artista/Contato dinâmicas (leem cookies pelo client de
+  servidor); como o resto do site já era dinâmico, não há cache a
+  invalidar: o que a artista salva aparece no próximo carregamento.
+- **Páginas:** Home (frase da capa, Sobre a artista, chamada final),
+  A Artista (abertura, trajetória, 4 etapas, chamada final), Contato
+  (título, texto) e o Rodapé (usa a frase da capa). Títulos de seção fixos
+  ("Como cada série nasce.", "Três fotos, uma curadoria.") ficaram de fora,
+  como combinado.
+- **WhatsApp:** `src/lib/contato.ts` perdeu as mensagens fixas e ganhou
+  `whatsAppUrlGeral(mensagem)` e `whatsAppUrlSobreFoto(modelo, titulo,
+  link)`. O modelo usa `{titulo}`/`{link}`; o admin não salva sem `{link}`,
+  e se ele sumir mesmo assim o link vai no fim. `BotaoWhatsApp` agora exige
+  `href`. O menu do celular recebe a URL pronta do Cabecalho.
+- **Retratos — um por página** (pedido do usuário: Home, A Artista e
+  Contato podem ter fotos diferentes). Chaves `retrato_home`,
+  `retrato_artista`, `retrato_contato` (`RETRATOS` em `src/lib/textos.ts`);
+  página sem retrato mostra o "B". `src/components/contato/Retrato.tsx`
+  (moldura 4:5, `next/image`). Rota `POST /api/textos/retrato` (FormData:
+  `arquivo` + `local`) e `DELETE ?local=…`, com os dois portões: sharp →
+  webp 1200px q82, até 20 MB, sem HEIC (o sharp do npm não abre; o Safari
+  do iPhone já converte para JPEG). Arquivo em
+  `obras-web/site/retrato-<local>-<data>.webp` (nome novo a cada troca, sem
+  cache velho). Ordem: sobe o novo → grava a URL → apaga o antigo daquela
+  página (só se estiver em `site/`); falha no banco desfaz o upload. A
+  primeira versão tinha um retrato só (`retrato_url`); a linha foi removida
+  no teste e não sobrou nada para migrar.
+- **Tela** `/admin/textos` (menu "Textos do site"): um cartão por página,
+  com o retrato dela no topo (escolher a foto já envia; "Remover retrato"
+  com confirmação) e os textos com Salvar próprio, "Desfazer alterações" e
+  "Voltar ao texto original" por campo. Valida em branco, tamanho (200
+  curto / 3000 longo) e o `{link}`. Recado no grupo A Artista sobre a copy
+  de placeholder (ver "Atenção à copy atual" abaixo).
+- **Verificado:** lint e tipos; sem a tabela, todas as páginas respondem
+  200 com os textos padrão; a trajetória sai em 2 parágrafos; a mensagem
+  da foto sai com título e link substituídos; `/admin/textos` sem login
+  redireciona. **Testado logado pelo usuário** (com o SQL rodado): salvar
+  texto, voltar ao original, validação do `{link}`, WhatsApp da foto,
+  trocar e remover o retrato — na versão de retrato único. A separação em
+  três retratos foi conferida com tipos, lint e print da tela.
+
+Plano original:
 
 Pedido exato do usuário (aprovado): **Home, A Artista e Contato**, mais o
 **retrato** da artista e as **mensagens do WhatsApp**. NÃO tornar editável

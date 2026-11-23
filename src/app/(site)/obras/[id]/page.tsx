@@ -10,6 +10,7 @@ import CartaoObra from '@/components/ui/CartaoObra'
 import FichaTecnica from '@/components/obra/FichaTecnica'
 import { BotaoWhatsApp } from '@/components/contato/BotoesContato'
 import { whatsAppUrlSobreFoto } from '@/lib/contato'
+import { lerConteudoSite } from '@/lib/textos-servidor'
 
 // Título e descrição desta foto na aba do navegador e na pré-visualização
 // do link (Open Graph). A imagem da pré-visualização vem do arquivo
@@ -89,6 +90,8 @@ export default async function PaginaObra({
   const host = cabecalhos.get('host')
   const protocolo = cabecalhos.get('x-forwarded-proto') ?? 'https'
   const linkDaFoto = host ? `${protocolo}://${host}/obras/${obra.id}` : ''
+  // O modelo da mensagem (com {titulo} e {link}) é editável em /admin/textos.
+  const { textos } = await lerConteudoSite()
 
   const proporcaoImagem =
     obra.largura_px && obra.altura_px ? `${obra.largura_px} / ${obra.altura_px}` : '4 / 5'
@@ -172,7 +175,7 @@ export default async function PaginaObra({
               Gostou desta foto? Fale com a artista para saber como adquiri-la.
             </p>
             <BotaoWhatsApp
-              href={whatsAppUrlSobreFoto(obra.titulo, linkDaFoto)}
+              href={whatsAppUrlSobreFoto(textos['whatsapp.mensagem_foto'], obra.titulo, linkDaFoto)}
               rotulo="Tenho interesse nesta foto"
             />
           </div>

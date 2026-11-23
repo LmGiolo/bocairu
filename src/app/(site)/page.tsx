@@ -5,6 +5,10 @@ import Botao from '@/components/ui/Botao'
 import CartaoObra from '@/components/ui/CartaoObra'
 import CartaoSerie from '@/components/colecoes/CartaoSerie'
 import { BotaoInstagram, BotaoWhatsApp } from '@/components/contato/BotoesContato'
+import Retrato from '@/components/contato/Retrato'
+import { whatsAppUrlGeral } from '@/lib/contato'
+import { paragrafos } from '@/lib/textos'
+import { lerConteudoSite } from '@/lib/textos-servidor'
 
 type ObraHome = {
   id: string
@@ -27,6 +31,8 @@ type Serie = {
 
 export default async function Home() {
   const supabase = await createClient()
+  // Textos editáveis em /admin/textos (com o texto padrão de reserva).
+  const { textos, retratos } = await lerConteudoSite()
 
   // Sem filtro de status: o RLS decide o que é visível pra quem não é admin
   // (mesma regra que /galeria e /obras/[id] já seguem — ver docs/handoff.md
@@ -95,7 +101,7 @@ export default async function Home() {
           <div className="anim-hero-texto mx-auto max-w-[1440px]">
             <h1 className="font-serif text-6xl italic text-areia md:text-7xl">Bocairú</h1>
             <p className="mt-4 max-w-md text-base leading-relaxed text-areia/90 md:text-lg">
-              Fotografia autoral. Sessões de foto sob agendamento.
+              {textos['home.capa_frase']}
             </p>
             <div className="mt-9">
               <Botao variante="primario" href="/galeria">
@@ -174,24 +180,19 @@ export default async function Home() {
       {/* Sobre a artista */}
       <section className="mx-auto max-w-[1360px] px-6 py-20 md:px-12 md:py-28 lg:px-24">
         <div className="grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr] md:gap-20" data-anim="secao">
-          {/* Sem foto de retrato no schema/ativos ainda — placeholder até
-              existir uma imagem de verdade da artista. */}
-          <div
-            className="flex w-full items-center justify-center border border-linho bg-creme"
-            style={{ aspectRatio: '4 / 5' }}
-          >
-            <span className="font-serif text-8xl italic text-ouro">B</span>
-          </div>
+          {/* Retrato da Home, enviado em /admin/textos — sem ele, o "B". */}
+          <Retrato url={retratos.home} />
 
           <div>
             <div className="mb-5 text-xs uppercase tracking-widest text-ouro">A artista</div>
             <h2 className="mb-6 max-w-md font-serif text-3xl text-tinta md:text-4xl">
-              Bocairú fotografa o que a luz revela devagar.
+              {textos['home.artista_titulo']}
             </h2>
-            <p className="mb-8 max-w-md text-base leading-relaxed text-[#3A342C]">
-              Cada série nasce de um tempo longo de observação — paisagem, matéria e silêncio antes
-              da câmera.
-            </p>
+            <div className="mb-8 flex max-w-md flex-col gap-4 text-base leading-relaxed text-[#3A342C]">
+              {paragrafos(textos['home.artista_texto']).map((paragrafo) => (
+                <p key={paragrafo}>{paragrafo}</p>
+              ))}
+            </div>
             <Botao variante="secundario" href="/a-artista">
               Conhecer a artista
             </Botao>
@@ -202,12 +203,14 @@ export default async function Home() {
       {/* CTA final — o objetivo do portfólio: virar conversa no WhatsApp */}
       <section className="bg-creme px-6 py-24 text-center md:px-12 lg:px-24">
         <div className="mx-auto max-w-2xl" data-anim="secao">
-          <h2 className="mb-5 font-serif text-3xl text-tinta md:text-4xl">Vamos fotografar juntos?</h2>
-          <p className="mb-9 text-base text-fumaca">
-            Sessões de foto sob agendamento, combinadas direto com a artista.
-          </p>
+          <h2 className="mb-5 font-serif text-3xl text-tinta md:text-4xl">{textos['home.cta_titulo']}</h2>
+          <div className="mb-9 flex flex-col gap-3 text-base text-fumaca">
+            {paragrafos(textos['home.cta_texto']).map((paragrafo) => (
+              <p key={paragrafo}>{paragrafo}</p>
+            ))}
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <BotaoWhatsApp />
+            <BotaoWhatsApp href={whatsAppUrlGeral(textos['whatsapp.mensagem_geral'])} />
             <BotaoInstagram />
           </div>
         </div>

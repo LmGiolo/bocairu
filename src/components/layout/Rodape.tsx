@@ -1,8 +1,13 @@
 import Link from 'next/link'
 
-import { INSTAGRAM_EXIBICAO, INSTAGRAM_URL, WHATSAPP_EXIBICAO, WHATSAPP_URL_GERAL } from '@/lib/contato'
+import { INSTAGRAM_EXIBICAO, INSTAGRAM_URL, WHATSAPP_EXIBICAO, whatsAppUrlGeral } from '@/lib/contato'
+import { lerConteudoSite } from '@/lib/textos-servidor'
 
-export default function Rodape() {
+export default async function Rodape() {
+  // Mesma leitura do Cabecalho e da página: o cache() faz o banco ser
+  // consultado uma vez só por visita.
+  const { textos } = await lerConteudoSite()
+
   return (
     <footer className="mt-16 bg-tinta px-6 py-16 text-pedra md:px-12 lg:px-24">
       <div className="mx-auto grid max-w-[1440px] gap-12 pb-10 md:grid-cols-[1.4fr_1fr_1fr]">
@@ -10,9 +15,8 @@ export default function Rodape() {
           <div className="mb-3 font-serif text-2xl italic text-areia">
             BOCAIRÚ
           </div>
-          <p className="max-w-xs text-sm">
-            Fotografia autoral. Sessões de foto sob agendamento.
-          </p>
+          {/* A mesma frase da capa da Home (editável em /admin/textos). */}
+          <p className="max-w-xs text-sm">{textos['home.capa_frase']}</p>
         </div>
 
         <div>
@@ -32,7 +36,7 @@ export default function Rodape() {
             Contato
           </div>
           <div className="flex flex-col gap-2.5 text-sm">
-            <a href={WHATSAPP_URL_GERAL} target="_blank" rel="noopener noreferrer" className="text-pedra">
+            <a href={whatsAppUrlGeral(textos['whatsapp.mensagem_geral'])} target="_blank" rel="noopener noreferrer" className="text-pedra">
               WhatsApp {WHATSAPP_EXIBICAO}
             </a>
             <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="text-pedra">

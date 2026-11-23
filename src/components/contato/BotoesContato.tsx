@@ -1,4 +1,4 @@
-import { INSTAGRAM_URL, WHATSAPP_URL_GERAL } from '@/lib/contato'
+import { INSTAGRAM_URL } from '@/lib/contato'
 
 // Ícones em SVG inline (traço fino, mesmo estilo dos ícones do Cabeçalho)
 // — sem biblioteca de ícones só pra dois desenhos.
@@ -24,14 +24,17 @@ export function IconeInstagram() {
 const CLASSE_BASE =
   'inline-flex items-center justify-center gap-2.5 rounded-sm px-8 py-4 text-sm tracking-wide transition-colors duration-200'
 
-// Botão do WhatsApp. `href` opcional: sem ele, abre com a mensagem geral;
-// a Página da Obra passa um link com a mensagem que cita a foto.
+// Botão do WhatsApp. `href` é obrigatório: quem usa monta o link com a
+// mensagem certa (whatsAppUrlGeral ou whatsAppUrlSobreFoto, de
+// src/lib/contato.ts), porque o texto da mensagem é editável pela artista e
+// vem do banco — este componente não tem como ler o banco sozinho (ele
+// também é usado em componente de navegador, por causa dos ícones).
 //
 // Links externos usam <a> comum (não o <Link> do Next, que é pra navegar
 // dentro do site) com target="_blank" — abre o app/aba do WhatsApp sem
 // tirar a pessoa do portfólio. `rel="noopener noreferrer"` impede a aba
 // nova de controlar esta aqui (proteção padrão pra qualquer _blank).
-export function BotaoWhatsApp({ href = WHATSAPP_URL_GERAL, rotulo = 'Conversar no WhatsApp' }: { href?: string; rotulo?: string }) {
+export function BotaoWhatsApp({ href, rotulo = 'Conversar no WhatsApp' }: { href: string; rotulo?: string }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className={`botao-bordo ${CLASSE_BASE} bg-vinho text-areia hover:bg-vinho-escuro`}>
       <IconeWhatsApp />
