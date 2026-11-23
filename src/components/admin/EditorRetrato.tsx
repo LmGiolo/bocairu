@@ -7,15 +7,17 @@ import { useState } from 'react'
 import Aviso, { type TipoAviso } from '@/components/admin/Aviso'
 import { CLASSE_BOTAO_SECUNDARIO, CLASSE_BOTAO_TEXTO, CLASSE_ROTULO } from '@/components/admin/estilos'
 import { RETRATOS, type LocalRetrato } from '@/lib/textos'
+import { enviarDireto } from '@/lib/envios/navegador'
 
 // O retrato de UMA página (Home, A Artista ou Contato) — cada página tem o
 // seu, e este bloco aparece no topo do cartão dela em /admin/textos.
 //
 // Escolher a foto já envia — não há botão "Salvar" separado, porque não há
 // nada para revisar antes: a prévia que aparece aqui é a mesma que o site
-// vai mostrar. O envio passa pela rota /api/textos/retrato (service role),
-// e não direto pelo navegador: o servidor converte a foto para webp e
-// apaga o arquivo do retrato anterior daquela página.
+// vai mostrar. A foto sobe direto do navegador para uma pasta de passagem
+// do Storage (src/lib/envios/comum.ts), e a rota /api/textos/retrato
+// (service role) faz o resto: converte para webp, troca o retrato e apaga
+// o arquivo do retrato anterior daquela página.
 export default function EditorRetrato({
   local,
   retratoInicial,
@@ -31,13 +33,22 @@ export default function EditorRetrato({
   async function enviar(arquivo: File | undefined) {
     if (!arquivo) return
     setOcupado(true)
-    setAviso({ tipo: 'info', texto: 'Enviando… o servidor está preparando a foto.' })
-
-    const dados = new FormData()
-    dados.append('arquivo', arquivo)
-    dados.append('local', local)
+    setAviso({ tipo: 'info', texto: 'Enviando a foto…' })
 
     try {
+      // A foto vai direto para o Storage (src/lib/envios/comum.ts); a rota
+      // recebe só o caminho dela e prepara o webp.
+      const envio = await enviarDireto(arquivo, 'retrato')
+      if (!envio.ok) {
+        setAviso({ tipo: 'erro', texto: envio.erro })
+        return
+      }
+      setAviso({ tipo: 'info', texto: 'Foto enviada. O servidor está preparando o retrato…' })
+
+      const dados = new FormData()
+      dados.append('envio', envio.caminho)
+      dados.append('local', local)
+
       const resposta = await fetch('/api/textos/retrato', { method: 'POST', body: dados })
       const corpo = await resposta.json().catch(() => null)
       if (!resposta.ok) {

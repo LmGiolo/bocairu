@@ -1,17 +1,18 @@
 import type { NextRequest } from 'next/server'
 import sharp from 'sharp'
 
-import { createClient } from '@/lib/supabase/server'
-import { criarClientAdmin } from '@/lib/supabase/admin'
+import type { criarClientAdmin } from '@/lib/supabase/admin'
 import { RETRATOS, ehLocalRetrato } from '@/lib/textos'
 import { revalidarSitePublico } from '@/lib/cache-site'
+import { conferirAdmin } from '@/lib/conferir-admin'
+import { apagarEnvio, baixarEnvio, ehCaminhoEnvio } from '@/lib/envios/servidor'
 
 // Os retratos da artista — um por página (Home, A Artista e Contato),
 // enviados pela tela /admin/textos. Toda chamada diz de qual página é o
 // retrato (`local`: 'home' | 'artista' | 'contato'); trocar o de uma
 // página nunca mexe no das outras.
 //
-// POST   (FormData: arquivo + local) → gera um webp e troca o retrato
+// POST   (FormData: envio + local) → gera um webp e troca o retrato
 //        daquela página por ele.
 // DELETE (?local=...) → tira o retrato daquela página (ela volta a
 //        mostrar o "B").
@@ -26,41 +27,16 @@ import { revalidarSitePublico } from '@/lib/cache-site'
 // JPEG ao enviar por um <input type="file" accept="image/*">.
 const FORMATOS_ACEITOS = ['jpeg', 'jpg', 'png', 'webp', 'tiff', 'avif']
 
-// 20 MB: bem menos que os 50 MB das obras — retrato não precisa de arquivo
-// de câmera em resolução máxima.
-const TAMANHO_MAXIMO = 20 * 1024 * 1024
+// O arquivo não chega nesta rota: o navegador o manda direto para o Storage
+// (src/lib/envios/comum.ts) e aqui chega só o caminho, no campo `envio`.
+// O teto de tamanho (20 MB — retrato não precisa de arquivo de câmera em
+// resolução máxima) é conferido no download, em baixarEnvio().
 
 // Maior lado do webp. A moldura do retrato tem no máximo ~600px de largura
 // na tela; 1200px cobre telas retina com folga.
 const LADO_MAIOR = 1200
 
 const BUCKET = 'obras-web'
-
-// Os dois portões de toda rota de admin (ver CLAUDE.md, "O client de
-// service role"): (1) identidade pelo getUser(), que confere o token no
-// servidor de Auth; (2) papel lido com service role, pelo id do token
-// verificado. Mesma lógica de src/app/api/obras/route.ts, explicada lá
-// em detalhe.
-async function conferirAdmin() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: erroAuth,
-  } = await supabase.auth.getUser()
-
-  if (erroAuth || !user) {
-    return { erro: Response.json({ erro: 'Não autenticado.' }, { status: 401 }) }
-  }
-
-  const admin = criarClientAdmin()
-  const { data: perfil, error: erroPerfil } = await admin.from('perfis').select('papel').eq('id', user.id).single()
-
-  if (erroPerfil || perfil?.papel !== 'admin') {
-    return { erro: Response.json({ erro: 'Acesso restrito a administradores.' }, { status: 403 }) }
-  }
-
-  return { admin }
-}
 
 // A URL pública guardada vira o caminho dentro do bucket (o que vem depois
 // de "/obras-web/"), que é o que o remove() do Storage quer. Mesmo cuidado
@@ -102,23 +78,34 @@ export async function POST(request: NextRequest) {
   if ('erro' in portao) return portao.erro
   const { admin } = portao
 
-  // ── 1) Valida antes de gravar qualquer coisa ──
   const formulario = await request.formData()
-  const local = formulario.get('local')
+  const envio = formulario.get('envio')
+  // Caminho fora do formato que /api/envios gera: recusa sem tocar em nada.
+  if (!ehCaminhoEnvio(envio)) {
+    return Response.json({ erro: 'Nenhum arquivo enviado.' }, { status: 400 })
+  }
+
+  // O arquivo enviado é só matéria-prima: o que fica é o webp. Por isso,
+  // dê certo ou errado, ele sai da pasta de passagem no fim (`finally`).
+  try {
+    return await trocarRetrato(admin, formulario.get('local'), envio)
+  } finally {
+    await apagarEnvio(admin, envio)
+  }
+}
+
+async function trocarRetrato(admin: Admin, local: FormDataEntryValue | null, envio: string): Promise<Response> {
+  // ── 1) Valida antes de gravar qualquer coisa ──
   if (!ehLocalRetrato(local)) {
     return Response.json({ erro: 'Página do retrato inválida.' }, { status: 400 })
   }
   const { chave } = RETRATOS[local]
-  const arquivo = formulario.get('arquivo')
 
-  if (!(arquivo instanceof File)) {
-    return Response.json({ erro: 'Nenhum arquivo enviado.' }, { status: 400 })
+  const baixado = await baixarEnvio(admin, envio, 'retrato')
+  if (!baixado.ok) {
+    return Response.json({ erro: baixado.erro }, { status: baixado.status })
   }
-  if (arquivo.size > TAMANHO_MAXIMO) {
-    return Response.json({ erro: `Arquivo maior que ${TAMANHO_MAXIMO / 1024 / 1024} MB.` }, { status: 413 })
-  }
-
-  const bytes = Buffer.from(await arquivo.arrayBuffer())
+  const bytes = baixado.bytes
 
   // O sharp diz o que o arquivo é de verdade (não confiamos na extensão).
   let formato: string | undefined

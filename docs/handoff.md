@@ -489,14 +489,17 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
 >   (`docs/sql/2026-11-23-textos-site.sql`) **já foi rodado** no Supabase
 >   em 2026-11-23. Numa base nova, rodar antes: sem a tabela o site
 >   funciona (textos padrão), mas `/admin/textos` avisa que não consegue ler.
-> - **Hospedagem (decisão em andamento, 2026-11-23):** a tendência é plano
->   Hostinger de 1 ano (precisa ser o **Unlimited**/Business — o Premium
->   não roda Node.js/Next) e o domínio **bocairu.com.br direto no
->   registro.br**, no CPF da artista. Quem paga é ela. Item 5 (deploy) muda
->   de Vercel para Hostinger quando a compra sair — reescrever o item 5.
+> - **Hospedagem (decidida, 2026-11-23):** Hostinger (plano que rode
+>   Node.js — Business/Cloud; o Premium não roda) com o domínio
+>   **bocairu.com.br direto no registro.br**, no CPF da artista. Quem paga é
+>   ela; falta só a compra. Enquanto isso, o site está no ar numa **prévia
+>   na Vercel (Hobby)** — ver item 5.
+> - ✅ Carrossel da Seleção atual, cache do site público (ISR), miniaturas
+>   do admin reduzidas e upload direto para o Storage (foto de qualquer
+>   tamanho até 50 MB) — no `main` (PRs #11, #12 e o do envio direto).
 > - Ordem daqui em diante: **resto do 4 (CTA do WhatsApp fixo na obra no
->   celular, carrossel de destaques, acessibilidade, skeleton) → 5
->   (deploy)**.
+>   celular, acessibilidade, skeleton) → 5 (deploy na Hostinger, quando a
+>   compra sair)**.
 > - Ferramentas: a skill `frontend-design` (anthropics/skills) está
 >   instalada globalmente nesta máquina, mas o usuário prefere seguir o
 >   Design Doc e os protótipos; propostas "diferentes" de animação foram
@@ -843,18 +846,29 @@ Lacunas encontradas comparando este documento com o código:
   diverge do protótipo em pontos reais. Ignorar nos protótipos tudo que for
   de venda (preço, carrinho, certificado, tamanhos).
 
-#### 5. Deploy na Vercel — a fazer
+#### 5. Deploy — Hostinger (definitivo) e Vercel (prévia provisória)
 
-- Conectar o repositório na Vercel (preview por PR + produção no `main` —
-  o `ci.yml` já cuida de lint/build).
-- Variáveis: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-  `SUPABASE_SERVICE_ROLE_KEY` (+ `NEXT_PUBLIC_SITE_URL` se houver domínio).
-- **Atenção ao tamanho do upload:** `POST /api/obras` aceita até 50 MB, mas
-  funções da Vercel costumam recusar corpo de requisição acima de ~4,5 MB.
-  Uma foto original de câmera passa disso fácil. Conferir o limite atual na
-  documentação da Vercel antes do deploy; se valer, o caminho é o navegador
-  subir o original direto para o Storage (signed upload URL) e a rota só
-  receber o caminho.
+- **Prévia na Vercel (feito, 2026-11-23):** projeto `bocairu` no plano
+  Hobby, deploy automático do `main` e link de prévia por PR. As três
+  variáveis foram configuradas à mão; a integração "Supabase" da Vercel
+  **não** foi adicionada (ela cria um banco novo). Hobby é só para uso
+  pessoal/não comercial: serve para mostrar, não para atender clientes.
+- **Definitivo: Hostinger + `bocairu.com.br`** (decisão do usuário,
+  2026-11-23), quando a artista fizer as compras. Antes de comprar,
+  confirmar na página da Hostinger que o plano escolhido roda **aplicação
+  Node.js** (Business/Cloud; o Premium não roda). Domínio direto no
+  registro.br, no CPF dela.
+- Variáveis em qualquer hospedagem: `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` e, com o
+  domínio, `NEXT_PUBLIC_SITE_URL=https://bocairu.com.br` (fora da Vercel
+  ela é obrigatória: é dela que saem o Open Graph e o link da foto no
+  WhatsApp).
+- **Upload grande resolvido:** a foto vai do navegador direto para o
+  Storage (`src/lib/envios/`), então o limite de ~4,5 MB por requisição
+  das funções serverless não pega mais. Vale em qualquer hospedagem.
+- Na Hostinger, o próprio servidor Node faz a redução de imagens do
+  `next/image` e guarda o cache das páginas (ISR) — por isso o `sharp`
+  precisa estar alinhado ao do Next (ver CLAUDE.md).
 - Depois: Sharing Debugger da Meta (item 1) e checar que o ping
   anti-pause do Supabase segue verde (ele parou entre 19/10 e 22/11/2026
   porque o projeto foi pausado — e ninguém viu os e-mails de falha do

@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { useEffect, useId, useMemo, useState, type FormEvent } from 'react'
 
 import { STATUS_OBRA, ROTULOS_STATUS_OBRA, type StatusObra } from '@/lib/obras/status'
+import { validarFormularioObra } from '@/lib/obras/formulario'
+import { enviarDireto } from '@/lib/envios/navegador'
 import Aviso, { type TipoAviso } from '@/components/admin/Aviso'
 import {
   CLASSE_AREA_TEXTO,
@@ -119,17 +121,10 @@ export default function FormularioObra({
       return
     }
 
-    setEnviando(true)
-    setMensagem({
-      tipo: 'info',
-      texto: modoEdicao ? 'Salvando…' : 'Enviando… o servidor ainda vai preparar a imagem.',
-    })
-
-    // FormData é como se manda arquivo por HTTP. Não dá pra usar JSON aqui:
-    // JSON só carrega texto, e a imagem é binária. No modo edição não há
-    // arquivo nenhum — o campo simplesmente não é anexado.
+    // Os campos vão num FormData (o formato que as rotas leem). A imagem
+    // NÃO vai junto: ela segue direto para o Storage logo abaixo, e aqui só
+    // entra o caminho dela.
     const dados = new FormData()
-    if (arquivo) dados.append('arquivo', arquivo)
     dados.append('titulo', titulo)
     dados.append('descricao', descricao)
     dados.append('ano', ano)
@@ -141,7 +136,37 @@ export default function FormularioObra({
       dados.append(campo, valor)
     }
 
+    // A mesma validação que o servidor faz, rodada aqui ANTES de enviar a
+    // foto: título esquecido aparece na hora, e não depois de esperar
+    // 30 MB subirem. (O servidor valida de novo — o navegador não é
+    // confiável.)
+    const validacao = validarFormularioObra(dados)
+    if (!validacao.ok) {
+      setMensagem({ tipo: 'erro', texto: validacao.erro })
+      return
+    }
+
+    setEnviando(true)
+
     try {
+      // Obra nova: primeiro a foto vai direto para o Storage (sem passar
+      // pela nossa rota, que recusa arquivo grande — ver
+      // src/lib/envios/comum.ts). Na edição não há foto nova.
+      if (!modoEdicao && arquivo) {
+        setMensagem({ tipo: 'info', texto: 'Enviando a imagem… foto grande pode levar um minuto.' })
+        const envio = await enviarDireto(arquivo, 'obra')
+        if (!envio.ok) {
+          setMensagem({ tipo: 'erro', texto: envio.erro })
+          return
+        }
+        dados.append('envio', envio.caminho)
+      }
+
+      setMensagem({
+        tipo: 'info',
+        texto: modoEdicao ? 'Salvando…' : 'Imagem enviada. O servidor está preparando a versão do site…',
+      })
+
       const resposta = await fetch(modoEdicao ? `/api/obras/${obra.id}` : '/api/obras', {
         method: modoEdicao ? 'PATCH' : 'POST',
         body: dados,
