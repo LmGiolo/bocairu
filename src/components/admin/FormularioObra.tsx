@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useId, useMemo, useState, type FormEvent } from 'react'
 
 import { STATUS_OBRA, ROTULOS_STATUS_OBRA, type StatusObra } from '@/lib/obras/status'
@@ -200,8 +201,15 @@ export default function FormularioObra({
           <div className="flex flex-wrap items-start gap-5">
             {modoEdicao ? (
               <>
-                {/* eslint-disable-next-line @next/next/no-img-element -- admin sem next/image, ver docs/handoff.md §7 */}
-                <img src={obra.imagemWebUrl} alt="" className="h-36 w-36 border border-tinta object-cover" />
+                {/* Quadro fixo de 144px: largura fixa, como na Miniatura
+                    (192 dá folga para o recorte de foto deitada). */}
+                <Image
+                  src={obra.imagemWebUrl}
+                  alt=""
+                  width={192}
+                  height={192}
+                  className="h-36 w-36 border border-tinta object-cover"
+                />
                 <p className="max-w-xs text-[13px] leading-relaxed text-fumaca">
                   Trocar a imagem ainda não é possível por aqui. Para usar outra foto, cadastre uma obra nova e
                   exclua esta.
