@@ -1,5 +1,12 @@
+import type { Metadata } from 'next'
+
 import { BotaoInstagram, BotaoWhatsApp } from '@/components/contato/BotoesContato'
 import { INSTAGRAM_EXIBICAO, WHATSAPP_EXIBICAO } from '@/lib/contato'
+
+export const metadata: Metadata = {
+  title: 'Contato',
+  description: 'Fale com Bocairú pelo WhatsApp ou Instagram para agendar uma sessão de fotos.',
+}
 
 // Contato do portfólio: dois caminhos diretos, sem formulário. O antigo
 // /encomendas gravava um lead no banco (`solicitacoes_encomenda`) — saiu

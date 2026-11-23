@@ -8,7 +8,9 @@ Site-portfólio de fotografia de uma artista. Next.js 16 (App Router) + Supabase
 
 **Vendas em standby (desde 2026-11-22):** o site é só portfólio — o visitante vê as fotos e fala com a artista pelo WhatsApp/Instagram (`src/lib/contato.ts`) para agendar sessões ou negociar a compra de uma foto (a negociação é fora do site). Não há carrinho, checkout, tamanhos, preços nem contas de visitante; só a artista faz login (admin). Todo o código da loja está na tag git `loja-v1`; como retomar está em docs/handoff.md ("Vendas em standby").
 
-A especificação de design e o estado do projeto estão em docs/handoff.md; consulte antes de construir telas.
+A especificação de design e o estado do projeto estão em docs/handoff.md; consulte antes de construir telas. **O plano do que falta fazer (com especificação) está em docs/handoff.md §7 → "A construir"** — comece por ele ao retomar o trabalho.
+
+Commits e PRs deste repositório **não levam atribuição de IA** (nada de `Co-Authored-By: Claude` nem "Generated with Claude Code").
 
 ## Comandos
 

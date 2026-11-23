@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { headers } from 'next/headers'
@@ -8,6 +9,36 @@ import CartaoObra from '@/components/ui/CartaoObra'
 import FichaTecnica from '@/components/obra/FichaTecnica'
 import { BotaoWhatsApp } from '@/components/contato/BotoesContato'
 import { whatsAppUrlSobreFoto } from '@/lib/contato'
+
+// Título e descrição desta foto na aba do navegador e na pré-visualização
+// do link (Open Graph). A imagem da pré-visualização vem do arquivo
+// opengraph-image.tsx desta mesma pasta. Descrição: a da obra; sem ela, o
+// começo da história; sem as duas, uma frase genérica.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: obra } = await supabase
+    .from('obras')
+    .select('titulo, descricao, historia')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (!obra) return {}
+
+  const textoBase: string = obra.descricao || obra.historia || 'Fotografia de Bocairú.'
+  // ~160 caracteres é o que os apps costumam mostrar antes de cortar.
+  const descricao = textoBase.length > 160 ? `${textoBase.slice(0, 157).trimEnd()}…` : textoBase
+
+  return {
+    title: obra.titulo,
+    description: descricao,
+    openGraph: { title: obra.titulo, description: descricao },
+  }
+}
 
 export default async function PaginaObra({
   params,

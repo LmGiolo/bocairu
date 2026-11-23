@@ -1,5 +1,12 @@
+import type { Metadata } from 'next'
+
 import { createClient } from '@/lib/supabase/server'
 import GaleriaInterativa from '@/components/galeria/GaleriaInterativa'
+
+export const metadata: Metadata = {
+  title: 'Galeria',
+  description: 'Todas as fotografias do portfólio de Bocairú.',
+}
 
 export default async function Galeria({
   searchParams,
