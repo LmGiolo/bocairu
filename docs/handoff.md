@@ -10,6 +10,22 @@
 
 ---
 
+## Continuar em outro computador
+
+1. `git clone https://github.com/LmGiolo/bocairu.git` e `npm install`.
+2. Criar `.env.local` com `NEXT_PUBLIC_SUPABASE_URL`,
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY` (fora do
+   git — copiar da máquina antiga ou do painel do Supabase).
+3. `npm run dev` → http://localhost:3000. Admin em `/entrar`.
+4. O plano do que falta está em **§7 → "A construir"**. As regras do
+   projeto para o Claude Code estão em `CLAUDE.md` (inclusive: commits e
+   PRs **sem** atribuição de IA).
+5. Mudança de schema = arquivo novo em `docs/sql/` (idempotente), rodado à
+   mão no SQL Editor do Supabase. Todos os arquivos que já existem lá
+   **já foram aplicados** no banco atual.
+
+---
+
 ## Vendas em standby (desde 2026-11-22)
 
 ### O que mudou e por quê
@@ -453,21 +469,159 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
   `docs/sql/` (idempotente), pra o repositório guardar o que o banco
   deveria ter.
 
-### A construir
+### A construir — plano registrado em 2026-11-23
 
-Portfólio (atualizado em 2026-11-22):
+> Este é o plano vivo do projeto. Quem continuar (outra máquina, outra
+> sessão do Claude Code) começa por aqui. Ordem combinada com o usuário:
+> **1 → 2 → 3 → 4 → 5**. Marque cada item como feito ao terminar.
 
-1. **Textos da artista** — a copy de A Artista e da Home foi escrita como
-   placeholder para uma artista de fine art que *vende impressões*; parte
-   dela contradiz o novo foco em sessões (ex.: A Artista diz "não há ensaio
-   nem direção"). Precisa do texto dela. Idem a história de cada foto: hoje
-   quase nenhuma obra tem `historia`, e sem ela a Página da Obra fica rasa.
-2. **Open Graph por foto** (pré-visualização do link no WhatsApp/Instagram)
-   — o que a artista provavelmente quis dizer com "Meta Ads". Meta Pixel só
-   se houver anúncio pago (exige banner LGPD).
-3. Refinamentos visuais (estilo do Admin, animações §4, acessibilidade §6
-   restante)
-4. Deploy (Vercel)
+#### 1. Open Graph (pré-visualização do link) — ✅ FEITO (branch `feat/og-admin-textos`)
+
+O que a artista chamou de "Meta Ads" era, na prática, isto: quando alguém
+cola o link no WhatsApp, no direct ou no story do Instagram, aparece a foto
+com título.
+
+- `src/lib/site.ts` — `urlDoSite()`: `NEXT_PUBLIC_SITE_URL` →
+  `VERCEL_PROJECT_PRODUCTION_URL` (a Vercel preenche sozinha) → localhost.
+  Vira o `metadataBase` do layout raiz.
+- `src/lib/og/imagemOg.tsx` — recorta a foto em 1200×630 JPEG com **sharp**
+  (`position: 'attention'`). Não usa `ImageResponse` para a foto porque ele
+  não lê webp (formato do bucket); `ImageResponse` só na imagem de reserva
+  (texto "Bocairú" sobre areia).
+- `src/app/opengraph-image.tsx` — padrão do site = foto da capa (posição 1).
+- `src/app/(site)/obras/[id]/opengraph-image.tsx` — cada foto tem a sua.
+  A URL ganha um sufixo gerado pelo Next (`opengraph-image-xxxxxx`) — normal.
+- `generateMetadata` na Página da Obra (título + descrição/história, ~160
+  caracteres) e em `/colecoes/[serie]`; `metadata` fixo em Galeria,
+  Coleções, A Artista e Contato. Título vira "Página · Bocairú".
+- **Pendente (só depois do deploy):** colar um link no Sharing Debugger da
+  Meta (https://developers.facebook.com/tools/debug/) para conferir e forçar
+  a releitura. Se houver domínio próprio, definir `NEXT_PUBLIC_SITE_URL` nas
+  variáveis da Vercel.
+- Lembrar a artista: o **feed** do Instagram não mostra link; a prévia
+  aparece no direct, no link da bio e na figurinha de link do story.
+- **Meta Pixel: NÃO instalar** sem decisão explícita de anúncio pago — exige
+  banner de consentimento (LGPD) e não há conversão de venda para medir.
+
+#### 2. Excluir foto pelo admin — a fazer
+
+Pedido do usuário: hoje dá para **arquivar** (status "Arquivada"/"Rascunho"
+tira do site sem apagar); falta **excluir de vez**, para não lotar o plano
+grátis do Supabase. As duas opções convivem.
+
+- Botão **"Excluir"** em `src/components/admin/ListaObras.tsx`, com
+  confirmação: "Excluir <título> para sempre? Isso não pode ser desfeito."
+- Nova rota **`DELETE /api/obras/[id]`** (mesmo arquivo do PATCH), com os
+  **dois portões** de sempre (getUser + `perfis.papel` lido com service
+  role) e `criarClientAdmin()`.
+- Ordem das operações (importa):
+  1. ler a obra (`imagem_web`, `imagem_alta`);
+  2. **apagar a linha** de `obras` primeiro. Se o banco recusar por chave
+     estrangeira (fotos de teste antigas têm `pedido_itens` apontando para
+     elas — conferir o comportamento da FK), responder 409 com
+     "Esta foto tem histórico de pedido; arquive em vez de excluir";
+  3. só então remover os arquivos: `obras-web` (o caminho é o fim da URL
+     pública, depois de `/obras-web/`) e `obras-alta` (`imagem_alta` já é o
+     caminho). Se a remoção de arquivo falhar, a obra já sumiu do site —
+     sobra lixo no bucket, não dado errado; registrar no log.
+- Depois de excluir, tirar a linha da lista na tela (estado local) e
+  `router.refresh()`.
+
+#### 3. Textos do site editáveis pelo admin — a fazer
+
+Pedido exato do usuário (aprovado): **Home, A Artista e Contato**, mais o
+**retrato** da artista e as **mensagens do WhatsApp**. NÃO tornar editável
+cada rótulo de botão/filtro — só a "voz" dela.
+
+- **Banco** (novo arquivo `docs/sql/AAAA-MM-DD-textos-site.sql`,
+  idempotente, o usuário roda no SQL Editor): tabela `textos_site`
+  (`chave text primary key`, `valor text not null`, `atualizado_em
+  timestamptz default now()`). RLS: SELECT público; INSERT/UPDATE só
+  `eh_admin()`.
+- **Código** `src/lib/textos.ts`: catálogo das chaves com rótulo, página,
+  texto padrão (o texto atual do site) e se é multilinha. Função
+  `lerTextos(supabase)` devolve `{ chave: valor }` com **fallback para o
+  padrão** quando a chave não existe no banco — o site nunca fica em branco.
+- **Chaves previstas:**
+  - Home: frase da capa (hero); título e parágrafo de "Sobre a artista";
+    título e texto do CTA final.
+  - A Artista: título/abertura; os parágrafos da trajetória; as 4 etapas do
+    processo (título + texto de cada); título/texto do CTA final.
+  - Contato: título e texto de apresentação.
+  - WhatsApp: mensagem geral (sessão de fotos) e mensagem "sobre esta foto"
+    (compra), com marcadores `{titulo}` e `{link}` que `src/lib/contato.ts`
+    substitui. Validar que `{link}` continua presente.
+- **Retrato:** chave `retrato_url`. Upload numa rota admin
+  (`POST /api/textos/retrato`, dois portões, sharp → webp ~1200px) para o
+  bucket público `obras-web` (pasta `site/`). Substitui o placeholder "B"
+  na Home, em A Artista e no Contato. Ao trocar, apagar o arquivo antigo.
+- **Tela** `/admin/textos` (entrar no menu de `src/app/admin/layout.tsx`):
+  campos agrupados por página, `textarea` para os longos, botão "Salvar"
+  por grupo, mensagem de sucesso/erro com ícone + texto. Upsert direto pelo
+  client do navegador (RLS protege), como em `ListaObras.tsx`.
+- **Atenção à copy atual:** os textos de A Artista/Home foram escritos como
+  placeholder para quem *vendia impressões*. A Artista diz "não há ensaio
+  nem direção" — contradiz o foco em sessões de foto. O texto padrão pode
+  ficar, mas avisar a artista para reescrever pela tela nova.
+
+#### 4. Estética — auditoria do handoff (§2–§6) feita em 2026-11-23 — a fazer
+
+Prioridade: **site público**. O visual do admin é baixa prioridade (decisão
+do usuário). Lacunas encontradas comparando este documento com o código:
+
+- **Animações (§4) — nada implementado ainda:**
+  - entrada fade + translateY(12px)→0, 500ms, `cubic-bezier(0.16,1,0.3,1)`;
+    grids com stagger de 60ms;
+  - reveal-on-scroll por seção (IntersectionObserver);
+  - header encolhe 80px→56px ao rolar;
+  - parallax sutil (0.9x) só no hero da Home;
+  - hover de imagem `scale(1.03)` 600ms (hoje é `scale-105` = 1.05 em
+    `CartaoObra` e `CartaoSerie`); card: borda hairline → ink, sem sombra;
+  - botão: wipe da esquerda 250ms (`src/components/ui/Botao.tsx` e
+    `BotoesContato.tsx`);
+  - skeleton shimmer nos cards durante carregamento (`loading.tsx` nas
+    rotas da galeria/coleções/obra);
+  - transição de página cross-fade 350ms; Galeria → Obra com view
+    transition da imagem compartilhada (conferir suporte em
+    `node_modules/next/dist/docs/` antes — é Next 16);
+  - **tudo dentro de `prefers-reduced-motion`**: com redução, só fade.
+- **Acessibilidade (§6):**
+  - falta **skip-to-content** ("Pular para o conteúdo") antes do header;
+  - **ouro em texto pequeno** — os overlines `text-xs ... text-ouro`
+    aparecem em ~8 arquivos; §6 proíbe gold em texto < 18px (falha AA).
+    Trocar a cor do texto (ex.: `text-fumaca`) e manter o ouro em fios,
+    ícones e elementos ≥18px;
+  - alt text descritivo por obra (hoje é só o título) — considerar um campo
+    "texto alternativo" no formulário de obra;
+  - foco visível já existe (`:focus-visible` ouro em `globals.css`).
+- **Responsividade (§5):**
+  - Galeria: filtros viram **drawer/bottom sheet** no tablet/mobile (hoje
+    só quebram linha);
+  - Página da Obra no mobile: **CTA do WhatsApp sticky no rodapé**;
+  - Home no mobile: destaques em **carrossel com swipe**;
+  - Cabeçalho no mobile: 5 links + 2 ícones quebram linha — avaliar menu
+    compacto (com trap de foco + Esc, §6);
+  - conferir proporções do split da Obra (60/40 desktop, 55/45 tablet).
+- **Tipografia (§2):** H1 do spec é 64px; várias páginas usam
+  `text-4xl md:text-5xl` (36/48px). Revisar a escala H1/H2/H3 contra a
+  tabela.
+- **Conteúdo visual:** retrato real (item 3), favicon/ícone e logo da
+  marca, fotos reais no lugar das de teste.
+- Ler também os protótipos em `docs/prototipo/*.dc.html` (Home, A Artista,
+  Galeria, Página da Obra) **na íntegra** antes de mexer — o §3 é resumo e
+  diverge do protótipo em pontos reais. Ignorar nos protótipos tudo que for
+  de venda (preço, carrinho, certificado, tamanhos).
+
+#### 5. Deploy na Vercel — a fazer
+
+- Conectar o repositório na Vercel (preview por PR + produção no `main` —
+  o `ci.yml` já cuida de lint/build).
+- Variáveis: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY` (+ `NEXT_PUBLIC_SITE_URL` se houver domínio).
+- Depois: Sharing Debugger da Meta (item 1) e checar que o ping
+  anti-pause do Supabase segue verde (ele parou entre 19/10 e 22/11/2026
+  porque o projeto foi pausado — e ninguém viu os e-mails de falha do
+  GitHub; vale ativar notificação).
 
 ---
 

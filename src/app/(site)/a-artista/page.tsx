@@ -1,4 +1,11 @@
+import type { Metadata } from 'next'
+
 import Botao from '@/components/ui/Botao'
+
+export const metadata: Metadata = {
+  title: 'A Artista',
+  description: 'Conheça Bocairú, a fotógrafa por trás do portfólio.',
+}
 
 const PROCESSO = [
   {

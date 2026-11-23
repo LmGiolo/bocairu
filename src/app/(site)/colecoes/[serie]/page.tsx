@@ -1,8 +1,21 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
 import GaleriaInterativa from '@/components/galeria/GaleriaInterativa'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ serie: string }>
+}): Promise<Metadata> {
+  const { serie } = await params
+  return {
+    title: serie,
+    description: `Série ${serie}, de Bocairú.`,
+  }
+}
 
 export default async function Colecao({
   params,

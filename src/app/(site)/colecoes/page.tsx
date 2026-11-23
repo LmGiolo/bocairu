@@ -1,5 +1,12 @@
+import type { Metadata } from 'next'
+
 import { createClient } from '@/lib/supabase/server'
 import CartaoSerie from '@/components/colecoes/CartaoSerie'
+
+export const metadata: Metadata = {
+  title: 'Coleções',
+  description: 'As séries fotográficas de Bocairú.',
+}
 
 type ObraColecoes = {
   serie: string | null
