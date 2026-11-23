@@ -503,29 +503,33 @@ com título.
 - **Meta Pixel: NÃO instalar** sem decisão explícita de anúncio pago — exige
   banner de consentimento (LGPD) e não há conversão de venda para medir.
 
-#### 2. Excluir foto pelo admin — a fazer
+#### 2. Excluir foto pelo admin — ✅ FEITO (branch `feat/excluir-foto`)
 
-Pedido do usuário: hoje dá para **arquivar** (status "Arquivada"/"Rascunho"
-tira do site sem apagar); falta **excluir de vez**, para não lotar o plano
-grátis do Supabase. As duas opções convivem.
+Hoje dá para **arquivar** (status "Arquivada"/"Rascunho" tira do site sem
+apagar) **e** para **excluir de vez** (para não lotar o plano grátis do
+Supabase). As duas opções convivem.
 
 - Botão **"Excluir"** em `src/components/admin/ListaObras.tsx`, com
-  confirmação: "Excluir <título> para sempre? Isso não pode ser desfeito."
-- Nova rota **`DELETE /api/obras/[id]`** (mesmo arquivo do PATCH), com os
-  **dois portões** de sempre (getUser + `perfis.papel` lido com service
-  role) e `criarClientAdmin()`.
-- Ordem das operações (importa):
-  1. ler a obra (`imagem_web`, `imagem_alta`);
-  2. **apagar a linha** de `obras` primeiro. Se o banco recusar por chave
-     estrangeira (fotos de teste antigas têm `pedido_itens` apontando para
-     elas — conferir o comportamento da FK), responder 409 com
-     "Esta foto tem histórico de pedido; arquive em vez de excluir";
-  3. só então remover os arquivos: `obras-web` (o caminho é o fim da URL
-     pública, depois de `/obras-web/`) e `obras-alta` (`imagem_alta` já é o
-     caminho). Se a remoção de arquivo falhar, a obra já sumiu do site —
-     sobra lixo no bucket, não dado errado; registrar no log.
-- Depois de excluir, tirar a linha da lista na tela (estado local) e
-  `router.refresh()`.
+  `confirm()`: "Excluir "<título>" para sempre? Isso não pode ser
+  desfeito." Não é otimista: a linha só some depois que o servidor confirma.
+- Rota **`DELETE /api/obras/[id]`** (mesmo arquivo do PATCH), com os dois
+  portões e `criarClientAdmin()`. Ordem das operações:
+  1. lê a obra (`imagem_web`, `imagem_alta`);
+  2. **se houver `pedido_itens` com esse `obra_id` → 409** "Esta foto tem
+     histórico de pedido; arquive em vez de excluir". É uma pergunta
+     explícita, não um erro de FK, porque o schema de `pedido_itens` e
+     `tamanhos` foi criado pelo painel e **não sabemos se as FKs são
+     cascade** — se fossem, apagar a obra apagaria o histórico calado;
+  3. apaga os `tamanhos` da obra (sem a foto não servem para nada);
+  4. apaga a linha de `obras` (23503 de FK desconhecida → 409 genérico);
+  5. só então remove os arquivos dos dois buckets. Falha aqui = arquivo
+     órfão (lixo, não dado errado), registrado com `console.error`.
+- O caminho no `obras-web` sai da URL pública com `decodeURIComponent`:
+  obras antigas têm espaço no nome (`WhatsApp%20Image...`). Obras antigas
+  também não têm `imagem_alta` — a rota pula esse bucket.
+- Testado: lint, build, 401 sem sessão e a extração de caminho contra as 5
+  URLs reais do banco. **Falta o teste logado como admin** (excluir uma
+  foto de teste; "test1" deve responder 409 por ter pedido).
 
 #### 3. Textos do site editáveis pelo admin — a fazer
 
@@ -567,7 +571,21 @@ cada rótulo de botão/filtro — só a "voz" dela.
 #### 4. Estética — auditoria do handoff (§2–§6) feita em 2026-11-23 — a fazer
 
 Prioridade: **site público**. O visual do admin é baixa prioridade (decisão
-do usuário). Lacunas encontradas comparando este documento com o código:
+do usuário).
+
+> **Decisão em aberto antes de começar (2026-11-23).** O usuário quer o site
+> "moderno e sem cara de IA" e instalou a skill `frontend-design`
+> (anthropics/skills, global em `~/.claude/skills/`). Ela lista os padrões
+> visuais mais típicos de página gerada por IA, e o Design Doc (§2) bate em
+> vários: fundo creme ~`#F4F1EA` (o nosso é `#F5F1EA`) com serifa de alto
+> contraste; fios hairline + raio zero; overline em caixa alta acima de
+> cada título; fade-and-slide-up em toda seção e stagger em todo grid
+> (exatamente o §4). Antes de implementar §4, decidir com o usuário: manter
+> o Design Doc como está, ou revisar paleta/tipo/movimento com a skill
+> (passo 1: plano de tokens + wireframes, revisado contra o brief). As
+> lacunas de acessibilidade e responsividade abaixo valem nos dois casos.
+
+Lacunas encontradas comparando este documento com o código:
 
 - **Animações (§4) — nada implementado ainda:**
   - entrada fade + translateY(12px)→0, 500ms, `cubic-bezier(0.16,1,0.3,1)`;
@@ -738,9 +756,10 @@ do usuário). Lacunas encontradas comparando este documento com o código:
   então `rascunho` e `arquivada` somem da vitrine automaticamente, sem
   filtro nenhum no código. "Despublicar" (§7, Admin → Obras) move pra
   `rascunho`; `arquivada` existe pro caso de tirar uma obra de circulação
-  de vez, preservando o histórico (pedidos antigos não referenciam
-  `obras` por FK — `pedido_itens` guarda `obra_titulo` copiado —, então
-  arquivar ou mesmo apagar uma obra nunca quebra pedido já feito).
+  de vez, preservando o histórico. (Correção de 2026-11-23: `pedido_itens`
+  **tem** coluna `obra_id` — além do `obra_titulo` copiado —, e não se sabe
+  se a FK é cascade. Por isso `DELETE /api/obras/[id]` recusa excluir obra
+  com pedido; ver §7, "Excluir foto pelo admin".)
 - **Frete: porte é escolha manual (P/M/G) da artista, não calculado de
   `largura_cm`/`altura_cm`.** Essas colunas existem em `tamanhos` desde o
   schema original mas nenhuma tela nunca as preencheu — exigir isso agora
