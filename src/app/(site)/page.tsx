@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { createClient } from '@/lib/supabase/server'
+import { criarClientPublico } from '@/lib/supabase/publico'
 import Botao from '@/components/ui/Botao'
 import CarrosselDestaques from '@/components/ui/CarrosselDestaques'
 import CartaoSerie from '@/components/colecoes/CartaoSerie'
@@ -31,7 +31,7 @@ type Serie = {
 }
 
 export default async function Home() {
-  const supabase = await createClient()
+  const supabase = criarClientPublico()
   // Textos editáveis em /admin/textos (com o texto padrão de reserva).
   const { textos, retratos } = await lerConteudoSite()
 
@@ -45,7 +45,10 @@ export default async function Home() {
     .order('criado_em', { ascending: true })
 
   if (error) {
-    return <p style={{ color: 'crimson', padding: 40 }}>Erro: {error.message}</p>
+    // Lançar o erro (em vez de desenhar uma mensagem) é o que protege o
+    // cache: se o banco falhar na hora de remontar a página, o Next mantém
+    // a versão anterior em vez de guardar uma página de erro por uma hora.
+    throw new Error('Falha ao ler as fotos: ' + error.message)
   }
 
   // A posição de cada foto vem da tela Admin → Ordem: a 1ª vira o hero, da

@@ -1,16 +1,49 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { ViewTransition } from 'react'
 
-import { createClient } from '@/lib/supabase/server'
+import { criarClientPublico } from '@/lib/supabase/publico'
 import CartaoObra from '@/components/ui/CartaoObra'
 import FichaTecnica from '@/components/obra/FichaTecnica'
 import { BotaoWhatsApp } from '@/components/contato/BotoesContato'
 import { whatsAppUrlSobreFoto } from '@/lib/contato'
+import { buscarObraPublica } from '@/lib/obras/publicas'
+import { urlDoSite } from '@/lib/site'
 import { lerConteudoSite } from '@/lib/textos-servidor'
+
+// Lista vazia = nenhuma foto montada no build; cada Página da Obra é
+// montada na primeira visita e fica em cache (ver `revalidate` em
+// ../../layout.tsx). Sem esta função, rota com [parâmetro] seria montada de
+// novo a cada visita.
+export async function generateStaticParams() {
+  return []
+}
+
+type ObraRelacionada = {
+  id: string
+  titulo: string
+  tecnica: string | null
+  imagem_web: string
+  largura_px: number | null
+  altura_px: number | null
+}
+
+// Até 4 outras fotos da mesma série, na ordem do site. Foto sem série não
+// tem relacionadas (nem consulta o banco).
+async function buscarRelacionadas(serie: string | null, idAtual: string): Promise<ObraRelacionada[]> {
+  if (!serie) return []
+  const { data } = await criarClientPublico()
+    .from('obras')
+    .select('id, titulo, tecnica, imagem_web, largura_px, altura_px')
+    .eq('serie', serie)
+    .neq('id', idAtual)
+    .order('ordem', { ascending: true })
+    .order('criado_em', { ascending: true })
+    .limit(4)
+  return data ?? []
+}
 
 // Título e descrição desta foto na aba do navegador e na pré-visualização
 // do link (Open Graph). A imagem da pré-visualização vem do arquivo
@@ -22,12 +55,9 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: obra } = await supabase
-    .from('obras')
-    .select('titulo, descricao, historia')
-    .eq('id', id)
-    .maybeSingle()
+  // Mesma busca da página logo abaixo: com o cache() de buscarObraPublica,
+  // as duas juntas consultam o banco uma vez só.
+  const obra = await buscarObraPublica(id)
 
   if (!obra) return {}
 
@@ -48,50 +78,27 @@ export default async function PaginaObra({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const supabase = await createClient()
 
-  // Sem filtro de status: o RLS decide o que é visível pra quem não é
-  // admin, do mesmo jeito que a /galeria já faz.
-  const { data: obra } = await supabase
-    .from('obras')
-    .select('*')
-    .eq('id', id)
-    .single()
+  // Sem filtro de status: o RLS só devolve obra publicada ao client
+  // público (ver src/lib/obras/publicas.ts), como na /galeria.
+  const obra = await buscarObraPublica(id)
 
   if (!obra) notFound()
 
-  let relacionadas: Array<{
-    id: string
-    titulo: string
-    tecnica: string | null
-    imagem_web: string
-    largura_px: number | null
-    altura_px: number | null
-  }> = []
-
-  if (obra.serie) {
-    const { data } = await supabase
-      .from('obras')
-      .select('id, titulo, tecnica, imagem_web, largura_px, altura_px')
-      .eq('serie', obra.serie)
-      .neq('id', obra.id)
-      .order('ordem', { ascending: true })
-      .order('criado_em', { ascending: true })
-      .limit(4)
-
-    relacionadas = data ?? []
-  }
+  // As fotos da mesma série e os textos do site não dependem um do outro:
+  // as duas consultas correm ao mesmo tempo, em vez de uma esperar a outra.
+  const [relacionadas, { textos }] = await Promise.all([
+    buscarRelacionadas(obra.serie, obra.id),
+    // O modelo da mensagem (com {titulo} e {link}) é editável em /admin/textos.
+    lerConteudoSite(),
+  ])
 
   // Endereço completo desta página, pra ir dentro da mensagem do WhatsApp
-  // (a artista recebe o link e sabe na hora de qual foto se trata). Montado
-  // a partir do próprio pedido — funciona igual em localhost, em preview e
-  // no domínio final, sem variável de ambiente pra lembrar de configurar.
-  const cabecalhos = await headers()
-  const host = cabecalhos.get('host')
-  const protocolo = cabecalhos.get('x-forwarded-proto') ?? 'https'
-  const linkDaFoto = host ? `${protocolo}://${host}/obras/${obra.id}` : ''
-  // O modelo da mensagem (com {titulo} e {link}) é editável em /admin/textos.
-  const { textos } = await lerConteudoSite()
+  // (a artista recebe o link e sabe na hora de qual foto se trata). Vem de
+  // urlDoSite() e não do endereço do pedido (headers()): ler o pedido
+  // tiraria a página do cache. Em preview da Vercel, o link aponta para o
+  // domínio de produção — que é onde o visitante de verdade está.
+  const linkDaFoto = new URL(`/obras/${obra.id}`, urlDoSite()).toString()
 
   const proporcaoImagem =
     obra.largura_px && obra.altura_px ? `${obra.largura_px} / ${obra.altura_px}` : '4 / 5'

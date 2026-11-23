@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { buscarObraPublica } from '@/lib/obras/publicas'
 import { imagemOgDaFoto, TAMANHO_OG } from '@/lib/og/imagemOg'
 
 // Pré-visualização da Página de uma foto: a própria foto, recortada em
@@ -8,11 +8,18 @@ export const alt = 'Fotografia de Bocairú'
 export const size = TAMANHO_OG
 export const contentType = 'image/jpeg'
 
+// Gerar esta imagem é caro (baixa a foto de 2000px e recorta com o sharp),
+// então ela fica em cache como as páginas: gerada na primeira vez que um
+// robô de pré-visualização pede, servida pronta depois. Lista vazia =
+// nenhuma gerada no build; `revalidate` = refeita no máximo de hora em
+// hora (e na hora, quando o admin salva algo — src/lib/cache-site.ts).
+export const revalidate = 3600
+export async function generateStaticParams() {
+  return []
+}
+
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createClient()
-
-  const { data: obra } = await supabase.from('obras').select('imagem_web').eq('id', id).maybeSingle()
-
+  const obra = await buscarObraPublica(id)
   return imagemOgDaFoto(obra?.imagem_web)
 }

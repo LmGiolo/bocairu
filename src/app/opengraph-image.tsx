@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { criarClientPublico } from '@/lib/supabase/publico'
 import { imagemOgDaFoto, TAMANHO_OG } from '@/lib/og/imagemOg'
 
 // Pré-visualização padrão do site inteiro (Home, Galeria, Contato...): a
@@ -9,8 +9,13 @@ export const alt = 'Fotografia de Bocairú'
 export const size = TAMANHO_OG
 export const contentType = 'image/jpeg'
 
+// Gerada uma vez e servida pronta (o recorte com sharp é caro); refeita no
+// máximo de hora em hora, ou na hora em que o admin salva algo
+// (src/lib/cache-site.ts) — trocar a capa, por exemplo.
+export const revalidate = 3600
+
 export default async function Image() {
-  const supabase = await createClient()
+  const supabase = criarClientPublico()
 
   // Mesma ordem da Home. O RLS só devolve obra publicada pra quem não está
   // logado — e quem busca esta imagem é o robô do WhatsApp/Instagram.

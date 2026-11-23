@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { atualizarSitePublico } from '@/app/admin/acoes'
 import { createClient } from '@/lib/supabase/client'
 import { STATUS_OBRA, ROTULOS_STATUS_OBRA, type StatusObra } from '@/lib/obras/status'
 import { CLASSE_BOTAO_TEXTO, CLASSE_CARTAO } from '@/components/admin/estilos'
@@ -101,7 +102,13 @@ export default function ListaObras({
     if (error && statusAnterior) {
       setLinhas((atuais) => atuais.map((l) => (l.id === id ? { ...l, status: statusAnterior } : l)))
       setErroPorId((atuais) => ({ ...atuais, [id]: 'Falha ao salvar: ' + error.message }))
+      return
     }
+
+    // Publicar/despublicar muda o site, que fica em cache: avisa para ele
+    // ser remontado (sem isso, levaria até uma hora). Falha de rede aqui não
+    // desfaz nada — o status já está salvo.
+    await atualizarSitePublico().catch(() => {})
   }
 
   async function excluir(obra: ObraAdmin) {

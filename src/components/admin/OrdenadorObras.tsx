@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+import { atualizarSitePublico } from '@/app/admin/acoes'
 import { createClient } from '@/lib/supabase/client'
 import type { StatusObra } from '@/lib/obras/status'
 import Aviso from '@/components/admin/Aviso'
@@ -103,6 +104,10 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
     const resultados = await Promise.all(
       novasPosicoes.map(({ id, ordem: posicao }) => supabase.from('obras').update({ ordem: posicao }).eq('id', id))
     )
+
+    // O site público fica em cache: avisa que a ordem mudou. Vale até se
+    // parte dos UPDATEs falhou — o que foi salvo já deve aparecer.
+    await atualizarSitePublico().catch(() => {})
 
     setSalvando(false)
 

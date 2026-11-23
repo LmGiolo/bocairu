@@ -4,6 +4,7 @@ import sharp from 'sharp'
 import { createClient } from '@/lib/supabase/server'
 import { criarClientAdmin } from '@/lib/supabase/admin'
 import { validarFormularioObra } from '@/lib/obras/formulario'
+import { revalidarSitePublico } from '@/lib/cache-site'
 
 // Formatos que aceitamos receber. Não confiamos no que o navegador diz:
 // esta lista é conferida depois contra o que o sharp realmente enxergou
@@ -232,6 +233,8 @@ export async function POST(request: NextRequest) {
     await reverterTudo()
     return Response.json({ erro: 'Falha ao criar a obra: ' + erroObra.message }, { status: 500 })
   }
+  // A foto nova já aparece no site: joga fora o cache das páginas públicas.
+  revalidarSitePublico()
   return Response.json({ obra }, { status: 201 })
 }
 
