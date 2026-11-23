@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Site-portfólio de fotografia de uma artista. Next.js 16 (App Router) + Supabase (Postgres, Auth, Storage).
 
-**Vendas em standby (desde 2026-11-22):** o site é só portfólio — o visitante vê as fotos e fala com a artista pelo WhatsApp/Instagram (`src/lib/contato.ts`) para agendar sessões. Não há carrinho, checkout, tamanhos, preços nem contas de visitante; só a artista faz login (admin). Todo o código da loja está na tag git `loja-v1`; como retomar está em docs/handoff.md ("Vendas em standby").
+**Vendas em standby (desde 2026-11-22):** o site é só portfólio — o visitante vê as fotos e fala com a artista pelo WhatsApp/Instagram (`src/lib/contato.ts`) para agendar sessões ou negociar a compra de uma foto (a negociação é fora do site). Não há carrinho, checkout, tamanhos, preços nem contas de visitante; só a artista faz login (admin). Todo o código da loja está na tag git `loja-v1`; como retomar está em docs/handoff.md ("Vendas em standby").
 
 A especificação de design e o estado do projeto estão em docs/handoff.md; consulte antes de construir telas.
 
@@ -100,7 +100,7 @@ A checagem de `perfis.papel` da página `/admin` não protege rota de API nenhum
 
 ## Contato
 
-`src/lib/contato.ts` é o único lugar com o número do WhatsApp, o Instagram e o texto das mensagens prontas (geral e "sobre esta foto", que leva título + link). Trocar número ou mensagem é mexer só ali.
+`src/lib/contato.ts` é o único lugar com o número do WhatsApp, o Instagram e o texto das mensagens prontas (geral, sobre sessão de fotos; e "sobre esta foto", interesse em comprar, com título + link). Trocar número ou mensagem é mexer só ali.
 
 ## Dinheiro (quando as vendas voltarem)
 

@@ -52,8 +52,11 @@ interruptor foi a recomendação inicial e perdeu.)
 
 - `/contato` com dois botões: WhatsApp e Instagram. Número, @ e textos das
   mensagens prontas moram só em `src/lib/contato.ts`.
-- Na Página da Obra, "Gostou desta foto?" + botão de WhatsApp cuja mensagem
-  já cita o título e o link daquela foto.
+- Na Página da Obra, "Gostou desta foto?" + botão "Tenho interesse nesta
+  foto" no WhatsApp: a mensagem pronta é de interesse em **comprar** aquela
+  foto e já cita o título e o link. A venda acontece na conversa, fora do
+  site (decisão da artista, 2026-11-22). A mensagem geral (Contato, Home,
+  Rodapé) é sobre sessão de fotos.
 - `/admin/ordem`: a artista numera as fotos publicadas (1 = capa da Home,
   2–4 = destaques, Galeria na mesma sequência), vê uma **prévia** e só então
   salva. Foto nova entra no fim da ordem.

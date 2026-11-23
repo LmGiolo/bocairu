@@ -127,13 +127,16 @@ export default async function PaginaObra({
 
           <FichaTecnica tecnica={obra.tecnica} material={obra.material} />
 
-          {/* O objetivo do portfólio: a foto vira conversa. A mensagem pronta
-              já cita o título e o link desta página. */}
+          {/* O site não tem checkout: o interesse em comprar vira conversa no
+              WhatsApp. A mensagem pronta já cita o título e o link desta página. */}
           <div className="border-t border-linho pt-8">
             <p className="mb-5 max-w-sm text-sm leading-relaxed text-fumaca">
-              Gostou desta foto? Converse com a artista sobre uma sessão nesse estilo.
+              Gostou desta foto? Fale com a artista para saber como adquiri-la.
             </p>
-            <BotaoWhatsApp href={whatsAppUrlSobreFoto(obra.titulo, linkDaFoto)} />
+            <BotaoWhatsApp
+              href={whatsAppUrlSobreFoto(obra.titulo, linkDaFoto)}
+              rotulo="Tenho interesse nesta foto"
+            />
           </div>
         </div>
       </section>

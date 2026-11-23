@@ -22,10 +22,12 @@ export const INSTAGRAM_URL = `https://instagram.com/${INSTAGRAM_USUARIO}`
 // (Contato, Home, Rodapé).
 const MENSAGEM_GERAL = 'Olá! Conheci seu trabalho pelo site e gostaria de conversar sobre uma sessão de fotos.'
 
-// Mensagem de quem clica na Página de uma foto: já leva o título e o link,
-// pra artista saber exatamente qual imagem despertou o interesse.
+// Mensagem de quem clica na Página de uma foto: interesse em COMPRAR aquela
+// foto. O site não vende (vendas em standby, ver docs/handoff.md), mas a
+// artista negocia direto pelo WhatsApp — por isso a mensagem já leva o
+// título e o link, pra ela saber exatamente de qual imagem se trata.
 function mensagemSobreFoto(titulo: string, link: string) {
-  return `Olá! Amei a foto "${titulo}" e queria saber como funciona para fazer uma sessão nesse estilo. ${link}`
+  return `Olá! Vi a foto "${titulo}" no seu site e tenho interesse em comprá-la. Pode me passar mais informações? ${link}`
 }
 
 // O wa.me abre a conversa já com o texto digitado; a pessoa só aperta
