@@ -2,7 +2,8 @@ import Link from 'next/link'
 
 import { IconeInstagram, IconeWhatsApp } from '@/components/contato/BotoesContato'
 import MenuCelular, { type ItemNavegacao } from '@/components/layout/MenuCelular'
-import { INSTAGRAM_URL, WHATSAPP_URL_GERAL } from '@/lib/contato'
+import { INSTAGRAM_URL, whatsAppUrlGeral } from '@/lib/contato'
+import { lerConteudoSite } from '@/lib/textos-servidor'
 
 // Navegação do site público. Desde que o site virou portfólio (vendas em
 // standby, ver docs/handoff.md), o Cabeçalho não tem mais carrinho nem
@@ -22,7 +23,10 @@ const CLASSE_ICONE = 'flex items-center text-tinta/85 transition-opacity duratio
 // - a partir de 1024px (`lg`): links e ícones em linha, como no protótipo;
 // - abaixo disso: só o logo e o botão "Menu" (MenuCelular), numa linha só
 //   de 65px — a altura em que a barra de filtros da Galeria gruda.
-export default function Cabecalho() {
+export default async function Cabecalho() {
+  const { textos } = await lerConteudoSite()
+  const whatsappUrl = whatsAppUrlGeral(textos['whatsapp.mensagem_geral'])
+
   return (
     // `cabecalho`: gancho do "encolher ao rolar" e, na Home, do modo
     // transparente por cima da capa (globals.css).
@@ -60,13 +64,13 @@ export default function Cabecalho() {
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram" className={CLASSE_ICONE}>
             <IconeInstagram />
           </a>
-          <a href={WHATSAPP_URL_GERAL} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp" className={CLASSE_ICONE}>
+          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp" className={CLASSE_ICONE}>
             <IconeWhatsApp />
           </a>
         </div>
       </div>
 
-      <MenuCelular itens={NAVEGACAO} />
+      <MenuCelular itens={NAVEGACAO} whatsappUrl={whatsappUrl} />
     </header>
   )
 }

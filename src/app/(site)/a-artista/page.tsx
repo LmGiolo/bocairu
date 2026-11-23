@@ -1,57 +1,44 @@
 import type { Metadata } from 'next'
 
 import Botao from '@/components/ui/Botao'
+import Retrato from '@/components/contato/Retrato'
+import { paragrafos, type ChaveTexto } from '@/lib/textos'
+import { lerConteudoSite } from '@/lib/textos-servidor'
 
 export const metadata: Metadata = {
   title: 'A Artista',
   description: 'Conheça Bocairú, a fotógrafa por trás do portfólio.',
 }
 
-const PROCESSO = [
-  {
-    numero: '01',
-    titulo: 'Observação',
-    texto: 'Tempo de convivência com o lugar ou o tema, sem câmera, antes de qualquer registro.',
-  },
-  {
-    numero: '02',
-    titulo: 'Espera',
-    texto: 'Voltas sucessivas até a luz, a composição ou o gesto revelarem o que valia a pena guardar.',
-  },
-  {
-    numero: '03',
-    titulo: 'Captura',
-    texto: 'Poucos cliques, decisão deliberada — nada de still life montado ou ensaio dirigido.',
-  },
-  {
-    numero: '04',
-    titulo: 'Seleção',
-    texto: 'De uma série longa, só uma fração pequena sobrevive à curadoria final.',
-  },
-]
+// As quatro etapas do processo: o número é fixo (é a ordem), o título e o
+// texto de cada uma são editáveis em /admin/textos.
+const ETAPAS = [1, 2, 3, 4].map((n) => ({
+  numero: `0${n}`,
+  chaveTitulo: `artista.processo_${n}_titulo` as ChaveTexto,
+  chaveTexto: `artista.processo_${n}_texto` as ChaveTexto,
+}))
 
-export default function AArtista() {
+export default async function AArtista() {
+  // Todos os textos desta página vêm de /admin/textos (com o texto padrão
+  // de reserva, ver src/lib/textos.ts).
+  const { textos, retratos } = await lerConteudoSite()
+
   return (
     <div>
       {/* Abertura — retrato + nome */}
       <section className="mx-auto max-w-[1360px] px-6 py-20 md:px-12 md:py-28 lg:px-24">
         <div className="grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr] md:gap-20" data-anim="secao">
-          {/* Mesmo placeholder tipográfico da Home, até existir uma foto real
-              da artista (ver docs/handoff.md §8). */}
-          <div
-            className="flex w-full items-center justify-center border border-linho bg-creme"
-            style={{ aspectRatio: '4 / 5' }}
-          >
-            <span className="font-serif text-8xl italic text-ouro">B</span>
-          </div>
+          {/* Retrato desta página, enviado em /admin/textos — sem ele, o "B". */}
+          <Retrato url={retratos.artista} />
 
           <div>
             <div className="mb-5 text-xs uppercase tracking-widest text-ouro">A artista</div>
-            <h1 className="mb-6 font-serif text-4xl text-tinta md:text-5xl">Bocairú.</h1>
-            <p className="max-w-md text-lg leading-relaxed text-[#3A342C]">
-              Fotógrafa fine art. Trabalha em séries longas, voltando ao mesmo lugar ou ao mesmo
-              tema até a imagem parar de mudar.
-            </p>
+            <h1 className="mb-6 font-serif text-4xl text-tinta md:text-5xl">{textos['artista.abertura_titulo']}</h1>
+            <div className="flex max-w-md flex-col gap-4 text-lg leading-relaxed text-[#3A342C]">
+              {paragrafos(textos['artista.abertura_texto']).map((paragrafo) => (
+                <p key={paragrafo}>{paragrafo}</p>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -60,20 +47,11 @@ export default function AArtista() {
       <section className="bg-creme px-6 py-20 md:px-12 md:py-28 lg:px-24">
         <div className="mx-auto max-w-2xl" data-anim="secao">
           <div className="mb-5 text-xs uppercase tracking-widest text-ouro">Trajetória</div>
-          <h2 className="mb-8 font-serif text-3xl text-tinta md:text-4xl">
-            Um olhar que espera antes de fotografar.
-          </h2>
+          <h2 className="mb-8 font-serif text-3xl text-tinta md:text-4xl">{textos['artista.trajetoria_titulo']}</h2>
           <div className="flex flex-col gap-5 text-base leading-relaxed text-[#3A342C]">
-            <p>
-              Bocairú começou a fotografar tentando guardar um pouco do tempo que passava em
-              paisagens que sabia que não veria de novo. Com os anos, essa urgência virou método:
-              cada série nasce de uma permanência, não de uma visita.
-            </p>
-            <p>
-              O trabalho se move entre paisagem, retrato e natureza-morta, mas a pergunta é sempre
-              a mesma — o que a luz revela quando a gente para de interferir. Não há ensaio nem
-              direção, só a espera de um instante que já estava ali.
-            </p>
+            {paragrafos(textos['artista.trajetoria_texto']).map((paragrafo) => (
+              <p key={paragrafo}>{paragrafo}</p>
+            ))}
           </div>
         </div>
       </section>
@@ -86,11 +64,15 @@ export default function AArtista() {
         </div>
 
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {PROCESSO.map((etapa) => (
+          {ETAPAS.map((etapa) => (
             <div key={etapa.numero} className="border-t border-linho pt-6">
               <div className="mb-4 font-serif text-2xl italic text-ouro">{etapa.numero}</div>
-              <h3 className="mb-2.5 text-base font-medium text-tinta">{etapa.titulo}</h3>
-              <p className="text-sm leading-relaxed text-fumaca">{etapa.texto}</p>
+              <h3 className="mb-2.5 text-base font-medium text-tinta">{textos[etapa.chaveTitulo]}</h3>
+              <div className="flex flex-col gap-3 text-sm leading-relaxed text-fumaca">
+                {paragrafos(textos[etapa.chaveTexto]).map((paragrafo) => (
+                  <p key={paragrafo}>{paragrafo}</p>
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -99,12 +81,12 @@ export default function AArtista() {
       {/* CTA final */}
       <section className="px-6 py-24 text-center md:px-12 lg:px-24">
         <div className="mx-auto max-w-2xl" data-anim="secao">
-          <h2 className="mb-5 font-serif text-3xl text-tinta md:text-4xl">
-            Conheça o trabalho completo.
-          </h2>
-          <p className="mb-9 text-base text-fumaca">
-            Cada coleção é um recorte diferente do mesmo olhar.
-          </p>
+          <h2 className="mb-5 font-serif text-3xl text-tinta md:text-4xl">{textos['artista.cta_titulo']}</h2>
+          <div className="mb-9 flex flex-col gap-3 text-base text-fumaca">
+            {paragrafos(textos['artista.cta_texto']).map((paragrafo) => (
+              <p key={paragrafo}>{paragrafo}</p>
+            ))}
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-5">
             <Botao variante="bordo" href="/colecoes">
               Ver coleções

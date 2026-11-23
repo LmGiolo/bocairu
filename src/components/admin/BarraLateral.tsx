@@ -13,6 +13,7 @@ import { createClient } from '@/lib/supabase/client'
 const ITENS = [
   { href: '/admin/obras', rotulo: 'Obras', icone: '▦' },
   { href: '/admin/ordem', rotulo: 'Ordem do site', icone: '◫' },
+  { href: '/admin/textos', rotulo: 'Textos do site', icone: '▣' },
 ]
 
 // Barra lateral do painel. Duas formas, a mesma lista de links:
