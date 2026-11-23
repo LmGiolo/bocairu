@@ -85,21 +85,31 @@ Esses redirects são só UX. Ao criar qualquer superfície nova de admin, ajuste
 
 ## Upload em dois buckets
 
-`POST /api/obras` (`src/app/api/obras/route.ts`) é o caminho de cadastro de obra. O formulário (`src/components/admin/FormularioObra.tsx`) só monta um `FormData` e entrega; todo o resto é servidor:
+`POST /api/obras` (`src/app/api/obras/route.ts`) é o caminho de cadastro de obra. O formulário (`src/components/admin/FormularioObra.tsx`) valida os campos, envia a foto e entrega os campos à rota; todo o resto é servidor.
+
+**O arquivo nunca passa pela rota** (envio direto, `src/lib/envios/`). Funções serverless recusam requisição acima de ~4,5 MB, então:
+
+1. o navegador pede `POST /api/envios` (dois portões) e recebe caminho + token de uma URL de envio assinada, numa pasta de passagem `envios/` do bucket privado `obras-alta`. **Quem escolhe o caminho é o servidor**;
+2. o navegador sobe o arquivo direto para o Storage (`enviarDireto()`, `uploadToSignedUrl`);
+3. a rota recebe só o caminho (campo `envio`), confere o formato com `ehCaminhoEnvio()` (caminho de fora de `envios/` é recusado: senão daria para apontar para o original de outra obra) e baixa o arquivo com `baixarEnvio()`, que confere o tamanho real.
+
+A partir daí, na rota:
 
 1. `sharp` gera a versão web (maior lado 2000px, webp q82, `.rotate()` para honrar o EXIF) — **sem marca d'água**;
-2. a versão web vai para o bucket público `obras-web`, o original para o bucket privado `obras-alta`;
+2. a versão web vai para o bucket público `obras-web`; o original é **movido** de `envios/` para o lugar definitivo em `obras-alta`;
 3. a obra guarda a URL pública em `imagem_web` e o **caminho** (não URL) em `imagem_alta`.
+
+O retrato (`POST /api/textos/retrato`) usa o mesmo envio direto; lá o arquivo de `envios/` é sempre apagado no fim (só o webp fica). Rotas novas de admin usam os portões de `src/lib/conferir-admin.ts`.
 
 **Versão do `sharp`:** a do `package.json` tem de ser a mesma que o `next` pede (hoje `^0.34.5`; confira com `npm ls sharp`, que deve mostrar `deduped`). Com duas versões instaladas, o otimizador do `next/image` e o nosso código carregam libvips diferentes no mesmo processo; a segunda quebra e o Next passa a servir a foto original sem reduzir, sem erro nenhum na tela. Ao atualizar o Next, alinhe o `sharp` junto.
 
 ### Consistência: a pilha de desfazer
 
-A rota grava em **dois sistemas** (Storage e Postgres) e o Supabase não oferece transação que abrace os dois. O padrão adotado é compensação: cada gravação bem-sucedida empilha em `desfazer` a ação que a reverte, e qualquer falha posterior chama `reverterTudo()`, que executa a pilha de trás para frente. Falhou o insert da obra → as duas imagens somem dos buckets.
+A rota grava em **dois sistemas** (Storage e Postgres) e o Supabase não oferece transação que abrace os dois. O padrão adotado é compensação: cada gravação bem-sucedida empilha em `desfazer` a ação que a reverte, e qualquer falha posterior chama `reverterTudo()`, que executa a pilha de trás para frente. A pilha já começa com "apagar o arquivo de `envios/`". Falhou o insert da obra → as duas imagens somem dos buckets.
 
-**Validação antes de efeito colateral.** Título, ano e ficha são validados no topo da rota, antes de `sharp` e antes de qualquer upload. Campo malformado nunca chega a sujar bucket.
+**Validação antes de efeito colateral.** O formulário roda `validarFormularioObra()` **antes** de enviar a foto, e a rota valida de novo antes de `sharp` e de qualquer gravação. Como a foto já está em `envios/` quando a rota roda, toda recusa da rota apaga esse arquivo antes de responder (`recusar()`).
 
-**O limite honesto:** isto não é uma transação. Se o processo morrer entre um upload e o insert da obra, a compensação não roda e sobra um arquivo órfão no bucket (lixo, não dado errado).
+**O limite honesto:** isto não é uma transação. Se o processo morrer entre um upload e o insert da obra, a compensação não roda e sobra um arquivo órfão no bucket (lixo, não dado errado). O mesmo vale para envio abandonado (foto subiu, a aba fechou antes da rota): fica em `obras-alta/envios/`, onde é fácil achar e apagar.
 
 Foto nova entra no **fim** da ordem do site (`ordem` = maior + 1).
 
