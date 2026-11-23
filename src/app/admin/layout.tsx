@@ -1,15 +1,16 @@
-import Link from 'next/link'
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
+import BarraLateral from '@/components/admin/BarraLateral'
 import { createClient } from '@/lib/supabase/server'
 
-const NAVEGACAO = [
-  { href: '/admin', rotulo: 'Cadastrar obra' },
-  { href: '/admin/obras', rotulo: 'Obras' },
-  { href: '/admin/ordem', rotulo: 'Ordem do site' },
-  // Pedidos, Encomendas e Frete saíram com as vendas — ver "Vendas em
-  // standby" em docs/handoff.md (código guardado na tag git `loja-v1`).
-]
+// "Painel · Bocairú" na aba do navegador. `robots`: o painel não tem nada a
+// fazer no Google — mesmo que alguém ache o link, a página só redireciona
+// para /entrar, mas assim nem a tentativa entra no índice.
+export const metadata: Metadata = {
+  title: { default: 'Painel', template: '%s · Painel · Bocairú' },
+  robots: { index: false, follow: false },
+}
 
 // Portão de UX pra todo /admin/*, não só a página inicial — a partir de
 // agora existe mais de uma rota aqui, e um layout roda pra qualquer rota
@@ -39,16 +40,22 @@ export default async function AdminLayout({
     redirect('/entrar')
   }
 
+  // A casca do painel segue docs/prototipo/Admin.dc.html: barra lateral
+  // escura de 240px e o conteúdo à direita (padding 44/56px, no máximo
+  // 1320px de largura). No celular a barra vira uma faixa no topo — ver
+  // BarraLateral.tsx.
   return (
-    <div style={{ fontFamily: 'sans-serif' }}>
-      <nav style={{ display: 'flex', gap: 16, padding: '16px 40px', borderBottom: '1px solid #ccc' }}>
-        {NAVEGACAO.map((item) => (
-          <Link key={item.href} href={item.href}>
-            {item.rotulo}
-          </Link>
-        ))}
-      </nav>
-      <main style={{ padding: 40 }}>{children}</main>
+    <div className="min-h-dvh bg-areia text-tinta">
+      <a
+        href="#conteudo"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-areia focus:px-4 focus:py-2 focus:text-tinta"
+      >
+        Pular para o conteúdo
+      </a>
+      <BarraLateral />
+      <main id="conteudo" className="px-5 py-8 md:px-10 lg:ml-60 lg:max-w-[1320px] lg:px-14 lg:py-11">
+        {children}
+      </main>
     </div>
   )
 }

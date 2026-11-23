@@ -481,14 +481,17 @@ Breakpoints: Desktop ≥1280px · Tablet 768–1279px · Mobile <768px
 > - ✅ Item 1 (Open Graph) e ✅ item 2 (excluir foto) — no `main`.
 > - ✅ Animações do item 4 (§4 do Design Doc + cabeçalho transparente da
 >   Home, como no protótipo) — no `main` (PR "Animações do Design Doc").
-> - **Próximo passo sugerido: o design do admin (item 2½ abaixo)**,
->   adiantado de "baixa prioridade" porque o usuário perguntou por ele.
->   Sugestão feita ao usuário: fazê-lo **antes do item 3**, porque o item 3
->   cria uma tela nova de admin (`/admin/textos`, o "Imagens do site" do
->   protótipo) — com o visual pronto, ela já nasce no estilo certo.
->   **Confirmar essa ordem com o usuário ao retomar.**
-> - Ordem proposta daqui em diante: **2½ (admin) → 3 → resto do 4
->   (acessibilidade, celular, skeleton) → 5 (deploy)**.
+> - ✅ Item 2½ (visual do admin igual ao protótipo) — branch
+>   `feat/admin-visual` (2026-11-23). Ordem confirmada pelo usuário: admin
+>   antes do item 3; **sem Dashboard** (o painel abre direto em Obras).
+>   **Falta o teste logado como admin** (cadastrar, editar, trocar status,
+>   excluir, ordenar, sair) — o visual foi conferido com dados falsos.
+> - **Próximo passo: item 3 (textos editáveis)** — a tela `/admin/textos`
+>   já nasce no estilo novo: usar `CabecalhoPagina`, `Aviso` e as classes
+>   de `src/components/admin/estilos.ts`, e pôr o item no menu em
+>   `BarraLateral.tsx` (lista `ITENS`).
+> - Ordem daqui em diante: **3 → resto do 4 (acessibilidade, celular,
+>   skeleton) → 5 (deploy)**.
 > - Ferramentas: a skill `frontend-design` (anthropics/skills) está
 >   instalada globalmente nesta máquina, mas o usuário prefere seguir o
 >   Design Doc e os protótipos; propostas "diferentes" de animação foram
@@ -555,7 +558,49 @@ Supabase). As duas opções convivem.
   URLs reais do banco. **Falta o teste logado como admin** (excluir uma
   foto de teste; "test1" deve responder 409 por ter pedido).
 
-#### 2½. Design do admin igual ao protótipo — próximo (a confirmar)
+#### 2½. Design do admin igual ao protótipo — ✅ FEITO (branch `feat/admin-visual`)
+
+O que foi construído (alvo: `docs/prototipo/Admin.dc.html`):
+
+- **Casca** (`src/app/admin/layout.tsx` + `src/components/admin/BarraLateral.tsx`):
+  barra lateral tinta de 240px fixa a partir de 1024px; abaixo disso, faixa
+  escura no topo com botão "Menu" que abre a mesma lista numa gaveta
+  (`<dialog>` nativo com `showModal()` — foco preso, Esc fecha, fundo
+  inerte). Menu: Obras e Ordem do site. No pé: a conta, "Ver o site" e
+  **"Sair"** (não existia logout no admin). Link "Pular para o conteúdo".
+  `metadata` com `robots: noindex` e título "Obras · Painel · Bocairú".
+- **`/admin` redireciona para `/admin/obras`** (decisão: sem Dashboard).
+  O `/entrar` continua mandando para `/admin`.
+- **Obras** (`PainelObras.tsx` + `ListaObras.tsx`): título "Obras", botão
+  "+ Nova obra", pílulas de filtro por status com contagem (Todas ·
+  Publicadas · Rascunhos · Arquivadas), tabela em cartão branco (miniatura
+  40×40, série, status como etiqueta colorida, Editar/Excluir). No celular
+  cada linha vira bloco empilhado.
+- **Cadastro e edição viraram janela modal**, como no protótipo
+  (`FormularioObra.tsx` mora dentro do `<dialog>` de `PainelObras`).
+  **`/admin/obras/[id]/editar` foi apagada.** A página de Obras passou a
+  trazer a ficha inteira no SELECT, para a edição abrir sem ir ao servidor.
+  Clicar fora da janela **não** fecha (no protótipo fechava): o formulário é
+  longo e um clique errado apagaria tudo. Topo e pé da janela são sticky;
+  no celular ela ocupa a tela inteira. Imagem: quadro que aceita clicar ou
+  arrastar, com prévia. Campo Série sugere as séries já usadas
+  (`<datalist>`). Depois de salvar: a janela fecha, aparece o aviso e a
+  lista recarrega (`router.refresh()` + o "reiniciar estado quando a prop
+  muda" em `ListaObras`).
+- **Ordem do site**: mesmo cabeçalho e cartões; corrigida a rolagem lateral
+  no celular (coluna da grade sem `grid-cols-1` crescia com título longo).
+- **Peças reaproveitáveis**: `CabecalhoPagina.tsx` (sobretítulo + título
+  serifa 36px + ação), `Aviso.tsx` (ícone + texto, `role` alert/status) e
+  `estilos.ts` (botões, rótulo, campo, área de texto, cartão).
+- **Desvio consciente do protótipo:** sobretítulos e rótulos pequenos em
+  `text-fumaca`, não em ouro (ouro em texto < 18px falha AA, §6). O ouro
+  ficou no círculo da conta. Do formulário saiu o que era de venda
+  (tamanhos, preço, acabamento, certificado) e as imagens extras
+  ("detalhe", "ambientada").
+- `globals.css`: `html:has(dialog:modal) { overflow: hidden }` — a página
+  de trás não rola com uma janela aberta.
+
+Plano original (referência):
 
 Hoje o admin é cru: `src/app/admin/layout.tsx` é uma barra de links com
 `style={{}}` inline e fonte `sans-serif`; `ListaObras.tsx`,
@@ -728,6 +773,12 @@ Lacunas encontradas comparando este documento com o código:
   o `ci.yml` já cuida de lint/build).
 - Variáveis: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
   `SUPABASE_SERVICE_ROLE_KEY` (+ `NEXT_PUBLIC_SITE_URL` se houver domínio).
+- **Atenção ao tamanho do upload:** `POST /api/obras` aceita até 50 MB, mas
+  funções da Vercel costumam recusar corpo de requisição acima de ~4,5 MB.
+  Uma foto original de câmera passa disso fácil. Conferir o limite atual na
+  documentação da Vercel antes do deploy; se valer, o caminho é o navegador
+  subir o original direto para o Storage (signed upload URL) e a rota só
+  receber o caminho.
 - Depois: Sharing Debugger da Meta (item 1) e checar que o ping
   anti-pause do Supabase segue verde (ele parou entre 19/10 e 22/11/2026
   porque o projeto foi pausado — e ninguém viu os e-mails de falha do

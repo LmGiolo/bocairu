@@ -122,4 +122,4 @@ O domínio inteiro é em português do Brasil: rotas (`/entrar`, `/galeria`, `/a
 
 Os comentários do repositório têm registro explicativo, quase didático (o autor está aprendendo a stack). Mantenha esse tom.
 
-O site público usa Tailwind com os tokens do `@theme`; parte do admin (formulário de obra, listagem) ainda usa `style={{}}` inline.
+Site público e admin usam Tailwind com os tokens do `@theme` (sem `style={{}}` inline). No admin, telas novas usam `CabecalhoPagina`, `Aviso` e as classes de `src/components/admin/estilos.ts`, e entram no menu pela lista `ITENS` de `BarraLateral.tsx`.

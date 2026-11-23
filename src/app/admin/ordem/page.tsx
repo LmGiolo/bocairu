@@ -1,5 +1,10 @@
+import type { Metadata } from 'next'
+
 import { createClient } from '@/lib/supabase/server'
+import Aviso from '@/components/admin/Aviso'
 import OrdenadorObras, { type ObraOrdenavel } from '@/components/admin/OrdenadorObras'
+
+export const metadata: Metadata = { title: 'Ordem do site' }
 
 // Admin → Ordem do site: a artista decide em que posição cada foto aparece.
 // O portão (sessão + papel admin) já roda em admin/layout.tsx.
@@ -17,7 +22,7 @@ export default async function OrdemDoSite() {
     .order('criado_em', { ascending: true })
 
   if (error) {
-    return <p style={{ color: 'crimson' }}>Erro ao carregar as fotos: {error.message}</p>
+    return <Aviso tipo="erro">Erro ao carregar as fotos: {error.message}</Aviso>
   }
 
   return <OrdenadorObras obras={(obras ?? []) as ObraOrdenavel[]} />

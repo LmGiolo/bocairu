@@ -45,6 +45,14 @@
     outline: 2px solid var(--color-ouro);
     outline-offset: 2px;
   }
+
+  /* Janela aberta (<dialog> com showModal(), usado no admin): a página de
+   * trás para de rolar. O navegador já a deixa inerte para clique e
+   * teclado, mas não trava a rolagem — sem isto, rolar dentro da janela
+   * até o fim começaria a rolar a lista por trás. */
+  html:has(dialog:modal) {
+    overflow: hidden;
+  }
 }
 
 /* ═════════════════════════════════════════════════════════════════════

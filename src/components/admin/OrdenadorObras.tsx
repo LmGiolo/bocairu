@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/client'
 import type { StatusObra } from '@/lib/obras/status'
+import Aviso from '@/components/admin/Aviso'
+import CabecalhoPagina from '@/components/admin/CabecalhoPagina'
+import { CLASSE_BOTAO_PRIMARIO, CLASSE_BOTAO_TEXTO, CLASSE_CARTAO } from '@/components/admin/estilos'
 
 export type ObraOrdenavel = {
   id: string
@@ -119,24 +122,35 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
   const destaques = ordem.slice(1, 1 + POSICOES_DESTAQUE)
 
   return (
-    <div className="font-sans text-tinta">
-      <h1 className="mb-2 font-serif text-3xl">Ordem do site</h1>
-      <p className="mb-8 max-w-2xl text-sm leading-relaxed text-fumaca">
-        Digite o número da posição de cada foto (ou use as setas). A <strong>1</strong> é a capa da Home, da{' '}
-        <strong>2</strong> à <strong>4</strong> são os destaques, e a Galeria segue a mesma sequência. Confira a
-        prévia ao lado e clique em <strong>Salvar</strong> quando estiver do seu jeito — antes disso, nada muda no
-        site.
-      </p>
+    <div>
+      <CabecalhoPagina
+        sobretitulo="Site"
+        titulo="Ordem do site"
+        descricao={
+          <>
+            Digite o número da posição de cada foto (ou use as setas). A <strong className="text-tinta">1</strong> é a
+            capa da Home, da <strong className="text-tinta">2</strong> à <strong className="text-tinta">4</strong> são
+            os destaques, e a Galeria segue a mesma sequência. Confira a prévia e clique em{' '}
+            <strong className="text-tinta">Salvar</strong> quando estiver do seu jeito — antes disso, nada muda no
+            site.
+          </>
+        }
+      />
 
       {ordem.length === 0 ? (
-        <p className="text-sm text-fumaca">Nenhuma foto publicada ainda. Publique uma em Obras para ordenar.</p>
+        <p className={`${CLASSE_CARTAO} px-6 py-12 text-center text-sm text-fumaca`}>
+          Nenhuma foto publicada ainda. Publique uma em Obras para ordenar.
+        </p>
       ) : (
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        // `grid-cols-1` (= minmax(0, 1fr)) no celular: sem ele, a coluna única
+        // cresceria até caber o título mais longo (que não quebra linha) e a
+        // tela ganharia rolagem para o lado.
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           {/* ───── Lista numerada ───── */}
           <div>
-            <ol className="flex flex-col gap-2">
+            <ol className={CLASSE_CARTAO}>
               {ordem.map((obra, indice) => (
-                <li key={obra.id} className="flex items-center gap-3 border border-linho bg-white p-2.5">
+                <li key={obra.id} className="flex items-center gap-3 border-b border-creme px-3 py-2.5 last:border-b-0 md:px-4">
                   <label className="sr-only" htmlFor={`posicao-${obra.id}`}>
                     Posição de {obra.titulo}
                   </label>
@@ -152,13 +166,13 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') e.currentTarget.blur()
                     }}
-                    className="w-16 shrink-0 border border-linho px-2 py-2 text-center text-base"
+                    className="w-16 shrink-0 rounded-sm border border-linho bg-areia px-2 py-2 text-center text-base transition-colors duration-200 focus:border-tinta"
                   />
                   {/* eslint-disable-next-line @next/next/no-img-element -- admin ainda sem next/image, ver docs/handoff.md §7 */}
-                  <img src={obra.imagem_web} alt="" className="h-12 w-12 shrink-0 object-cover" />
+                  <img src={obra.imagem_web} alt="" className="h-10 w-10 shrink-0 bg-linho object-cover" />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm">{obra.titulo}</div>
-                    <div className="text-xs text-ouro">
+                    <div className="text-xs text-fumaca">
                       {indice === 0 ? 'Capa da Home' : indice <= POSICOES_DESTAQUE ? 'Destaque da Home' : 'Galeria'}
                     </div>
                   </div>
@@ -168,7 +182,7 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
                       onClick={() => mover(indice, indice - 1)}
                       disabled={indice === 0}
                       aria-label={`Subir ${obra.titulo}`}
-                      className="h-9 w-9 border border-linho text-sm disabled:opacity-30"
+                      className="h-9 w-9 rounded-sm border border-linho text-sm transition-colors duration-200 hover:border-tinta disabled:opacity-30 disabled:hover:border-linho"
                     >
                       ↑
                     </button>
@@ -177,7 +191,7 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
                       onClick={() => mover(indice, indice + 1)}
                       disabled={indice === ordem.length - 1}
                       aria-label={`Descer ${obra.titulo}`}
-                      className="h-9 w-9 border border-linho text-sm disabled:opacity-30"
+                      className="h-9 w-9 rounded-sm border border-linho text-sm transition-colors duration-200 hover:border-tinta disabled:opacity-30 disabled:hover:border-linho"
                     >
                       ↓
                     </button>
@@ -188,16 +202,16 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
 
             {foraDoSite.length > 0 && (
               <div className="mt-8">
-                <div className="mb-2 text-xs uppercase tracking-widest text-fumaca">
+                <h2 className="mb-2 text-[11px] uppercase tracking-[0.06em] text-fumaca">
                   Fora do site ({foraDoSite.length})
-                </div>
+                </h2>
                 <p className="mb-3 text-xs text-fumaca">
                   Rascunhos e arquivadas não aparecem para o visitante. Para colocar uma delas no site, mude o status
                   para “Publicada” em Obras — ela entra no fim da ordem.
                 </p>
-                <ul className="flex flex-col gap-2 opacity-50">
+                <ul className={`${CLASSE_CARTAO} opacity-60`}>
                   {foraDoSite.map((obra) => (
-                    <li key={obra.id} className="flex items-center gap-3 border border-linho bg-white p-2.5">
+                    <li key={obra.id} className="flex items-center gap-3 border-b border-creme px-3 py-2.5 last:border-b-0 md:px-4">
                       {/* eslint-disable-next-line @next/next/no-img-element -- admin ainda sem next/image */}
                       <img src={obra.imagem_web} alt="" className="h-10 w-10 shrink-0 object-cover" />
                       <span className="truncate text-sm">{obra.titulo}</span>
@@ -210,9 +224,9 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
 
           {/* ───── Prévia de como o site vai ficar ───── */}
           <div className="lg:sticky lg:top-6 lg:self-start">
-            <div className="mb-3 text-xs uppercase tracking-widest text-fumaca">Prévia</div>
-            <div className="border border-linho bg-areia p-4">
-              <div className="mb-1.5 text-[11px] uppercase tracking-widest text-ouro">Home — capa (1)</div>
+            <h2 className="mb-3 text-[11px] uppercase tracking-[0.06em] text-fumaca">Prévia</h2>
+            <div className={`${CLASSE_CARTAO} p-4 md:p-5`}>
+              <div className="mb-1.5 text-[11px] uppercase tracking-[0.06em] text-fumaca">Home — capa (1)</div>
               {capa && (
                 <div className="relative mb-5 aspect-[16/9] overflow-hidden bg-tinta">
                   {/* eslint-disable-next-line @next/next/no-img-element -- prévia do admin */}
@@ -225,7 +239,7 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
 
               {destaques.length > 0 && (
                 <>
-                  <div className="mb-1.5 text-[11px] uppercase tracking-widest text-ouro">
+                  <div className="mb-1.5 text-[11px] uppercase tracking-[0.06em] text-fumaca">
                     Home — destaques (2 a {1 + destaques.length})
                   </div>
                   <div className="mb-5 grid grid-cols-3 gap-2">
@@ -240,7 +254,7 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
                 </>
               )}
 
-              <div className="mb-1.5 text-[11px] uppercase tracking-widest text-ouro">Galeria</div>
+              <div className="mb-1.5 text-[11px] uppercase tracking-[0.06em] text-fumaca">Galeria</div>
               <div className="grid grid-cols-4 gap-1.5">
                 {ordem.map((obra, indice) => (
                   <div key={obra.id} className="relative">
@@ -260,7 +274,7 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
           type="button"
           onClick={salvar}
           disabled={!mudou || salvando}
-          className="rounded-sm bg-tinta px-7 py-3 text-sm text-areia disabled:cursor-not-allowed disabled:bg-creme disabled:text-pedra"
+          className={CLASSE_BOTAO_PRIMARIO}
         >
           {salvando ? 'Salvando…' : 'Salvar e atualizar o site'}
         </button>
@@ -268,17 +282,12 @@ export default function OrdenadorObras({ obras }: { obras: ObraOrdenavel[] }) {
           type="button"
           onClick={desfazer}
           disabled={!mudou || salvando}
-          className="text-sm underline underline-offset-4 disabled:opacity-40"
+          className={CLASSE_BOTAO_TEXTO}
         >
           Desfazer alterações
         </button>
         {!mudou && !mensagem && <span className="text-xs text-fumaca">Nenhuma alteração ainda.</span>}
-        {mensagem && (
-          <span role={mensagem.tipo === 'erro' ? 'alert' : 'status'} className={`text-sm ${mensagem.tipo === 'erro' ? 'text-[#B8492E]' : 'text-[#2F5233]'}`}>
-            {mensagem.tipo === 'erro' ? '⚠ ' : '✔ '}
-            {mensagem.texto}
-          </span>
-        )}
+        {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
       </div>
     </div>
   )
