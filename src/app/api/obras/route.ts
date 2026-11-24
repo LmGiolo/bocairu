@@ -1,5 +1,7 @@
 import type { NextRequest } from 'next/server'
-import sharp from 'sharp'
+// Desde o sharp 0.35 os tipos vêm como exportações nomeadas (não mais
+// pendurados em `sharp.Nome`), por isso o OutputInfo é importado à parte.
+import sharp, { type OutputInfo } from 'sharp'
 
 import { createClient } from '@/lib/supabase/server'
 import { criarClientAdmin } from '@/lib/supabase/admin'
@@ -131,7 +133,7 @@ export async function POST(request: NextRequest) {
   // 2) Gera a versão web: redimensionada e comprimida, sem marca d'água
   // ─────────────────────────────────────────────────────────────
   let bytesWeb: Buffer
-  let infoWeb: sharp.OutputInfo
+  let infoWeb: OutputInfo
   try {
     const resultado = await sharp(bytesOriginal)
       // Aplica a rotação que estava só anotada no EXIF. Sem isso, foto
