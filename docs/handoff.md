@@ -758,7 +758,7 @@ virou o item 2½ acima.
   scroll-driven, sem JS); hover 1.03 + moldura escura; botões com
   preenchimento da esquerda (250ms); cross-fade de 350ms entre páginas; a
   foto "voa" do cartão para a Página da Obra (`<ViewTransition>` do React,
-  `experimental.viewTransition` no `next.config.ts`). Com
+  sem flag desde o Next 16.3). Com
   `prefers-reduced-motion`, tudo vira fade.
 - **Cabeçalho do protótipo** (`docs/prototipo/Home.dc.html`): na Home ele
   fica fixo **por cima da capa, transparente, sem borda e com letras

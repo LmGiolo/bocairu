@@ -29,7 +29,7 @@ Não há setup de testes no repositório.
 
 ## Animações do site público
 
-Componentes não têm lógica de animação, só ganchos: `data-anim="secao|foto|capa"` e classes `anim-*`, `cabecalho`, `barra-filtros`, `botao-*`. O `ObservadorAnimacoes` (montado no layout do site) marca `data-visivel` quando o elemento entra na tela e `data-rolou` no `<html>` ao rolar; o CSS de tudo está no bloco "ANIMAÇÕES" de `src/app/globals.css`. A passagem da foto entre cartão e Página da Obra é `<ViewTransition name="foto-<id>">` do React (`experimental.viewTransition` no `next.config.ts`); os tipos vêm de `src/types/react-canary.d.ts`.
+Componentes não têm lógica de animação, só ganchos: `data-anim="secao|foto|capa"` e classes `anim-*`, `cabecalho`, `barra-filtros`, `botao-*`. O `ObservadorAnimacoes` (montado no layout do site) marca `data-visivel` quando o elemento entra na tela e `data-rolou` no `<html>` ao rolar; o CSS de tudo está no bloco "ANIMAÇÕES" de `src/app/globals.css`. A passagem da foto entre cartão e Página da Obra é `<ViewTransition name="foto-<id>">` do React (sem flag desde o Next 16.3; a antiga `experimental.viewTransition` foi removida); os tipos vêm de `src/types/react-canary.d.ts`.
 
 ## Stack e convenções de configuração
 
@@ -101,7 +101,7 @@ A partir daí, na rota:
 
 O retrato (`POST /api/textos/retrato`) usa o mesmo envio direto; lá o arquivo de `envios/` é sempre apagado no fim (só o webp fica). Rotas novas de admin usam os portões de `src/lib/conferir-admin.ts`.
 
-**Versão do `sharp`:** a do `package.json` tem de ser a mesma que o `next` pede (hoje `^0.34.5`; confira com `npm ls sharp`, que deve mostrar `deduped`). Com duas versões instaladas, o otimizador do `next/image` e o nosso código carregam libvips diferentes no mesmo processo; a segunda quebra e o Next passa a servir a foto original sem reduzir, sem erro nenhum na tela. Ao atualizar o Next, alinhe o `sharp` junto.
+**Versão do `sharp`:** a do `package.json` tem de ser a mesma que o `next` pede (hoje `^0.35.5`; confira com `npm ls sharp`, que deve mostrar `deduped`). Com duas versões instaladas, o otimizador do `next/image` e o nosso código carregam libvips diferentes no mesmo processo; a segunda quebra e o Next passa a servir a foto original sem reduzir, sem erro nenhum na tela. Ao atualizar o Next, alinhe o `sharp` junto.
 
 ### Consistência: a pilha de desfazer
 
