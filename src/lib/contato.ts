@@ -16,7 +16,7 @@ const WHATSAPP_NUMERO = '5562996339044'
 // Como o número aparece escrito na tela (não é usado no link).
 export const WHATSAPP_EXIBICAO = '(62) 99633-9044'
 
-const INSTAGRAM_USUARIO = 'isaviana.f'
+const INSTAGRAM_USUARIO = 'bocairu'
 
 export const INSTAGRAM_EXIBICAO = `@${INSTAGRAM_USUARIO}`
 export const INSTAGRAM_URL = `https://instagram.com/${INSTAGRAM_USUARIO}`
